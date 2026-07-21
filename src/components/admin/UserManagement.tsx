@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MoreVertical, Shield, Trash2, User as UserIcon, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Search, Filter, MoreVertical, Shield, Trash2, User as UserIcon, CheckCircle, XCircle, Loader2, Crown } from 'lucide-react';
 import { ConfirmModal } from '../ConfirmModal';
 import { db } from '../../firebase';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
@@ -79,6 +79,19 @@ export const UserManagement = () => {
     } catch (error) {
       console.error("Error updating user role:", error);
       alert("Failed to update user role.");
+    }
+  };
+
+  const togglePremium = async (id: string, currentStatus: boolean) => {
+    try {
+      const newStatus = !currentStatus;
+      await updateDoc(doc(db, 'users', id), { 
+        is_premium: newStatus,
+        subscription_plan: newStatus ? 'Premium' : 'Free'
+      });
+    } catch (error) {
+      console.error("Error updating user premium status:", error);
+      alert("Failed to update premium status.");
     }
   };
 
@@ -170,13 +183,18 @@ export const UserManagement = () => {
                       <p className="text-xs text-slate-400">{user.year || 'N/A'}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        user.is_premium
-                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                          : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                      }`}>
-                        {user.is_premium ? (user.subscription_plan || 'Premium') : 'Free'}
-                      </span>
+                      <button
+                        onClick={() => togglePremium(user.id, !!user.is_premium)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all shadow-sm ${
+                          user.is_premium
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+                            : 'bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600'
+                        }`}
+                        title="Click to toggle Premium ON/OFF"
+                      >
+                        <Crown className={`w-3.5 h-3.5 ${user.is_premium ? 'text-amber-400 fill-amber-400' : 'text-slate-400'}`} />
+                        {user.is_premium ? 'Premium ON' : 'Premium OFF'}
+                      </button>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400`}>
@@ -186,6 +204,17 @@ export const UserManagement = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => togglePremium(user.id, !!user.is_premium)}
+                          className={`p-2 rounded-lg transition-colors ${
+                            user.is_premium 
+                              ? 'text-amber-400 hover:bg-amber-900/30' 
+                              : 'text-slate-400 hover:text-amber-400 hover:bg-slate-700'
+                          }`}
+                          title={user.is_premium ? "Turn Premium OFF" : "Turn Premium ON"}
+                        >
+                          <Crown className="w-4 h-4" />
+                        </button>
                         <button 
                           onClick={() => toggleRole(user.id, user.role)}
                           className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
