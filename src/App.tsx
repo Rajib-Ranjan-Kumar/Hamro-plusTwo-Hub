@@ -54,7 +54,7 @@ export default function App() {
               <Route path="admin/*" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
               <Route path="add-content" element={<ProtectedRoute requireAdmin><AddContent /></ProtectedRoute>} />
               <Route path="pyq" element={<PYQ />} />
-              <Route path="chat" element={<ProtectedRoute requirePremium><Chat /></ProtectedRoute>} />
+              <Route path="chat" element={<Chat />} />
               <Route path="get-premium" element={<GetPremium />} />
               <Route path="premium" element={<Navigate to="/get-premium" replace />} />
               <Route path="verify-subscriptions" element={<ProtectedRoute requireAdmin><VerifySubscriptions /></ProtectedRoute>} />
