@@ -23,6 +23,12 @@ export const getFirebaseErrorMessage = (error: any): string => {
   if (errorCode === 'auth/popup-closed-by-user' || errorMessage.includes('auth/popup-closed-by-user')) {
     return 'Sign-in popup was closed before completing.';
   }
+  if (errorCode === 'auth/unauthorized-domain' || errorMessage.includes('auth/unauthorized-domain')) {
+    return 'Domain unauthorized: Please add this Vercel domain to Authorized Domains in Firebase Console (Authentication > Settings > Authorized Domains).';
+  }
+  if (errorCode === 'auth/operation-not-allowed' || errorMessage.includes('auth/operation-not-allowed')) {
+    return 'Sign-in method disabled: Please enable Google Sign-in in Firebase Console (Authentication > Sign-in method).';
+  }
   
-  return 'An unexpected error occurred. Please try again.';
+  return error?.code ? `An error occurred (${error.code}). Please try again.` : 'An unexpected error occurred. Please try again.';
 };
