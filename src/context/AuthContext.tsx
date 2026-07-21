@@ -73,11 +73,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             window.history.replaceState({}, document.title, newUrl.toString());
           }
           
+          const isAdminEmail = (email?: string | null) => {
+            if (!email) return false;
+            const lower = email.toLowerCase().trim();
+            const ADMIN_EMAILS = ['jaiswalrajib98192@gmail.com', 'shaktisah871@gmail.com'];
+            return ADMIN_EMAILS.includes(lower);
+          };
+
           if (userDoc.exists()) {
             const userData = userDoc.data() as User;
             
-            // Elevate role to 'admin' if email is the hardcoded admin email
-            if (firebaseUser.email === 'jaiswalrajib98192@gmail.com' && userData.role !== 'admin') {
+            // Elevate role to 'admin' if email is in the admin emails list
+            if (isAdminEmail(firebaseUser.email) && userData.role !== 'admin') {
               userData.role = 'admin';
               await setDoc(userRef, { role: 'admin' }, { merge: true });
             }
@@ -98,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const newUser = {
               name: firebaseUser.displayName || 'User',
               email: firebaseUser.email || '',
-              role: firebaseUser.email === 'jaiswalrajib98192@gmail.com' ? 'admin' : 'student',
+              role: isAdminEmail(firebaseUser.email) ? 'admin' : 'student',
               college_id: '',
               stream: '',
               year: '',
