@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-slate-950: #081229;
+  --color-slate-900: #0D1B3E; /* Deep navy background */
+  --color-slate-800: #1A2E5A; /* Lighter navy for cards */
+  --color-slate-700: #233A6B; /* Borders / Hover */
+  --color-slate-600: #4A5568;
+  --color-slate-500: #718096; /* Placeholder text */
+  --color-slate-400: #A0AEC0; /* Secondary text */
+  --color-slate-300: #CBD5E0;
+  --color-slate-200: #E2E8F0;
+  --color-slate-100: #EDF2F7;
+  --color-slate-50:  #F7FAFC;
+  
+  --color-emerald-700: #008B7A;
+  --color-emerald-600: #00A896; /* Primary accent teal */
+  --color-emerald-500: #02C39A; /* Hover accent teal */
+  --color-emerald-400: #48E5C2;
+  --color-emerald-300: #81F4D8;
+
+  --color-indigo-600: #00A896;
+  --color-indigo-500: #02C39A;
+  --color-indigo-400: #48E5C2;
+  --color-indigo-700: #008B7A;
+}
+
+@layer base {
+  body {
+    @apply select-none bg-slate-900 text-white selection:bg-emerald-500/30;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Prevent printing */
+  @media print {
+    body {
+      display: none !important;
+    }
+  }
+}
+
+.security-blur {
+  filter: blur(40px) grayscale(100%) brightness(0.3);
+  transition: filter 0.2s ease;
+}
+
+.security-overlay {
+  background: rgba(13, 27, 62, 0.95);
+  backdrop-filter: blur(20px);
+}
+
+.glass-panel {
+  @apply bg-slate-800/80 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl;
+}
+
+.hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10;
+}

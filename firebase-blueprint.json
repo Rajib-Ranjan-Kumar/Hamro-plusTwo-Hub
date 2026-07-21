@@ -1,0 +1,263 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["student", "admin"] },
+        "college_id": { "type": "string" },
+        "stream": { "type": "string" },
+        "year": { "type": "string" },
+        "wallet_balance": { "type": "number" },
+        "points": { "type": "number" },
+        "is_premium": { "type": "boolean" },
+        "subscription_plan": { "type": "string" },
+        "subscription_expiry_date": { "type": "string", "format": "date-time" },
+        "session_id": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "SubscriptionRequest": {
+      "title": "SubscriptionRequest",
+      "description": "User request for premium subscription",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "user_name": { "type": "string" },
+        "user_email": { "type": "string" },
+        "transaction_image_url": { "type": "string" },
+        "transaction_id": { "type": "string" },
+        "plan_selected": { "type": "string" },
+        "payment_method": { "type": "string" },
+        "amount_paid": { "type": "number" },
+        "expected_amount": { "type": "number" },
+        "payment_date": { "type": "string", "format": "date-time" },
+        "subscription_start_date": { "type": "string", "format": "date-time" },
+        "subscription_expiry_date": { "type": "string", "format": "date-time" },
+        "auto_renew": { "type": "boolean" },
+        "grace_period_days": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "need_review"] },
+        "admin_comment": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "user_name", "user_email", "status", "created_at"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Audit logs for admin actions",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string" },
+        "admin_id": { "type": "string" },
+        "admin_name": { "type": "string" },
+        "target_user_id": { "type": "string" },
+        "target_request_id": { "type": "string" },
+        "changes": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["action", "admin_id", "admin_name", "created_at"]
+    },
+    "PaymentInfo": {
+      "title": "PaymentInfo",
+      "description": "Admin payment information for subscriptions",
+      "type": "object",
+      "properties": {
+        "esewa_qr_url": { "type": "string" },
+        "account_number": { "type": "string" },
+        "account_holder": { "type": "string" },
+        "bank_name": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["updated_at"]
+    },
+    "College": {
+      "title": "College",
+      "description": "College information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Subject information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "year": { "type": "string" },
+        "stream": { "type": "string" },
+        "college_id": { "type": "string" }
+      },
+      "required": ["name", "year", "stream"]
+    },
+    "ContentType": {
+      "title": "ContentType",
+      "description": "Content type information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "year": { "type": "string" },
+        "college_id": { "type": "string" }
+      },
+      "required": ["name", "year"]
+    },
+    "ExamYear": {
+      "title": "ExamYear",
+      "description": "Exam year information",
+      "type": "object",
+      "properties": {
+        "year_value": { "type": "string" },
+        "year": { "type": "string" },
+        "college_id": { "type": "string" }
+      },
+      "required": ["year_value", "year"]
+    },
+    "Contribution": {
+      "title": "Contribution",
+      "description": "User contribution",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "college_id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string" },
+        "subject_id": { "type": "string" },
+        "term": { "type": "string" },
+        "exam_year": { "type": "string" },
+        "file_url": { "type": "string" },
+        "solution_url": { "type": "string" },
+        "access_level": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "verified", "rejected"] },
+        "reward": { "type": "number" },
+        "admin_comment": { "type": "string" },
+        "upvotes": { "type": "number" },
+        "downvotes": { "type": "number" },
+        "upvoted_by": { "type": "array", "items": { "type": "string" } },
+        "downvoted_by": { "type": "array", "items": { "type": "string" } },
+        "rating": { "type": "number" },
+        "rating_count": { "type": "number" },
+        "reported": { "type": "boolean" },
+        "solution_status": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "type", "subject_id", "status"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "User withdrawal request",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "amount": { "type": "number" },
+        "payment_method": { "type": "string" },
+        "payment_details": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "admin_comment": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "amount", "payment_method", "payment_details", "status"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Chat message",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "user_name": { "type": "string" },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "college_id": { "type": "string" },
+        "stream": { "type": "string" },
+        "year": { "type": "string" }
+      },
+      "required": ["user_id", "user_name", "text", "timestamp"]
+    },
+    "Bookmark": {
+      "title": "Bookmark",
+      "description": "User bookmark",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "content_id": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "content_id"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "title", "message", "read"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/colleges/{collegeId}": {
+      "schema": { "$ref": "#/entities/College" },
+      "description": "Colleges"
+    },
+    "/subjects/{subjectId}": {
+      "schema": { "$ref": "#/entities/Subject" },
+      "description": "Subjects"
+    },
+    "/content_types/{contentTypeId}": {
+      "schema": { "$ref": "#/entities/ContentType" },
+      "description": "Content types"
+    },
+    "/exam_years/{examYearId}": {
+      "schema": { "$ref": "#/entities/ExamYear" },
+      "description": "Exam years"
+    },
+    "/contributions/{contributionId}": {
+      "schema": { "$ref": "#/entities/Contribution" },
+      "description": "Contributions"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": { "$ref": "#/entities/Withdrawal" },
+      "description": "Withdrawals"
+    },
+    "/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Chat messages"
+    },
+    "/bookmarks/{bookmarkId}": {
+      "schema": { "$ref": "#/entities/Bookmark" },
+      "description": "Bookmarks"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Notifications"
+    },
+    "/subscription_requests/{requestId}": {
+      "schema": { "$ref": "#/entities/SubscriptionRequest" },
+      "description": "Subscription requests"
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Admin audit logs"
+    },
+    "/payment_info/{infoId}": {
+      "schema": { "$ref": "#/entities/PaymentInfo" },
+      "description": "Admin payment info"
+    }
+  }
+}

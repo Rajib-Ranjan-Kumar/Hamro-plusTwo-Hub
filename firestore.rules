@@ -1,0 +1,246 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin') ||
+          (request.auth.token.get('email', '') == "jaiswalrajib98192@gmail.com"));
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.user_id;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email.size() > 0 && data.email.size() < 100 &&
+             data.role in ['student', 'user', 'admin'] &&
+             (!('subscription_expiry_date' in data) || data.subscription_expiry_date is string) &&
+             (!('subscription_plan' in data) || data.subscription_plan is string);
+    }
+
+    function isValidCollege(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 200;
+    }
+
+    function isValidSubject(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.year is string && data.year.size() > 0 && data.year.size() < 50 &&
+             data.stream is string && data.stream.size() > 0 && data.stream.size() < 100;
+    }
+
+    function isValidContentType(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.year is string && data.year.size() > 0 && data.year.size() < 50;
+    }
+
+    function isValidExamYear(data) {
+      return data.year_value is string && data.year_value.size() > 0 && data.year_value.size() < 50 &&
+             data.year is string && data.year.size() > 0 && data.year.size() < 50;
+    }
+
+    function isValidContribution(data) {
+      return data.user_id is string && data.user_id.size() > 0 &&
+             data.type is string && data.type.size() > 0 && data.type.size() < 100 &&
+             data.subject_id is string && data.subject_id.size() > 0 &&
+             data.status in ['pending', 'verified', 'rejected'] &&
+             (!('user_name' in data) || (data.user_name is string && data.user_name.size() <= 100)) &&
+             (!('user_email' in data) || (data.user_email is string && data.user_email.size() <= 100)) &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 500));
+    }
+
+    function isValidWithdrawal(data) {
+      return data.user_id is string && data.user_id.size() > 0 &&
+             (!('user_name' in data) || (data.user_name is string && data.user_name.size() <= 100)) &&
+             (!('user_email' in data) || (data.user_email is string && data.user_email.size() <= 100)) &&
+             data.amount is number && data.amount > 0 &&
+             data.payment_method is string && data.payment_method.size() > 0 && data.payment_method.size() < 100 &&
+             data.payment_details is string && data.payment_details.size() > 0 && data.payment_details.size() < 200 &&
+             data.status in ['pending', 'approved', 'rejected'];
+    }
+
+    function isValidMessage(data) {
+      return data.type in ['chat', 'system'] &&
+             data.user_id is string && data.user_id.size() > 0 &&
+             data.user_name is string && data.user_name.size() > 0 && data.user_name.size() < 100 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 2000 &&
+             data.college_id is string && data.college_id.size() > 0 &&
+             data.stream is string && data.stream.size() > 0 &&
+             data.year is string && data.year.size() > 0;
+    }
+
+    function isPremium() {
+      return isAdmin() || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('is_premium', false) == true);
+    }
+
+    function isValidSubscriptionRequest(data) {
+      return data.user_id is string && data.user_id.size() > 0 &&
+             data.user_name is string && data.user_name.size() > 0 &&
+             data.user_email is string && data.user_email.size() > 0 &&
+             data.status in ['pending', 'approved', 'rejected', 'need_review', 'cancelled'];
+    }
+
+    function isValidAuditLog(data) {
+      return data.action is string && data.action.size() > 0 &&
+             data.admin_id is string && data.admin_id.size() > 0 &&
+             data.admin_name is string && data.admin_name.size() > 0;
+    }
+
+    function isValidPaymentInfo(data) {
+      return (!('esewa_qr_url' in data) || (data.esewa_qr_url is string)) &&
+             (!('account_number' in data) || (data.account_number is string)) &&
+             (!('account_holder' in data) || (data.account_holder is string)) &&
+             (!('bank_name' in data) || (data.bank_name is string));
+    }
+
+    function isPremiumOnlyMode() {
+      return !exists(/databases/$(database)/documents/settings/global) || 
+             get(/databases/$(database)/documents/settings/global).data.premium_only_mode == true;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /test/{document=**} {
+      allow read, write: if true;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
+                    (request.resource.data.role in ['student', 'user'] || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    ((isOwner(userId) && areImmutableFieldsUnchanged(['role', 'points', 'created_at']) &&
+                      (math.abs((request.resource.data.get('wallet_balance', 0) + request.resource.data.get('holding_balance', 0)) - (resource.data.get('wallet_balance', 0) + resource.data.get('holding_balance', 0))) < 0.01) &&
+                      request.resource.data.get('wallet_balance', 0) >= 0 && request.resource.data.get('holding_balance', 0) >= 0
+                    ) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /colleges/{collegeId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidCollege(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSubject(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /content_types/{contentTypeId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidContentType(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /exam_years/{examYearId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidExamYear(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /college_exams/{collegeId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /contributions/{contributionId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() || 
+        isDocOwner() ||
+        resource.data.status == 'verified'
+      );
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidContribution(request.resource.data);
+      allow update: if isAuthenticated() && isValidContribution(request.resource.data) && (
+        isAdmin() ||
+        (isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'status', 'reward', 'admin_comment', 'upvotes', 'rating', 'rating_count', 'reported', 'solution_status', 'created_at'])) ||
+        (!isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'college_id', 'title', 'description', 'type', 'subject_id', 'term', 'exam_year', 'file_url', 'solution_url', 'access_level', 'status', 'reward', 'admin_comment', 'solution_status', 'created_at']))
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /subscription_requests/{requestId} {
+      allow read: if isAuthenticated() && (isDocOwner() || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidSubscriptionRequest(request.resource.data);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && isValidAuditLog(request.resource.data);
+      allow update, delete: if false; // Audit logs should be immutable
+    }
+
+    match /payment_info/{infoId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidPaymentInfo(request.resource.data);
+    }
+
+    match /withdrawals/{withdrawalId} {
+      allow read: if isAuthenticated() && (isDocOwner() || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidWithdrawal(request.resource.data);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidMessage(request.resource.data);
+      allow update, delete: if isAuthenticated() && (isDocOwner() || isAdmin());
+    }
+
+    match /bookmarks/{bookmarkId} {
+      allow read: if isAuthenticated() && isDocOwner();
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isAuthenticated() && isDocOwner();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && isDocOwner();
+      allow create: if isAdmin();
+      allow update: if isAuthenticated() && isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'title', 'message', 'created_at']);
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
+
+    match /contact_messages/{messageId} {
+      allow read: if isAdmin();
+      allow create: if true; // Anyone can submit a contact message
+      allow update, delete: if isAdmin();
+    }
+  }
+}
