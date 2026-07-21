@@ -75,9 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           const isAdminEmail = (email?: string | null) => {
             if (!email) return false;
-            const lower = email.toLowerCase().trim();
-            const ADMIN_EMAILS = ['jaiswalrajib98192@gmail.com', 'shaktisah871@gmail.com'];
-            return ADMIN_EMAILS.includes(lower);
+            return email.toLowerCase().trim() === 'jaiswalrajib98192@gmail.com';
           };
 
           if (userDoc.exists()) {
