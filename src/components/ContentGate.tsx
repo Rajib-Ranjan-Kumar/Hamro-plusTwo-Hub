@@ -16,11 +16,11 @@ export const ContentGate: React.FC<ContentGateProps> = ({
   requireAdmin = false,
   fallback,
 }) => {
-  const { user } = useAuth();
+  const { user, hasPremiumAccess } = useAuth();
 
   const isAuthorized = () => {
     if (requireAdmin && user?.role !== 'admin') return false;
-    if (requirePremium && !user?.is_premium && user?.role !== 'admin') return false;
+    if (requirePremium && !hasPremiumAccess) return false;
     return true;
   };
 

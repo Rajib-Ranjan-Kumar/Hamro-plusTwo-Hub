@@ -17,7 +17,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requirePremium = false,
   redirectTo = '/login',
 }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, hasPremiumAccess } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -36,7 +36,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/dashboard" replace />;
   }
 
-  if (requirePremium && !user?.is_premium && user?.role !== 'admin') {
+  if (requirePremium && !hasPremiumAccess) {
     return <Navigate to="/get-premium" replace />;
   }
 

@@ -3,6 +3,8 @@ import { auth, db } from '../firebase';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 
+import { subscribeToGlobalSettings } from '../services/db';
+
 interface User {
   id: string;
   name: string;
@@ -27,6 +29,8 @@ interface AuthContextType {
   logout: () => void;
   fetchUser: () => void;
   isLoading: boolean;
+  premiumOnlyMode: boolean;
+  hasPremiumAccess: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,6 +39,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [premiumOnlyMode, setPremiumOnlyMode] = useState<boolean>(true);
+
+  useEffect(() => {
+    const unsubSettings = subscribeToGlobalSettings((settings) => {
+      if (settings && settings.premium_only_mode !== undefined) {
+        setPremiumOnlyMode(settings.premium_only_mode);
+      }
+    });
+    return () => unsubSettings();
+  }, []);
 
   const logout = async () => {
     if (auth.currentUser) {
@@ -73,16 +87,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             window.history.replaceState({}, document.title, newUrl.toString());
           }
           
-          const isAdminEmail = (email?: string | null) => {
-            if (!email) return false;
-            return email.toLowerCase().trim() === 'jaiswalrajib98192@gmail.com';
-          };
-
           if (userDoc.exists()) {
             const userData = userDoc.data() as User;
             
-            // Elevate role to 'admin' if email is in the admin emails list
-            if (isAdminEmail(firebaseUser.email) && userData.role !== 'admin') {
+            // Elevate role to 'admin' if email is the hardcoded admin email
+            if (firebaseUser.email === 'jaiswalrajib98192@gmail.com' && userData.role !== 'admin') {
               userData.role = 'admin';
               await setDoc(userRef, { role: 'admin' }, { merge: true });
             }
@@ -103,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const newUser = {
               name: firebaseUser.displayName || 'User',
               email: firebaseUser.email || '',
-              role: isAdminEmail(firebaseUser.email) ? 'admin' : 'student',
+              role: firebaseUser.email === 'jaiswalrajib98192@gmail.com' ? 'admin' : 'student',
               college_id: '',
               stream: '',
               year: '',
@@ -184,8 +193,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(newUser);
   };
 
+  // Compute hasPremiumAccess dynamically:
+  // When premiumOnlyMode === false, bypass is active for all users.
+  // When premiumOnlyMode === true, strict enforcement applies.
+  const hasPremiumAccess = (() => {
+    if (!premiumOnlyMode) return true; // Global Bypass
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    if (user.is_premium) return true;
+
+    if (user.subscription_expiry_date) {
+      try {
+        const expiryDate = new Date(user.subscription_expiry_date);
+        const graceEnd = new Date(expiryDate);
+        graceEnd.setDate(graceEnd.getDate() + 3);
+        if (new Date() <= graceEnd) return true;
+      } catch {
+        // Ignore invalid dates
+      }
+    }
+
+    return false;
+  })();
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, fetchUser, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, fetchUser, isLoading, premiumOnlyMode, hasPremiumAccess }}>
       {children}
     </AuthContext.Provider>
   );

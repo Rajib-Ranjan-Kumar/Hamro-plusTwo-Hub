@@ -164,20 +164,40 @@ export const AdminSettings = () => {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-slate-700 rounded-xl mt-6">
-                    <div>
-                      <p className="font-medium text-white">Premium Only Mode</p>
-                      <p className="text-sm text-slate-400">When enabled, only premium users can access PYQs, Syllabus, and Chat.</p>
+                  {/* Premium Content Access Toggle Card */}
+                  <div className="p-5 border border-slate-700 bg-slate-900/40 rounded-2xl space-y-4 mt-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white text-base">Premium Content Access</span>
+                          {premiumOnlyMode ? (
+                            <span className="px-2.5 py-0.5 text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full">
+                              ENFORCED (ON)
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">
+                              GLOBAL BYPASS (OFF)
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-400">
+                          {premiumOnlyMode 
+                            ? 'Strict Mode: Subscription enforcement is active. Only active subscribers and admins can view premium materials.'
+                            : 'Bypass Mode: All premium materials (PYQs, Syllabus, Notes, Chat) are accessible to all users for free.'}
+                        </p>
+                      </div>
+
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={premiumOnlyMode}
+                          disabled={saving || loading}
+                          onChange={(e) => setPremiumOnlyMode(e.target.checked)}
+                        />
+                        <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        className="sr-only peer" 
-                        checked={premiumOnlyMode}
-                        onChange={(e) => setPremiumOnlyMode(e.target.checked)}
-                      />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-600"></div>
-                    </label>
                   </div>
                 </div>
 

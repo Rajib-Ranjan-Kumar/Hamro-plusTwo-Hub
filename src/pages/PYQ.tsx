@@ -8,33 +8,14 @@ import { ThumbsDown } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export const PYQ = () => {
-  const { user } = useAuth();
+  const { user, hasPremiumAccess } = useAuth();
   const navigate = useNavigate();
 
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, title: string, message: string, onConfirm: () => void}>({
     isOpen: false, title: '', message: '', onConfirm: () => {}
   });
 
-  const [premiumOnlyMode, setPremiumOnlyMode] = useState(true);
-
-  useEffect(() => {
-    getGlobalSettings().then(settings => {
-      setPremiumOnlyMode(settings.premium_only_mode !== false);
-    });
-  }, []);
-
-  // Check if user is premium or in grace period (e.g., 3 days after expiry)
-  let hasPremiumAccess = user?.is_premium;
-  if (!hasPremiumAccess && user?.subscription_expiry_date) {
-    const expiryDate = new Date(user.subscription_expiry_date);
-    const gracePeriodEnd = new Date(expiryDate);
-    gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 3); // 3 days grace period
-    if (new Date() <= gracePeriodEnd) {
-      hasPremiumAccess = true;
-    }
-  }
-
-  const isLocked = premiumOnlyMode && !hasPremiumAccess && user?.role !== 'admin';
+  const isLocked = !hasPremiumAccess;
 
   const [subjects, setSubjects] = useState<any[]>([]);
   const [content, setContent] = useState<any[]>([]);

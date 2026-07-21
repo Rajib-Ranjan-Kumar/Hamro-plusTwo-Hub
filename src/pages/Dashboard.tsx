@@ -14,7 +14,7 @@ import { ContentGate } from '../components/ContentGate';
 import { motion } from 'motion/react';
 
 export const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, hasPremiumAccess } = useAuth();
   const [data, setData] = useState<any>({
     progressStats: [],
     notifications: [],
@@ -23,26 +23,8 @@ export const Dashboard = () => {
     examTimer: null
   });
   const [loading, setLoading] = useState(true);
-  const [premiumOnlyMode, setPremiumOnlyMode] = useState(true);
 
-  useEffect(() => {
-    getGlobalSettings().then(settings => {
-      setPremiumOnlyMode(settings.premium_only_mode !== false);
-    });
-  }, []);
-
-  // Check if user is premium or in grace period (e.g., 3 days after expiry)
-  let hasPremiumAccess = user?.is_premium;
-  if (!hasPremiumAccess && user?.subscription_expiry_date) {
-    const expiryDate = new Date(user.subscription_expiry_date);
-    const gracePeriodEnd = new Date(expiryDate);
-    gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 3); // 3 days grace period
-    if (new Date() <= gracePeriodEnd) {
-      hasPremiumAccess = true;
-    }
-  }
-
-  const isLocked = premiumOnlyMode && !hasPremiumAccess && user?.role !== 'admin';
+  const isLocked = !hasPremiumAccess;
 
   const handleMaterialClick = (e: React.MouseEvent, url: string, type: string, title?: string, accessLevel?: string) => {
     const isPremiumType = ['pyq', 'syllabus', 'notes'].includes(type.toLowerCase());

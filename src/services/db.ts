@@ -1,5 +1,5 @@
 import { db, storage } from '../firebase';
-import { collection, getDocs, query, where, addDoc, updateDoc, doc, getDoc, deleteDoc, orderBy, serverTimestamp, writeBatch, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, updateDoc, doc, getDoc, deleteDoc, orderBy, serverTimestamp, writeBatch, setDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth } from '../firebase';
 
@@ -87,12 +87,22 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-export const getGlobalSettings = async () => {
+export interface GlobalSettings {
+  site_name?: string;
+  support_email?: string;
+  site_description?: string;
+  premium_only_mode?: boolean;
+  notify_registrations?: boolean;
+  notify_subscriptions?: boolean;
+  notify_reports?: boolean;
+}
+
+export const getGlobalSettings = async (): Promise<GlobalSettings> => {
   try {
     const docRef = doc(db, 'settings', 'global');
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return docSnap.data();
+      return docSnap.data() as GlobalSettings;
     }
     return { premium_only_mode: true }; // Default
   } catch (error) {
@@ -101,7 +111,21 @@ export const getGlobalSettings = async () => {
   }
 };
 
-export const updateGlobalSettings = async (data: any) => {
+export const subscribeToGlobalSettings = (callback: (settings: GlobalSettings) => void) => {
+  const docRef = doc(db, 'settings', 'global');
+  return onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data() as GlobalSettings);
+    } else {
+      callback({ premium_only_mode: true });
+    }
+  }, (err) => {
+    console.warn("Failed to subscribe to global settings:", err);
+    callback({ premium_only_mode: true });
+  });
+};
+
+export const updateGlobalSettings = async (data: Partial<GlobalSettings>) => {
   try {
     const docRef = doc(db, 'settings', 'global');
     await setDoc(docRef, data, { merge: true });
