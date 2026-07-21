@@ -56,6 +56,7 @@ export default function App() {
               <Route path="pyq" element={<PYQ />} />
               <Route path="chat" element={<ProtectedRoute requirePremium><Chat /></ProtectedRoute>} />
               <Route path="get-premium" element={<GetPremium />} />
+              <Route path="premium" element={<Navigate to="/get-premium" replace />} />
               <Route path="verify-subscriptions" element={<ProtectedRoute requireAdmin><VerifySubscriptions /></ProtectedRoute>} />
               <Route path="verify-contributions" element={<ProtectedRoute requireAdmin><VerifyContributions /></ProtectedRoute>} />
               <Route path="privacy-policy" element={<PrivacyPolicy />} />

@@ -132,6 +132,24 @@ export const Settings = () => {
     }
   };
 
+  const formatMemberSince = (createdVal: any) => {
+    if (!createdVal) return 'Unknown';
+    try {
+      let date: Date;
+      if (typeof createdVal === 'object' && createdVal?.seconds) {
+        date = new Date(createdVal.seconds * 1000);
+      } else if (typeof createdVal?.toDate === 'function') {
+        date = createdVal.toDate();
+      } else {
+        date = new Date(createdVal);
+      }
+      if (isNaN(date.getTime())) return 'Unknown';
+      return format(date, 'MMMM d, yyyy');
+    } catch {
+      return 'Unknown';
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -246,7 +264,7 @@ export const Settings = () => {
               <span className="text-sm font-medium text-slate-300">Member Since</span>
             </div>
             <p className="text-lg font-semibold text-white">
-              {user?.created_at ? format(new Date(user.created_at), 'MMMM d, yyyy') : 'Unknown'}
+              {formatMemberSince(user?.created_at)}
             </p>
           </div>
 

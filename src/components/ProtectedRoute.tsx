@@ -37,7 +37,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requirePremium && !user?.is_premium && user?.role !== 'admin') {
-    return <Navigate to="/premium" replace />;
+    return <Navigate to="/get-premium" replace />;
   }
 
   return <>{children}</>;
