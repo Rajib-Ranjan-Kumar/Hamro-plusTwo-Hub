@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Download, Lock, ChevronDown, Star, ThumbsUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { getSubjects, getExamYears, getContent, upvoteContent, downvoteContent, rateContent, reportContent, updateSolutionStatus, getGlobalSettings } from '../services/db';
+import { getSubjects, getExamYears, getContent, upvoteContent, downvoteContent, rateContent, reportContent, updateSolutionStatus, getGlobalSettings, getColleges } from '../services/db';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { ThumbsDown } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -17,14 +17,17 @@ export const PYQ = () => {
 
   const isLocked = !hasPremiumAccess;
 
+  const [colleges, setColleges] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [content, setContent] = useState<any[]>([]);
   
-  // Filters
-  const [filterYear, setFilterYear] = useState(user?.year || 'Class 11');
-  const [filterSubject, setFilterSubject] = useState('');
-  const [filterTerm, setFilterTerm] = useState('');
-  const [filterExamYear, setFilterExamYear] = useState('');
+  // Filters persisted in localStorage with user default fallbacks
+  const [filterCollege, setFilterCollege] = useState(() => localStorage.getItem('pyq_filter_college') || user?.college_id || '');
+  const [filterStream, setFilterStream] = useState(() => localStorage.getItem('pyq_filter_stream') || user?.stream || 'Science');
+  const [filterYear, setFilterYear] = useState(() => localStorage.getItem('pyq_filter_year') || user?.year || 'Class 11');
+  const [filterSubject, setFilterSubject] = useState(() => localStorage.getItem('pyq_filter_subject') || '');
+  const [filterTerm, setFilterTerm] = useState(() => localStorage.getItem('pyq_filter_term') || '');
+  const [filterExamYear, setFilterExamYear] = useState(() => localStorage.getItem('pyq_filter_exam_year') || '');
   const [examYears, setExamYears] = useState<any[]>([]);
 
   // Detailed View
@@ -41,24 +44,66 @@ export const PYQ = () => {
     window.open(`/viewer?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}${allowDownload ? '&download=true' : ''}`, '_blank');
   };
 
+  // Fetch colleges list
   useEffect(() => {
-    const fetchCollegeId = user?.college_id;
-    getSubjects(fetchCollegeId).then(data => {
-      // Filter by stream and year for both users and admins
-      const filtered = data.filter((s: any) => s.stream === user?.stream && s.year === filterYear);
-      setSubjects(filtered);
-      if (filtered.length > 0 && !filterSubject) setFilterSubject(filtered[0].id.toString());
-    });
+    getColleges().then(data => setColleges(data));
+  }, []);
 
-    getExamYears(fetchCollegeId, filterYear).then(data => setExamYears(data));
-  }, [filterYear, user?.college_id, user?.stream]);
+  // Save filter changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('pyq_filter_college', filterCollege);
+  }, [filterCollege]);
+
+  useEffect(() => {
+    localStorage.setItem('pyq_filter_stream', filterStream);
+  }, [filterStream]);
+
+  useEffect(() => {
+    localStorage.setItem('pyq_filter_year', filterYear);
+  }, [filterYear]);
 
   useEffect(() => {
     if (filterSubject) {
-      const fetchCollegeId = user?.college_id;
-      getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, fetchCollegeId).then(data => setContent(data));
+      localStorage.setItem('pyq_filter_subject', filterSubject);
     }
-  }, [filterSubject, filterYear, filterTerm, filterExamYear, user?.college_id]);
+  }, [filterSubject]);
+
+  useEffect(() => {
+    localStorage.setItem('pyq_filter_term', filterTerm);
+  }, [filterTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('pyq_filter_exam_year', filterExamYear);
+  }, [filterExamYear]);
+
+  // Fetch subjects and exam years based on parent selections
+  useEffect(() => {
+    getSubjects(filterCollege).then(data => {
+      const filtered = data.filter((s: any) => s.stream === filterStream && s.year === filterYear);
+      setSubjects(filtered);
+      
+      // Auto-restore saved subject if compatible, or select first available
+      const savedSubject = localStorage.getItem('pyq_filter_subject');
+      if (savedSubject && filtered.some(s => s.id.toString() === savedSubject)) {
+        setFilterSubject(savedSubject);
+      } else if (filtered.length > 0) {
+        setFilterSubject(filtered[0].id.toString());
+      } else {
+        setFilterSubject('');
+      }
+    });
+
+    getExamYears(filterCollege, filterYear).then(data => setExamYears(data));
+  }, [filterCollege, filterStream, filterYear]);
+
+  // Fetch content list
+  useEffect(() => {
+    if (filterSubject) {
+      getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, filterCollege).then(data => setContent(data));
+    } else {
+      setContent([]);
+    }
+  }, [filterSubject, filterYear, filterTerm, filterExamYear, filterCollege]);
 
   const handleUpvote = async (id: string) => {
     if (!user) return;
@@ -66,8 +111,7 @@ export const PYQ = () => {
       const result = await upvoteContent(id, user.id);
       if (result) {
         // Refresh content to get exact counts
-        const fetchCollegeId = user?.college_id;
-        const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, fetchCollegeId);
+        const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, filterCollege);
         setContent(data);
         const updatedItem = data.find((c: any) => c.id === id);
         if (selectedPyq?.id === id && updatedItem) {
@@ -86,8 +130,7 @@ export const PYQ = () => {
       const result = await downvoteContent(id, user.id);
       if (result) {
         // Refresh content to get exact counts
-        const fetchCollegeId = user?.college_id;
-        const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, fetchCollegeId);
+        const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, filterCollege);
         setContent(data);
         const updatedItem = data.find((c: any) => c.id === id);
         if (selectedPyq?.id === id && updatedItem) {
@@ -105,8 +148,7 @@ export const PYQ = () => {
       await rateContent(id, val);
       alert('Thank you for rating!');
       // Refresh content
-      const fetchCollegeId = user?.college_id;
-      const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, fetchCollegeId);
+      const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, filterCollege);
       setContent(data);
       const updatedItem = data.find((c: any) => c.id === id);
       if (selectedPyq?.id === id && updatedItem) {
@@ -138,8 +180,7 @@ export const PYQ = () => {
       setReportReason('');
       
       // Refresh content
-      const fetchCollegeId = user?.college_id;
-      const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, fetchCollegeId);
+      const data = await getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, filterCollege);
       setContent(data);
       const updatedItem = data.find((c: any) => c.id === reportingId);
       if (selectedPyq?.id === reportingId && updatedItem) {
@@ -174,38 +215,69 @@ export const PYQ = () => {
           Previous Year Questions (PYQs)
         </h1>
         <div className="text-sm text-slate-400">
-          {user?.stream} • {user?.year}
+          {filterStream} • {filterYear}
         </div>
       </div>
 
       <div className="glass-panel p-4 rounded-2xl mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* 1. College */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Class</label>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">College</label>
             <select 
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm disabled:opacity-50"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 dark:text-slate-100 text-sm transition-colors cursor-pointer"
+              value={filterCollege}
+              onChange={(e) => setFilterCollege(e.target.value)}
+            >
+              <option value="">General (No College)</option>
+              {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          {/* 2. Stream */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Stream</label>
+            <select 
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 dark:text-slate-100 text-sm transition-colors cursor-pointer"
+              value={filterStream}
+              onChange={(e) => setFilterStream(e.target.value)}
+            >
+              <option value="Science">Science</option>
+              <option value="Management">Management</option>
+              <option value="Humanities">Humanities</option>
+            </select>
+          </div>
+          {/* 3. Class */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Class</label>
+            <select 
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 dark:text-slate-100 text-sm transition-colors cursor-pointer"
               value={filterYear}
               onChange={(e) => setFilterYear(e.target.value)}
-              disabled
             >
               <option value="Class 11">Class 11</option>
               <option value="Class 12">Class 12</option>
             </select>
           </div>
+          {/* 4. Subject */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Subject</label>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Subject</label>
             <select 
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 dark:text-slate-100 text-sm transition-colors cursor-pointer"
               value={filterSubject}
               onChange={(e) => setFilterSubject(e.target.value)}
             >
-              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              {subjects.length === 0 ? (
+                <option value="">No Subjects</option>
+              ) : (
+                subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+              )}
             </select>
           </div>
+          {/* 5. Term */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Term</label>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Term</label>
             <select 
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 dark:text-slate-100 text-sm transition-colors cursor-pointer"
               value={filterTerm}
               onChange={(e) => setFilterTerm(e.target.value)}
             >
@@ -216,10 +288,11 @@ export const PYQ = () => {
               <option value="Final Term">Final Term</option>
             </select>
           </div>
+          {/* 6. Exam Year */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Exam Year</label>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Exam Year</label>
             <select 
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-slate-800 dark:text-slate-100 text-sm transition-colors cursor-pointer"
               value={filterExamYear}
               onChange={(e) => setFilterExamYear(e.target.value)}
             >
@@ -235,28 +308,35 @@ export const PYQ = () => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Main Content Area */}
-        <div className="flex-1 glass-panel rounded-2xl overflow-hidden relative">
+        <div className="flex-1 glass-panel rounded-2xl overflow-hidden relative min-h-[400px] flex flex-col">
           {isLocked && (
-            <div className="absolute inset-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
-              <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-4">
-                <Lock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Premium Content Locked</h3>
-              <p className="text-slate-600 dark:text-slate-300 max-w-md mb-6">
-                This content is only available for premium users. Upgrade your account to access all Previous Year Questions, structured notes, and more.
-              </p>
-              <button 
-                onClick={() => navigate('/get-premium')}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors shadow-sm hover-lift"
+            <div className="absolute inset-0 z-10 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-6 text-center">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="bg-slate-800/95 border border-slate-700/80 rounded-2xl p-8 max-w-md mx-auto text-center shadow-2xl backdrop-blur-sm flex flex-col items-center"
               >
-                Get Premium Access
-              </button>
+                <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/30 rounded-full flex items-center justify-center mb-6">
+                  <Lock className="w-7 h-7 text-amber-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Premium Content Locked</h3>
+                <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                  This content is restricted to premium members. Upgrade your account to unlock all Previous Year Questions, structured notes, and verified solutions.
+                </p>
+                <button 
+                  onClick={() => navigate('/get-premium')}
+                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-xl transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35"
+                >
+                  Unlock Premium Access
+                </button>
+              </motion.div>
             </div>
           )}
           
-          <div className={`p-6 ${isLocked ? 'opacity-20 pointer-events-none' : ''}`}>
+          <div className={`p-6 flex-1 flex flex-col ${isLocked ? 'opacity-20 pointer-events-none' : ''}`}>
             <h2 className="text-xl font-bold text-white mb-6">
-              {subjects.find(s => s.id.toString() === filterSubject)?.name} - PYQs
+              {subjects.find(s => s.id.toString() === filterSubject)?.name || 'General'} - PYQs
             </h2>
 
             {selectedPyq ? (
