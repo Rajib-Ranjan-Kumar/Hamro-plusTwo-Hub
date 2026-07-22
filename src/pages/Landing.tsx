@@ -55,7 +55,7 @@ export const Landing = () => {
         {/* Hero Background Image - Full screen cover */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" 
-          style={{ backgroundImage: "url('/hero-bg.png')" }}
+          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         />
         {/* Dark overlay for text readability, matching the warm sunset theme */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent z-0 pointer-events-none" />

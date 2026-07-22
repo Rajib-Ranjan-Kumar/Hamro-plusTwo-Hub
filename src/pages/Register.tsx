@@ -159,7 +159,7 @@ export const Register = () => {
       {/* Full-screen Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" 
-        style={{ backgroundImage: "url('/hero-bg.png')" }}
+        style={{ backgroundImage: "url('/hero-bg.jpg')" }}
       />
       {/* Dark blur overlay */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0 pointer-events-none" />
