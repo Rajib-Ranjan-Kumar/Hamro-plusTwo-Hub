@@ -4,11 +4,9 @@
  */
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
 import { Landing } from './pages/Landing';
 import { Dashboard } from './pages/Dashboard';
 import { Contribute } from './pages/Contribute';
@@ -30,10 +28,23 @@ import { Contact } from './pages/Contact';
 import { FAQ } from './pages/FAQ';
 import { NotFound } from './pages/NotFound';
 import { ServerError } from './pages/ServerError';
-import { Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Analytics } from './components/Analytics';
 import { ViewerPage } from './pages/ViewerPage';
+
+const HomeRoute = () => {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0F1115]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5C21B]"></div>
+      </div>
+    );
+  }
+
+  return user ? <Layout /> : <Landing />;
+};
 
 export default function App() {
   return (
@@ -42,20 +53,17 @@ export default function App() {
         <Router>
           <Analytics />
           <Routes>
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/500" element={<ServerError />} />
             <Route path="/viewer" element={<ProtectedRoute><ViewerPage /></ProtectedRoute>} />
-            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route path="/" element={<HomeRoute />}>
               <Route index element={<Dashboard />} />
-              <Route path="contribute" element={<Contribute />} />
-              <Route path="syllabus" element={<Syllabus />} />
+              <Route path="contribute" element={<ProtectedRoute><Contribute /></ProtectedRoute>} />
+              <Route path="syllabus" element={<ProtectedRoute><Syllabus /></ProtectedRoute>} />
               <Route path="admin/*" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
               <Route path="add-content" element={<ProtectedRoute requireAdmin><AddContent /></ProtectedRoute>} />
-              <Route path="pyq" element={<PYQ />} />
-              <Route path="chat" element={<Chat />} />
-              <Route path="get-premium" element={<GetPremium />} />
+              <Route path="pyq" element={<ProtectedRoute><PYQ /></ProtectedRoute>} />
+              <Route path="chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="get-premium" element={<ProtectedRoute><GetPremium /></ProtectedRoute>} />
               <Route path="premium" element={<Navigate to="/get-premium" replace />} />
               <Route path="verify-subscriptions" element={<ProtectedRoute requireAdmin><VerifySubscriptions /></ProtectedRoute>} />
               <Route path="verify-contributions" element={<ProtectedRoute requireAdmin><VerifyContributions /></ProtectedRoute>} />
@@ -65,9 +73,8 @@ export default function App() {
               <Route path="disclaimer" element={<Disclaimer />} />
               <Route path="contact" element={<Contact />} />
               <Route path="faq" element={<FAQ />} />
-              {/* Placeholders for other routes */}
               <Route path="leaderboard" element={<div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div>} />
-              <Route path="settings" element={<Settings />} />
+              <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
