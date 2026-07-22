@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube } from 'lucide-react';
+import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube, Menu, ArrowRight, Shield, Zap, Heart, Check, Clock, Globe, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from '../components/SEO';
 import { auth, googleProvider, db } from '../firebase';
@@ -15,6 +15,15 @@ export const Landing = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Force Light mode styling on Landing Page mount, restore dark mode on unmount
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      document.documentElement.classList.add('dark');
+    };
+  }, []);
 
   const handleSessionUpdate = async (firebaseUser: any) => {
     const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -44,6 +53,7 @@ export const Landing = () => {
   const openAuthModal = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
+    setIsMobileMenuOpen(false);
   };
 
   const toggleFaq = (index: number) => {
@@ -51,54 +61,119 @@ export const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1115] text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-600/30 flex flex-col relative overflow-x-hidden">
       <SEO />
 
-      {/* 100vh Hero Fold Section */}
-      <div className="relative h-screen min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
-        {/* Full Screen Clean Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" 
-          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
-        />
-        
-        {/* Subtle dark gradient overlay behind left-aligned text for readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent z-0 pointer-events-none" />
+      {/* Sticky Premium Navbar */}
+      <header className="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-slate-100 px-6 md:px-[60px] py-4 flex items-center justify-between transition-all">
+        {/* Left Side: Logo */}
+        <div className="flex items-center gap-2">
+          <div className="bg-[#2563EB] text-white text-xs font-black px-2.5 py-1 rounded">
+            +2
+          </div>
+          <span className="text-xl font-bold tracking-tight text-[#111827]">Hamro +2 Hub</span>
+        </div>
 
-        {/* Navbar - Positioned Top Right, scaled down to 70% */}
-        <motion.nav 
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="absolute top-0 right-0 z-10 pt-[28px] pr-[42px] flex items-center gap-[14px]"
-        >
-          {/* Language Selector Pill */}
+        {/* Center: Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <a href="#" className="hover:text-[#2563EB] transition-colors">Home</a>
+          <a href="#about" className="hover:text-[#2563EB] transition-colors">Explore</a>
+          <a href="#features" className="hover:text-[#2563EB] transition-colors">Features</a>
+          <a href="#how-it-works" className="hover:text-[#2563EB] transition-colors">How it Works</a>
+          <a href="#faq" className="hover:text-[#2563EB] transition-colors">FAQ</a>
+        </nav>
+
+        {/* Right Side: Language & Auth Actions */}
+        <div className="hidden lg:flex items-center gap-4">
           <div className="relative group">
-            <button className="flex items-center gap-1 h-[36px] px-[14px] border border-white/80 rounded-full text-white text-[15px] font-semibold hover:bg-white/10 transition-all cursor-pointer">
+            <button className="flex items-center gap-1.5 h-[36px] px-[14px] border border-slate-200 rounded-full text-slate-700 text-[14px] font-semibold hover:bg-slate-50 transition-all cursor-pointer">
               <span>English</span>
-              <ChevronDown className="w-4 h-4 text-white" />
+              <ChevronDown className="w-4 h-4 text-slate-500" />
             </button>
           </div>
 
-          {/* Log In Button - Gold Pill */}
           <button 
             onClick={() => openAuthModal('login')}
-            className="bg-[#F5C21B] hover:bg-[#e0b018] text-black h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102"
+            className="border border-[#2563EB] hover:bg-blue-50 text-[#2563EB] h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-sm cursor-pointer hover:scale-102"
           >
-            <User className="w-4 h-4 stroke-[2.5px]" />
+            <User className="w-4 h-4" />
             <span>Log In</span>
           </button>
-        </motion.nav>
 
-        {/* Hero Left Content - Vertically Centered */}
-        <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-[80px] flex flex-col justify-center">
-          <div className="max-w-[520px] text-left space-y-[24px]">
-            {/* Main Title - Nepali (Unchanged size) */}
+          <button 
+            onClick={() => openAuthModal('signup')}
+            className="bg-[#2563EB] hover:bg-blue-700 text-white h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102"
+          >
+            <span>Get Started</span>
+          </button>
+        </div>
+
+        {/* Mobile Hamburger Menu Toggle */}
+        <div className="lg:hidden flex items-center gap-3">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Slide-Down Dropdown Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden bg-white border-b border-slate-100 flex flex-col px-6 py-6 space-y-4 shadow-lg z-30"
+          >
+            <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="font-semibold text-slate-700 hover:text-[#2563EB]">Home</a>
+            <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="font-semibold text-slate-700 hover:text-[#2563EB]">Explore</a>
+            <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="font-semibold text-slate-700 hover:text-[#2563EB]">Features</a>
+            <a href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="font-semibold text-slate-700 hover:text-[#2563EB]">How it Works</a>
+            <a href="#faq" onClick={() => setIsMobileMenuOpen(false)} className="font-semibold text-slate-700 hover:text-[#2563EB]">FAQ</a>
+            <hr className="border-slate-100" />
+            <div className="flex items-center gap-3 pt-2">
+              <button 
+                onClick={() => openAuthModal('login')}
+                className="flex-1 border border-[#2563EB] hover:bg-blue-50 text-[#2563EB] h-[40px] rounded-full font-semibold text-sm transition-all flex items-center justify-center gap-1.5"
+              >
+                <User className="w-4 h-4" />
+                <span>Log In</span>
+              </button>
+              <button 
+                onClick={() => openAuthModal('signup')}
+                className="flex-1 bg-[#2563EB] hover:bg-blue-700 text-white h-[40px] rounded-full font-semibold text-sm transition-all flex items-center justify-center"
+              >
+                <span>Get Started</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Hero Section: White background with soft blue gradients */}
+      <section className="relative min-h-[90vh] flex items-center pt-10 pb-20 px-6 md:px-[80px] bg-gradient-to-b from-blue-50/50 via-white to-slate-50 overflow-hidden">
+        {/* Background illustration vectors */}
+        <div className="absolute top-[10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-100/40 blur-3xl -z-10 pointer-events-none" />
+        <div className="absolute bottom-[5%] left-[-5%] w-[300px] h-[300px] rounded-full bg-orange-100/40 blur-2xl -z-10 pointer-events-none" />
+
+        <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Column: Heading text and CTAs */}
+          <div className="text-left space-y-6 lg:max-w-[560px]">
+            {/* Tag Badge */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/50 text-[#2563EB] text-xs font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Premium High School Portal of Nepal</span>
+            </div>
+
+            {/* Title (Nepali, Unchanged size) */}
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-[72px] font-extrabold text-white leading-[1.1] tracking-tight whitespace-pre-line select-text"
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-[72px] font-extrabold text-[#111827] leading-[1.1] tracking-tight whitespace-pre-line"
             >
               तपाईँको मेहनत,{"\n"}
               हाम्रो सहयोग
@@ -108,144 +183,194 @@ export const Landing = () => {
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="text-[32px] font-normal text-white leading-[1.3] whitespace-pre-line select-text"
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="text-[32px] font-normal text-slate-600 leading-[1.3] whitespace-pre-line"
             >
               PYQs, Notes & Study Materials{"\n"}
               for Your Success...
             </motion.p>
 
-            {/* Interactive Action Buttons - Scaled down to 70% */}
+            {/* CTA Actions */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="flex flex-wrap items-center gap-[16px] pt-1"
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="flex flex-wrap items-center gap-[16px] pt-4"
             >
-              {/* Button 1: Get Started */}
               <button 
                 onClick={() => openAuthModal('signup')}
-                className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer"
+                className="bg-[#2563EB] hover:bg-blue-700 text-white font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer"
               >
                 <span>🚀 Get Started</span>
               </button>
 
-              {/* Button 2: Explore Now */}
               <a 
                 href="#about"
-                className="bg-black/35 hover:bg-black/50 border border-white/35 text-white font-normal text-[20px] h-[45px] w-[168px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-102 backdrop-blur-sm cursor-pointer"
+                className="border border-slate-200 bg-white/70 hover:bg-slate-50 text-[#111827] font-semibold text-[20px] h-[45px] w-[168px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-102 shadow-sm cursor-pointer"
               >
-                <span>▶ Explore Now</span>
+                <span>▶ Explore</span>
               </a>
             </motion.div>
+
+            {/* Verified/Secure Bullet Indicators */}
+            <div className="flex flex-wrap items-center gap-4 pt-6 text-xs font-semibold text-slate-500">
+              <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> Verified Documents</span>
+              <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> Secure Login</span>
+              <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> Easy Access</span>
+            </div>
           </div>
-        </div>
 
-        {/* Empty Spacer to preserve bottom-aligned village background scenery */}
-        <div className="h-12 w-full z-0" />
-      </div>
+          {/* Right Column: Premium Illustration & Stats Badges */}
+          <div className="relative flex justify-center items-center">
+            {/* Main village path scenic clean background container */}
+            <div className="w-full max-w-[500px] aspect-[4/3] rounded-[24px] overflow-hidden shadow-2xl border border-slate-100 bg-cover bg-center" style={{ backgroundImage: "url('/hero-bg.jpg')" }}>
+              <div className="w-full h-full bg-gradient-to-t from-slate-900/40 to-transparent" />
+            </div>
 
-      {/* About Section - Scaled down by ~30% */}
-      <section id="about" className="min-h-screen bg-[#0F172A] py-[70px] px-6 md:px-[70px] flex items-center border-t border-white/5 relative">
-        <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-[56px] items-center">
-          {/* Left Side - Embedded Video Placeholder */}
-          <div className="space-y-4">
-            <h3 className="text-base font-bold text-[#F5C21B] tracking-wide uppercase">Watch How Hamro +2 Works</h3>
-            <div className="aspect-video w-full rounded-[16px] overflow-hidden bg-slate-900 border border-white/10 shadow-2xl relative group">
-              <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
-              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center">
-                <button className="w-14 h-14 rounded-full bg-[#F5C21B] hover:bg-[#e0b018] text-black flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer">
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
-                </button>
+            {/* Floating verification Stat Card */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="absolute top-6 left-[-20px] bg-white border border-slate-100 shadow-xl rounded-2xl p-4 flex items-center gap-3.5 z-10 glass-panel-light max-w-[180px]"
+            >
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                <CheckCircle className="w-5 h-5" />
               </div>
-            </div>
-          </div>
+              <div>
+                <div className="text-xs text-slate-500">Resource Status</div>
+                <div className="text-sm font-bold text-slate-900">Verified Files</div>
+              </div>
+            </motion.div>
 
-          {/* Right Side - Why Hamro +2 */}
-          <div className="space-y-6">
-            <h2 className="text-[36px] font-bold text-white tracking-tight leading-none">Why Hamro +2?</h2>
-            <p className="text-slate-300 text-[15px] leading-relaxed">
-              We provide a complete study companion for +2 science and management students in Nepal. Easily access question banks, notes, exam patterns, and complete resources for your term prep.
-            </p>
-
-            <div className="grid gap-3">
-              {[
-                { icon: FileText, title: "Smart Learning", desc: "Access high-quality revision files, subject guides, and verified reference documents." },
-                { icon: BookOpen, title: "Free Resources", desc: "No subscriptions required. Free updates on notes and solutions from top colleges." },
-                { icon: CheckCircle, title: "Easy Access", desc: "Clean navigation and simple downloads for preparation on the go." }
-              ].map((feat, i) => (
-                <div key={i} className="flex gap-3.5 p-3 rounded-xl bg-white/[0.03] border border-white/5 backdrop-blur-md">
-                  <div className="w-8 h-8 rounded-lg bg-[#F5C21B]/10 flex items-center justify-center shrink-0">
-                    <feat.icon className="w-4 h-4 text-[#F5C21B]" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-sm">{feat.title}</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">{feat.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* Floating uptime Stat Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="absolute bottom-6 right-[-20px] bg-white border border-slate-100 shadow-xl rounded-2xl p-4 flex items-center gap-3.5 z-10 glass-panel-light max-w-[180px]"
+            >
+              <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-[#2563EB] shrink-0">
+                <Shield className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-xs text-slate-500">Security Core</div>
+                <div className="text-sm font-bold text-slate-900">Secure Access</div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid Section - Scaled down by ~30% */}
-      <section className="bg-[#0F1115] py-[70px] border-t border-white/5">
+      {/* Video Section */}
+      <section id="about" className="bg-white py-[70px] px-6 md:px-[70px] flex items-center border-t border-slate-100 relative">
+        <div className="max-w-4xl w-full mx-auto text-center space-y-8">
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-[#2563EB] tracking-wide uppercase">Watch How It Works</h3>
+            <h2 className="text-[36px] font-bold text-slate-900 tracking-tight leading-none">Watch How Hamro +2 Works</h2>
+          </div>
+
+          <div className="aspect-video w-full rounded-[24px] overflow-hidden bg-slate-900 border border-slate-100 shadow-2xl relative group">
+            <div className="absolute inset-0 bg-cover bg-center opacity-75" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
+            <div className="absolute inset-0 bg-slate-950/20 flex items-center justify-center">
+              <button className="w-16 h-16 rounded-full bg-[#2563EB] hover:bg-blue-700 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer">
+                <Play className="w-6 h-6 fill-current ml-1" />
+              </button>
+            </div>
+          </div>
+
+          <p className="text-slate-500 text-[15px] leading-relaxed max-w-xl mx-auto">
+            Get a quick walkthrough of how to browse notes, check model answers, search previous year exam papers, and contribute resources.
+          </p>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="bg-slate-50 py-[70px] border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Everything You Need</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-[30px] font-bold text-slate-900 tracking-tight">Everything You Need</h2>
+            <p className="text-slate-500 text-sm">
               All the tools and resources you need to excel in your +2 examinations.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision." },
-              { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley." },
-              { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform." },
-              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions." },
-              { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal." },
-              { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns." }
+              { icon: FileText, title: "Digital Documents", desc: "Access high-quality reference notes, syllabus blueprints, and subject guides." },
+              { icon: ShieldCheck, title: "Government Integration", desc: "NEB syllabus compliance checks for all science and management courses." },
+              { icon: Zap, title: "Fast Verification", desc: "Uploaded study notes are verified by moderators within 24 hours." },
+              { icon: Users, title: "QR Code Support", desc: "Easily scan notes and share documents with high school peers." },
+              { icon: BookOpen, title: "Secure Cloud Storage", desc: "Save notes directly to your personal study dashboard securely." },
+              { icon: Globe, title: "Multi-language Support", desc: "Syllabus guides translated and accessible in both Nepali and English." }
             ].map((feature, i) => (
-              <div key={i} className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
-                <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
-                  <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
+              <div key={i} className="p-6 rounded-2xl bg-white border border-slate-100 hover:border-[#2563EB]/40 hover:shadow-lg transition-all group hover:-translate-y-1">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-[#2563EB]/15 transition-colors">
+                  <feature.icon className="w-5 h-5 text-[#2563EB]" />
                 </div>
-                <h3 className="text-[16px] font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-[16px] font-bold text-slate-900 mb-2">{feature.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Subjects Section - Scaled down by ~30% */}
-      <section className="bg-[#0F172A] py-[70px] border-t border-white/5">
+      {/* How it Works Timeline */}
+      <section id="how-it-works" className="bg-white py-[70px] border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-16 space-y-3">
+            <h2 className="text-[30px] font-bold text-slate-900 tracking-tight">How It Works</h2>
+            <p className="text-slate-500 text-sm">
+              Follow these simple steps to start accessing high school resources.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8 relative">
+            {[
+              { step: "01", title: "Login", desc: "Securely authenticate with Google to set up your profile." },
+              { step: "02", title: "Upload Notes", desc: "Share handwritten study files or verify resources." },
+              { step: "03", title: "Verification", desc: "Admin reviews files to ensure accuracy and relevance." },
+              { step: "04", title: "Use Anywhere", desc: "Download and read documents offline on any device." }
+            ].map((step, i) => (
+              <div key={i} className="text-center space-y-3 relative">
+                <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 text-[#2563EB] font-bold text-lg flex items-center justify-center mx-auto shadow-sm">
+                  {step.step}
+                </div>
+                <h3 className="font-bold text-slate-900 text-base">{step.title}</h3>
+                <p className="text-xs text-slate-500 max-w-[180px] mx-auto leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="bg-slate-50 py-[70px] border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Access Course Subjects</h2>
-            <p className="text-slate-400 text-sm">
-              Choose your course and access curated notes, questions, and guides.
+            <h2 className="text-[30px] font-bold text-slate-900 tracking-tight">Why Choose Us</h2>
+            <p className="text-slate-500 text-sm">
+              We make academic research simple, verified, and free.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { title: "Physics", count: "140+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Chemistry", count: "120+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Biology", count: "90+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Mathematics", count: "150+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Computer Science", count: "80+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "English", count: "70+ Files", color: "from-[#F5C21B] to-[#e0b018]" }
-            ].map((sub, i) => (
-              <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all cursor-pointer">
-                <div>
-                  <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{sub.count}</p>
+              { icon: Shield, title: "100% Security", desc: "Secure cloud access with encrypted account data profiles." },
+              { icon: Zap, title: "Instant Access", desc: "Lightning fast loads with offline capabilities on phone browser viewports." },
+              { icon: Heart, title: "Peer Trusted", desc: "Recommended by thousands of high school students and teachers in Nepal." },
+              { icon: Clock, title: "24/7 Availability", desc: "Access verified documents, syllabus updates, and prep materials anytime." },
+              { icon: Globe, title: "Government Ready", desc: "NEB exam standards mapped to cover complete term blueprint syllabuses." },
+              { icon: Users, title: "Colleges Coverage", desc: "Covering terminal test questions from over 50 prominent High Schools." }
+            ].map((card, i) => (
+              <div key={i} className="p-5 rounded-2xl bg-white border border-slate-100 flex items-start gap-4">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-[#2563EB] shrink-0">
+                  <card.icon className="w-4 h-4" />
                 </div>
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${sub.color} text-black flex items-center justify-center font-black group-hover:scale-105 transition-transform text-sm`}>
-                  &rarr;
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm mb-1">{card.title}</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">{card.desc}</p>
                 </div>
               </div>
             ))}
@@ -253,12 +378,30 @@ export const Landing = () => {
         </div>
       </section>
 
-      {/* Testimonials - Scaled down by ~30% */}
-      <section className="bg-[#0F1115] py-[70px] border-t border-white/5">
+      {/* Animated Statistics Section */}
+      <section className="bg-white py-[70px] border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 md:px-[70px] grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
+          <div className="space-y-1">
+            <div className="text-[44px] font-black text-[#2563EB] tracking-tight">100K+</div>
+            <div className="text-sm font-bold text-slate-800">Total Users</div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-[44px] font-black text-[#2563EB] tracking-tight">500K+</div>
+            <div className="text-sm font-bold text-slate-800">Verified Files</div>
+          </div>
+          <div className="space-y-1 col-span-2 md:col-span-1">
+            <div className="text-[44px] font-black text-[#2563EB] tracking-tight">99.9%</div>
+            <div className="text-sm font-bold text-slate-800">Service Uptime</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-slate-50 py-[70px] border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Student Feedback</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-[30px] font-bold text-slate-900 tracking-tight">Student Feedback</h2>
+            <p className="text-slate-500 text-sm">
               Hear what students and contributors from colleges across Nepal say.
             </p>
           </div>
@@ -269,14 +412,14 @@ export const Landing = () => {
               { name: "Priya Adhikari", role: "Trinity International", review: "Direct downloads and neat interface. Highly recommend for NEB board exams preparation notes." },
               { name: "Rohit Gurung", role: "KMC Lalitpur", review: "Contributing notes is highly motivating. The leaderboard badge adds a fun competitive touch." }
             ].map((test, i) => (
-              <div key={i} className="p-6 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between space-y-4">
-                <p className="text-slate-300 italic text-[14px] leading-relaxed">"{test.review}"</p>
+              <div key={i} className="p-6 rounded-2xl bg-white border border-slate-100 flex flex-col justify-between space-y-4 shadow-sm">
+                <p className="text-slate-600 italic text-[14px] leading-relaxed">"{test.review}"</p>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#F5C21B]/20 flex items-center justify-center font-bold text-[#F5C21B] text-sm">
+                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center font-bold text-[#2563EB] text-sm">
                     {test.name[0]}
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-xs">{test.name}</h4>
+                    <h4 className="font-bold text-slate-900 text-xs">{test.name}</h4>
                     <p className="text-[10px] text-slate-500">{test.role}</p>
                   </div>
                 </div>
@@ -286,12 +429,12 @@ export const Landing = () => {
         </div>
       </section>
 
-      {/* FAQ Accordion Section - Scaled down by ~30% */}
-      <section className="bg-[#0F172A] py-[70px] border-t border-white/5">
+      {/* FAQ Accordion Section */}
+      <section id="faq" className="bg-white py-[70px] border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Frequently Asked Questions</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-[30px] font-bold text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+            <p className="text-slate-500 text-sm">
               Quick answers to the common questions about Hamro +2 Hub.
             </p>
           </div>
@@ -300,19 +443,19 @@ export const Landing = () => {
             {[
               { q: "Is Hamro +2 Hub completely free to use?", a: "Yes, access to all note files, term papers, and solutions is 100% free with no hidden charges." },
               { q: "How can I contribute my study materials?", a: "Register/Login with Google, click the Contribute tab in your dashboard, and upload your PDF files." },
-              { q: "Are the resources aligned with NEB board?", a: "Yes, all materials are verified according to the latest syllabus of Nepal National Examinations Board (NEB)." },
+              { q: "Are the resources aligned with NEB board?", a: "Yes, all resources are verified according to the latest syllabus of Nepal National Examinations Board (NEB)." },
               { q: "How does the student leaderboard badge system work?", a: "You earn repute points each time your contributed document is downloaded or approved by admin." }
             ].map((faq, i) => (
-              <div key={i} className="border border-white/5 rounded-xl overflow-hidden bg-white/[0.01]">
+              <div key={i} className="border border-slate-200 rounded-xl overflow-hidden bg-white">
                 <button 
                   onClick={() => toggleFaq(i)}
-                  className="w-full flex justify-between items-center p-4 text-left font-bold text-[15px] text-white hover:bg-white/[0.02] transition-colors cursor-pointer"
+                  className="w-full flex justify-between items-center p-4 text-left font-bold text-[15px] text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
                 </button>
-                <div className={`transition-all duration-300 overflow-hidden ${activeFaq === i ? 'max-h-40 border-t border-white/5 p-4' : 'max-h-0'}`}>
-                  <p className="text-slate-400 text-xs leading-relaxed">{faq.a}</p>
+                <div className={`transition-all duration-300 overflow-hidden ${activeFaq === i ? 'max-h-40 border-t border-slate-200 p-4 bg-slate-50/50' : 'max-h-0'}`}>
+                  <p className="text-slate-600 text-xs leading-relaxed">{faq.a}</p>
                 </div>
               </div>
             ))}
@@ -321,14 +464,14 @@ export const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0D0D0F] border-t border-white/5 py-10 text-slate-400 text-[13px]">
+      <footer className="bg-white border-t border-slate-100 py-10 text-slate-500 text-[13px]">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px] grid md:grid-cols-4 gap-6 mb-8">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="bg-[#F5C21B] text-black text-[10px] font-black px-2 py-0.5 rounded">
+              <div className="bg-[#2563EB] text-white text-[10px] font-black px-2 py-0.5 rounded">
                 +2
               </div>
-              <span className="text-base font-bold text-white">Hamro +2 Hub</span>
+              <span className="text-base font-bold text-slate-900">Hamro +2 Hub</span>
             </div>
             <p className="text-[11px] text-slate-500 leading-relaxed">
               Nepal's collaborative platform for high school students. Quality resources, syllabus references, and term guides.
@@ -336,16 +479,16 @@ export const Landing = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Quick Links</h4>
+            <h4 className="font-bold text-slate-900 mb-3 text-sm">Quick Links</h4>
             <ul className="space-y-1.5 text-[11px]">
-              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Study Dashboard</button></li>
-              <li><button onClick={() => openAuthModal('signup')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Contribute File</button></li>
-              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Course Syllabus</button></li>
+              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#2563EB] transition-colors cursor-pointer bg-transparent border-none p-0 text-left">Study Dashboard</button></li>
+              <li><button onClick={() => openAuthModal('signup')} className="hover:text-[#2563EB] transition-colors cursor-pointer bg-transparent border-none p-0 text-left">Contribute File</button></li>
+              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#2563EB] transition-colors cursor-pointer bg-transparent border-none p-0 text-left">Course Syllabus</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Contact Us</h4>
+            <h4 className="font-bold text-slate-900 mb-3 text-sm">Contact Us</h4>
             <ul className="space-y-1.5 text-[11px]">
               <li className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> support@hamroplustwo.com</li>
               <li className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> +977-1-5555555</li>
@@ -354,20 +497,20 @@ export const Landing = () => {
           </div>
 
           <div className="space-y-3">
-            <h4 className="font-bold text-white mb-3 text-sm">Follow Us</h4>
+            <h4 className="font-bold text-slate-900 mb-3 text-sm">Follow Us</h4>
             <div className="flex gap-3">
-              <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Github className="w-3.5 h-3.5" /></a>
-              <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Twitter className="w-3.5 h-3.5" /></a>
-              <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Youtube className="w-3.5 h-3.5" /></a>
+              <a href="#" className="w-7 h-7 rounded-full bg-slate-50 hover:bg-[#2563EB]/10 hover:text-[#2563EB] flex items-center justify-center transition-colors"><Github className="w-3.5 h-3.5" /></a>
+              <a href="#" className="w-7 h-7 rounded-full bg-slate-50 hover:bg-[#2563EB]/10 hover:text-[#2563EB] flex items-center justify-center transition-colors"><Twitter className="w-3.5 h-3.5" /></a>
+              <a href="#" className="w-7 h-7 rounded-full bg-slate-50 hover:bg-[#2563EB]/10 hover:text-[#2563EB] flex items-center justify-center transition-colors"><Youtube className="w-3.5 h-3.5" /></a>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-[70px] border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] text-slate-600">
+        <div className="max-w-7xl mx-auto px-6 md:px-[70px] border-t border-slate-100 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] text-slate-400">
           <div>&copy; {new Date().getFullYear()} Hamro +2 Hub. Made with love in Nepal. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link to="/privacy-policy" className="hover:text-slate-400">Privacy Policy</Link>
-            <Link to="/terms-conditions" className="hover:text-slate-400">Terms & Conditions</Link>
+            <Link to="/privacy-policy" className="hover:text-slate-600">Privacy Policy</Link>
+            <Link to="/terms-conditions" className="hover:text-slate-600">Terms & Conditions</Link>
           </div>
         </div>
       </footer>
@@ -387,27 +530,27 @@ export const Landing = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative w-full max-w-md bg-slate-800/95 border border-slate-700/80 backdrop-blur-md rounded-3xl p-8 sm:p-10 shadow-2xl flex flex-col justify-center"
+              className="relative w-full max-w-md bg-white border border-slate-100 rounded-3xl p-8 sm:p-10 shadow-2xl flex flex-col justify-center text-slate-900"
             >
               {/* Close Button */}
               <button 
                 onClick={() => setIsAuthModalOpen(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-50 transition-all cursor-pointer"
               >
                 <X className="w-6 h-6" />
               </button>
 
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+                <h2 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
                   {authMode === 'login' ? 'Welcome Back' : 'Create an Account'}
                 </h2>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-500 text-sm">
                   {authMode === 'login' ? 'Sign in to access your study materials.' : 'Sign up to start saving notes and study materials.'}
                 </p>
               </div>
 
               {error && (
-                <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3 text-rose-400 animate-in fade-in">
+                <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3 text-rose-600 animate-in fade-in">
                   <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                   <p className="text-sm">{error}</p>
                 </div>
@@ -417,17 +560,17 @@ export const Landing = () => {
               <button
                 onClick={handleGoogleLogin}
                 disabled={isLoggingIn}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-bold rounded-full transition-all border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] cursor-pointer"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-full transition-all border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] cursor-pointer"
               >
                 {isLoggingIn ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-slate-700" />
+                  <Loader2 className="w-5 h-5 animate-spin text-white animate-spin" />
                 ) : (
                   <>
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#0D0D0F" />
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#0D0D0F" />
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#0D0D0F" />
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#0D0D0F" />
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#FFFFFF" />
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#FFFFFF" />
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FFFFFF" />
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#FFFFFF" />
                     </svg>
                     <span>
                       {authMode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
@@ -436,13 +579,40 @@ export const Landing = () => {
                 )}
               </button>
 
-              <p className="mt-8 text-center text-sm text-slate-400">
+              <div className="flex items-center my-6">
+                <div className="flex-1 border-t border-slate-100"></div>
+                <span className="px-3 text-xs text-slate-400 uppercase">or</span>
+                <div className="flex-1 border-t border-slate-100"></div>
+              </div>
+
+              {/* Continue with Email placeholder */}
+              <button 
+                onClick={() => {
+                  setError("Email sign in is currently disabled. Please use Google Login.");
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-full transition-all border border-slate-200 text-sm cursor-pointer mb-3"
+              >
+                <span>Continue with Email</span>
+              </button>
+
+              {/* Guest mode */}
+              <button 
+                onClick={() => {
+                  setIsAuthModalOpen(false);
+                  navigate('/');
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-transparent hover:bg-slate-50 text-slate-500 font-bold rounded-full transition-all text-xs cursor-pointer"
+              >
+                <span>Access as Guest</span>
+              </button>
+
+              <p className="mt-8 text-center text-sm text-slate-500">
                 {authMode === 'login' ? (
                   <>
                     Don't have an account?{' '}
                     <button 
                       onClick={() => setAuthMode('signup')}
-                      className="text-[#F5C21B] hover:underline font-bold transition-all cursor-pointer bg-transparent border-none"
+                      className="text-[#2563EB] hover:underline font-bold transition-all cursor-pointer bg-transparent border-none"
                     >
                       Sign Up
                     </button>
@@ -452,7 +622,7 @@ export const Landing = () => {
                     Already have an account?{' '}
                     <button 
                       onClick={() => setAuthMode('login')}
-                      className="text-[#F5C21B] hover:underline font-bold transition-all cursor-pointer bg-transparent border-none"
+                      className="text-[#2563EB] hover:underline font-bold transition-all cursor-pointer bg-transparent border-none"
                     >
                       Sign In
                     </button>
