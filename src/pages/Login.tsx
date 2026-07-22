@@ -152,7 +152,7 @@ export const Login = () => {
         style={{ backgroundImage: "url('/hero-bg.jpg')" }}
       />
       {/* Dark blur overlay */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-xl z-0 pointer-events-none" />
 
       {/* Top right Brand Badge */}
       <div className="absolute top-8 right-8 z-10 flex items-center gap-2">
