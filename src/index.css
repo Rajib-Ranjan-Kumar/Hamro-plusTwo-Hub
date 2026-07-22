@@ -1,41 +1,68 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-slate-950: #081229;
-  --color-slate-900: #0D1B3E; /* Deep navy background */
-  --color-slate-800: #1A2E5A; /* Lighter navy for cards */
-  --color-slate-700: #233A6B; /* Borders / Hover */
-  --color-slate-600: #4A5568;
-  --color-slate-500: #718096; /* Placeholder text */
-  --color-slate-400: #A0AEC0; /* Secondary text */
-  --color-slate-300: #CBD5E0;
-  --color-slate-200: #E2E8F0;
-  --color-slate-100: #EDF2F7;
-  --color-slate-50:  #F7FAFC;
-  
-  --color-emerald-700: #008B7A;
-  --color-emerald-600: #00A896; /* Primary accent teal */
-  --color-emerald-500: #02C39A; /* Hover accent teal */
-  --color-emerald-400: #48E5C2;
-  --color-emerald-300: #81F4D8;
+  /* Typography */
+  --font-sans: 'Manrope', sans-serif;
 
-  --color-indigo-600: #00A896;
-  --color-indigo-500: #02C39A;
-  --color-indigo-400: #48E5C2;
-  --color-indigo-700: #008B7A;
+  /* Global Color Remapping */
+  --color-slate-950: #08080a;
+  --color-slate-900: #0D0D0F; /* Primary Dark Background */
+  --color-slate-800: #141418; /* Secondary Dark Background */
+  --color-slate-700: #1E1C22; /* Card Background */
+  --color-slate-600: #26232B; /* Hover Background / Active border */
+  --color-slate-500: #34303C; /* Borders / Muted */
+  --color-slate-400: #7C7C8A; /* Muted Text */
+  --color-slate-300: #B5B5C3; /* Secondary Text */
+  --color-slate-200: #CBD5E0;
+  --color-slate-100: #F3F4F6;
+  --color-slate-5:   #FFFFFF; /* Primary Text */
+  
+  /* Primary Accent Mapping (Gold/Yellow Accent) */
+  --color-emerald-700: #FFB300; /* Gold Hover */
+  --color-emerald-600: #FFC400; /* Gold Primary */
+  --color-emerald-500: #FFD54F; /* Gold Light */
+  --color-emerald-400: #FFE082;
+  --color-emerald-300: #FFF9C4;
+
+  --color-indigo-700: #FFB300;
+  --color-indigo-600: #FFC400;
+  --color-indigo-500: #FFD54F;
+  --color-indigo-400: #FFE082;
 }
 
 @layer base {
   body {
-    @apply select-none bg-slate-900 text-white selection:bg-emerald-500/30;
+    @apply select-none bg-slate-900 text-slate-5/90 selection:bg-emerald-600/30;
+    font-family: 'Manrope', sans-serif;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+  }
+
+  /* Dropdown & Input Global Overrides */
+  input, select, textarea {
+    @apply bg-slate-700 border border-slate-500 rounded-xl px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 text-slate-5 !important;
+  }
+
+  /* Force high contrast black text on primary accent background elements */
+  .bg-emerald-600, .bg-indigo-600, .bg-amber-500 {
+    color: #0D0D0F !important;
+    font-weight: 700 !important;
+  }
+
+  .bg-emerald-600 svg, .bg-indigo-600 svg, .bg-amber-500 svg {
+    stroke: #0D0D0F !important;
+  }
+
+  .bg-emerald-600:hover, .bg-indigo-600:hover, .bg-amber-500:hover {
+    background-color: #FFB300 !important;
   }
 
   /* Prevent printing */
@@ -52,14 +79,14 @@
 }
 
 .security-overlay {
-  background: rgba(13, 27, 62, 0.95);
+  background: rgba(13, 13, 15, 0.95);
   backdrop-filter: blur(20px);
 }
 
 .glass-panel {
-  @apply bg-slate-800/80 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl;
+  @apply bg-slate-700/80 backdrop-blur-xl border border-slate-500 shadow-2xl rounded-2xl;
 }
 
 .hover-lift {
-  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10;
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-600/10;
 }
