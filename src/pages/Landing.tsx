@@ -1,26 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Sun, Moon, Play, ChevronDown, Rocket, User, Loader2 } from 'lucide-react';
+import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Sun, Moon, Play, ChevronDown, Rocket, User, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SEO } from '../components/SEO';
-import { useAuth } from '../context/AuthContext';
 import { auth, googleProvider, db } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
+import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 
 export const Landing = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [isDark, setIsDark] = React.useState(true);
-
-  React.useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
+  const [isDark, setIsDark] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSessionUpdate = async (firebaseUser: any) => {
     const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -33,17 +25,26 @@ export const Landing = () => {
   };
 
   const handleGoogleLogin = async () => {
-    setIsSubmitting(true);
+    setIsLoggingIn(true);
+    setError('');
     try {
       const result = await signInWithPopup(auth, googleProvider);
       await handleSessionUpdate(result.user);
       navigate('/');
     } catch (err: any) {
       console.error("Google login failed:", err);
-    } finally {
-      setIsSubmitting(false);
+      setError(getFirebaseErrorMessage(err));
+      setIsLoggingIn(false);
     }
   };
+
+  React.useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   return (
     <div className="min-h-screen bg-[#0F1115] text-white font-sans selection:bg-[#F4B400]/30 flex flex-col relative overflow-x-hidden">
@@ -51,7 +52,7 @@ export const Landing = () => {
 
       {/* Hero Fold Background and Content */}
       <div className="min-h-screen relative flex flex-col justify-between w-full">
-        {/* Hero Background Image */}
+        {/* Hero Background Image - Full screen cover */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" 
           style={{ backgroundImage: "url('/hero-bg.png')" }}
@@ -77,29 +78,21 @@ export const Landing = () => {
               </button>
             </div>
 
-            {/* Log In Button - Gold Pill */}
-            {user ? (
-              <Link 
-                to="/dashboard" 
-                className="bg-[#F4B400] hover:bg-[#FFC107] text-[#0F1115] text-sm font-bold px-5 py-2 rounded-full transition-all hover:scale-102 flex items-center gap-1.5 shadow-lg shadow-[#F4B400]/20"
-              >
-                <User className="w-4 h-4 fill-current" />
-                <span>Dashboard</span>
-              </Link>
-            ) : (
-              <button 
-                onClick={handleGoogleLogin}
-                disabled={isSubmitting}
-                className="bg-[#F4B400] hover:bg-[#FFC107] text-[#0F1115] text-sm font-bold px-5 py-2 rounded-full transition-all hover:scale-102 flex items-center gap-1.5 shadow-lg shadow-[#F4B400]/20 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-[#0F1115]" />
-                ) : (
+            {/* Log In Button - Gold Pill (Triggers Google Login directly) */}
+            <button 
+              onClick={handleGoogleLogin}
+              disabled={isLoggingIn}
+              className="bg-[#F4B400] hover:bg-[#FFC107] text-[#0F1115] text-sm font-bold px-5 py-2 rounded-full transition-all hover:scale-102 flex items-center gap-1.5 shadow-lg shadow-[#F4B400]/20 disabled:opacity-50 cursor-pointer"
+            >
+              {isLoggingIn ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
                   <User className="w-4 h-4 fill-current" />
-                )}
-                <span>Log In</span>
-              </button>
-            )}
+                  <span>Log In</span>
+                </>
+              )}
+            </button>
           </div>
         </nav>
 
@@ -122,36 +115,36 @@ export const Landing = () => {
               PYQs, Notes & Study Materials<br />
               for Your Success...
             </p>
+
+            {/* Display authentication errors directly on the page */}
+            {error && (
+              <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-400 max-w-md animate-in fade-in">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <p className="text-sm font-semibold">{error}</p>
+              </div>
+            )}
             
-            {/* Buttons */}
+            {/* Buttons: Sign in with Google directly on landing fold */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              {user ? (
-                <Link 
-                  to="/dashboard" 
-                  className="bg-[#F4B400] hover:bg-[#FFC107] text-[#0F1115] font-bold px-8 py-3.5 rounded-full flex items-center gap-2 transition-all hover:scale-103 shadow-lg shadow-[#F4B400]/25"
-                >
-                  <Rocket className="w-5 h-5 fill-current" />
-                  <span>Go to Dashboard</span>
-                </Link>
-              ) : (
-                <button 
-                  onClick={handleGoogleLogin}
-                  disabled={isSubmitting}
-                  className="bg-[#F4B400] hover:bg-[#FFC107] text-[#0F1115] font-bold px-8 py-3.5 rounded-full flex items-center gap-3 transition-all hover:scale-103 shadow-lg shadow-[#F4B400]/25 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-[#0F1115]" />
-                  ) : (
+              <button 
+                onClick={handleGoogleLogin}
+                disabled={isLoggingIn}
+                className="bg-[#F4B400] hover:bg-[#FFC107] text-[#0F1115] font-bold px-8 py-3.5 rounded-full flex items-center gap-2 transition-all hover:scale-103 shadow-lg shadow-[#F4B400]/25 disabled:opacity-50 cursor-pointer"
+              >
+                {isLoggingIn ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#0D0D0F" />
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#0D0D0F" />
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#0D0D0F" />
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#0D0D0F" />
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#0F1115" />
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#0F1115" />
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#0F1115" />
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#0F1115" />
                     </svg>
-                  )}
-                  <span>Sign in with Google</span>
-                </button>
-              )}
+                    <span>Sign in with Google</span>
+                  </>
+                )}
+              </button>
               <Link 
                 to="/login" 
                 className="bg-black/40 hover:bg-black/60 border border-white/30 hover:border-white/50 text-white font-bold px-8 py-3.5 rounded-full flex items-center gap-2 transition-all hover:scale-102 backdrop-blur-sm"
@@ -254,21 +247,12 @@ export const Landing = () => {
             <p className="text-[#0F1115]/80 text-lg mb-8 font-medium">
               Join thousands of +2 students across Nepal. Access quality study materials and contribute to help your peers succeed.
             </p>
-            {user ? (
-              <Link 
-                to="/dashboard" 
-                className="inline-flex items-center gap-2 bg-[#0F1115] hover:bg-slate-900 text-white font-bold px-6 py-3 rounded-full transition-colors hover-lift"
-              >
-                Go to Dashboard <span aria-hidden="true">&rarr;</span>
-              </Link>
-            ) : (
-              <button 
-                onClick={handleGoogleLogin}
-                className="inline-flex items-center gap-2 bg-[#0F1115] hover:bg-slate-900 text-white font-bold px-6 py-3 rounded-full transition-colors hover-lift"
-              >
-                Sign in with Google <span aria-hidden="true">&rarr;</span>
-              </button>
-            )}
+            <Link 
+              to="/login" 
+              className="inline-flex items-center gap-2 bg-[#0F1115] hover:bg-slate-900 text-white font-bold px-6 py-3 rounded-full transition-colors hover-lift"
+            >
+              Create Free Account <span aria-hidden="true">&rarr;</span>
+            </Link>
           </div>
         </motion.div>
       </section>
