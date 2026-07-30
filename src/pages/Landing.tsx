@@ -93,23 +93,23 @@ export const Landing = () => {
         {/* Hero Left Content - Vertically Centered */}
         <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-[80px] flex flex-col justify-center">
           <div className="max-w-[520px] text-left space-y-[24px]">
-            {/* Main Title - Nepali (Dynamic size according to device) */}
+            {/* Main Title - Nepali (Fluid size using clamp) */}
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-[36px] sm:text-[54px] md:text-[64px] lg:text-[72px] font-extrabold text-white leading-[1.15] tracking-tight whitespace-pre-line select-text"
+              className="text-[clamp(24px,6.5vw,72px)] font-extrabold text-white leading-[1.15] tracking-tight whitespace-pre-line select-text"
             >
               तपाईँको मेहनत,{"\n"}
               हाम्रो सहयोग
             </motion.h1>
 
-            {/* Subtitle (Dynamic size according to device) */}
+            {/* Subtitle (Fluid size using clamp) */}
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="text-[16px] sm:text-[22px] md:text-[26px] lg:text-[32px] font-normal text-white leading-[1.3] whitespace-pre-line select-text"
+              className="text-[clamp(14px,2.8vw,32px)] font-normal text-white leading-[1.3] whitespace-pre-line select-text"
             >
               PYQs, Notes & Study Materials{"\n"}
               for Your Success...
