@@ -98,7 +98,7 @@ export const Landing = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-[clamp(24px,6.5vw,72px)] font-extrabold text-white leading-[1.15] tracking-tight whitespace-pre-line select-text"
+              className="text-[clamp(20px,6.5vw,72px)] font-extrabold text-white leading-[1.15] tracking-tight whitespace-pre-line select-text"
             >
               तपाईँको मेहनत,{"\n"}
               हाम्रो सहयोग
@@ -109,7 +109,7 @@ export const Landing = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="text-[clamp(14px,2.8vw,32px)] font-normal text-white leading-[1.3] whitespace-pre-line select-text"
+              className="text-[clamp(12px,2.8vw,32px)] font-normal text-white leading-[1.3] whitespace-pre-line select-text"
             >
               PYQs, Notes & Study Materials{"\n"}
               for Your Success...
