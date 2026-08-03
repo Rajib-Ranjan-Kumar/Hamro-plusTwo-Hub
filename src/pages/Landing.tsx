@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from '../components/SEO';
@@ -7,37 +7,14 @@ import { auth, googleProvider, db } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
-import { translations } from '../utils/translations';
 
 export const Landing = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [redirectPath, setRedirectPath] = useState<string | null>(null);
-  
-  const [lang, setLang] = useState<'en' | 'ne'>(() => (localStorage.getItem('preferred_language') as 'en' | 'ne') || 'en');
-  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
-
-  const t = (section: string, key: string) => {
-    return translations[lang]?.[section]?.[key] || translations['en']?.[section]?.[key] || '';
-  };
-
-  const handleLanguageChange = (newLang: 'en' | 'ne') => {
-    setLang(newLang);
-    localStorage.setItem('preferred_language', newLang);
-  };
-
-  // Automatically trigger Auth Modal if redirected from a protected route
-  useEffect(() => {
-    if (location.state?.from) {
-      setAuthMode('login');
-      setIsAuthModalOpen(true);
-    }
-  }, [location.state]);
 
   const handleSessionUpdate = async (firebaseUser: any) => {
     const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -56,9 +33,7 @@ export const Landing = () => {
       const result = await signInWithPopup(auth, googleProvider);
       await handleSessionUpdate(result.user);
       setIsAuthModalOpen(false);
-      
-      const destination = redirectPath || location.state?.from?.pathname || '/';
-      navigate(destination);
+      navigate('/');
     } catch (err: any) {
       console.error("Google auth failed:", err);
       setError(getFirebaseErrorMessage(err));
@@ -69,11 +44,6 @@ export const Landing = () => {
   const openAuthModal = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
-  };
-
-  const handleFeatureClick = (path: string) => {
-    setRedirectPath(path);
-    openAuthModal('login');
   };
 
   const toggleFaq = (index: number) => {
@@ -97,72 +67,23 @@ export const Landing = () => {
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="absolute top-0 right-0 z-10 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[24px]"
+          className="absolute top-0 right-0 z-10 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[14px]"
         >
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-[20px] text-[15px] font-medium text-white/80">
-            {/* Public Links */}
-            <a href="/" className="hover:text-white transition-colors">{t('navbar', 'home')}</a>
-            <a href="#about" className="hover:text-white transition-colors">{t('navbar', 'about')}</a>
-            <Link to="/contact" className="hover:text-white transition-colors">{t('navbar', 'contact')}</Link>
-            <Link to="/faq" className="hover:text-white transition-colors">{t('navbar', 'faq')}</Link>
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">{t('navbar', 'privacy')}</Link>
-            
-            {/* Protected Links */}
-            <button onClick={() => handleFeatureClick('/pyq')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">{t('navbar', 'pyqs')}</button>
-            <button onClick={() => handleFeatureClick('/syllabus')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">{t('navbar', 'notes')}</button>
-            <button onClick={() => handleFeatureClick('/syllabus')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">{t('navbar', 'syllabus')}</button>
-            <button onClick={() => handleFeatureClick('/chat')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">{t('navbar', 'chat')}</button>
-            <button onClick={() => handleFeatureClick('/get-premium')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">{t('navbar', 'membership')}</button>
-          </div>
-
-          {/* Language Selector Dropdown Pill */}
-          <div className="relative">
-            <button 
-              onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-              className="flex items-center gap-1 h-[36px] px-[14px] border border-white/80 rounded-full text-white text-[15px] font-semibold hover:bg-white/10 transition-all cursor-pointer"
-            >
-              <span>{lang === 'en' ? 'English' : 'नेपाली'}</span>
+          {/* Language Selector Pill */}
+          <div className="relative group">
+            <button className="flex items-center gap-1 h-[36px] px-[14px] border border-white/80 rounded-full text-white text-[15px] font-semibold hover:bg-white/10 transition-all cursor-pointer">
+              <span>English</span>
               <ChevronDown className="w-4 h-4 text-white" />
             </button>
-
-            {isLangDropdownOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setIsLangDropdownOpen(false)} />
-                <div className="absolute right-0 mt-2 w-32 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden">
-                  <button 
-                    onClick={() => {
-                      handleLanguageChange('en');
-                      setIsLangDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-[14px] hover:bg-white/5 transition-all ${lang === 'en' ? 'text-[#F5C21B] font-bold' : 'text-white'}`}
-                  >
-                    English
-                  </button>
-                  <button 
-                    onClick={() => {
-                      handleLanguageChange('ne');
-                      setIsLangDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-[14px] hover:bg-white/5 transition-all ${lang === 'ne' ? 'text-[#F5C21B] font-bold' : 'text-white'}`}
-                  >
-                    नेपाली
-                  </button>
-                </div>
-              </>
-            )}
           </div>
 
           {/* Log In Button - Gold Pill */}
           <button 
-            onClick={() => {
-              setRedirectPath('/');
-              openAuthModal('login');
-            }}
+            onClick={() => openAuthModal('login')}
             className="bg-[#F5C21B] hover:bg-[#e0b018] text-black h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102"
           >
             <User className="w-4 h-4 stroke-[2.5px]" />
-            <span>{t('navbar', 'login')}</span>
+            <span>Log In</span>
           </button>
         </motion.nav>
 
@@ -177,7 +98,8 @@ export const Landing = () => {
               style={{ fontSize: 'clamp(20px, 6.5vw, 72px)' }}
               className="font-extrabold text-white leading-[1.15] tracking-tight whitespace-pre-line select-text"
             >
-              {t('hero', 'title')}
+              तपाईँको मेहनत,{"\n"}
+              हाम्रो सहयोग
             </motion.h1>
 
             {/* Subtitle (Fluid size using clamp inline style) */}
@@ -188,7 +110,8 @@ export const Landing = () => {
               style={{ fontSize: 'clamp(12px, 2.8vw, 32px)' }}
               className="font-normal text-white leading-[1.3] whitespace-pre-line select-text"
             >
-              {t('hero', 'subtitle')}
+              PYQs, Notes & Study Materials{"\n"}
+              for Your Success...
             </motion.p>
 
             {/* Interactive Action Buttons - Scaled down to 70% */}
@@ -200,13 +123,10 @@ export const Landing = () => {
             >
               {/* Button 1: Get Started */}
               <button 
-                onClick={() => {
-                  setRedirectPath('/');
-                  openAuthModal('signup');
-                }}
+                onClick={() => openAuthModal('signup')}
                 className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer"
               >
-                <span>{t('hero', 'getStarted')}</span>
+                <span>🚀 Get Started</span>
               </button>
 
               {/* Button 2: Explore Now */}
@@ -214,7 +134,7 @@ export const Landing = () => {
                 href="#about"
                 className="bg-black/35 hover:bg-black/50 border border-white/35 text-white font-normal text-[20px] h-[45px] w-[168px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-102 backdrop-blur-sm cursor-pointer"
               >
-                <span>{t('hero', 'exploreNow')}</span>
+                <span>▶ Explore Now</span>
               </a>
             </motion.div>
           </div>
@@ -229,7 +149,7 @@ export const Landing = () => {
         <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-[56px] items-center">
           {/* Left Side - Embedded Video Placeholder */}
           <div className="space-y-4">
-            <h3 className="text-base font-bold text-[#F5C21B] tracking-wide uppercase">{t('about', 'tag')}</h3>
+            <h3 className="text-base font-bold text-[#F5C21B] tracking-wide uppercase">Watch How Hamro +2 Works</h3>
             <div className="aspect-video w-full rounded-[16px] overflow-hidden bg-slate-900 border border-white/10 shadow-2xl relative group">
               <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
               <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center">
@@ -242,24 +162,24 @@ export const Landing = () => {
 
           {/* Right Side - Why Hamro +2 */}
           <div className="space-y-6">
-            <h2 className="text-[36px] font-bold text-white tracking-tight leading-none">{t('about', 'title')}</h2>
+            <h2 className="text-[36px] font-bold text-white tracking-tight leading-none">Why Hamro +2?</h2>
             <p className="text-slate-300 text-[15px] leading-relaxed">
-              {t('about', 'desc')}
+              We provide a complete study companion for +2 science and management students in Nepal. Easily access question banks, notes, exam patterns, and complete resources for your term prep.
             </p>
 
             <div className="grid gap-3">
               {[
-                { icon: FileText, titleKey: "feature1Title", descKey: "feature1Desc" },
-                { icon: BookOpen, titleKey: "feature2Title", descKey: "feature2Desc" },
-                { icon: CheckCircle, titleKey: "feature3Title", descKey: "feature3Desc" }
+                { icon: FileText, title: "Smart Learning", desc: "Access high-quality revision files, subject guides, and verified reference documents." },
+                { icon: BookOpen, title: "Free Resources", desc: "No subscriptions required. Free updates on notes and solutions from top colleges." },
+                { icon: CheckCircle, title: "Easy Access", desc: "Clean navigation and simple downloads for preparation on the go." }
               ].map((feat, i) => (
                 <div key={i} className="flex gap-3.5 p-3 rounded-xl bg-white/[0.03] border border-white/5 backdrop-blur-md">
                   <div className="w-8 h-8 rounded-lg bg-[#F5C21B]/10 flex items-center justify-center shrink-0">
                     <feat.icon className="w-4 h-4 text-[#F5C21B]" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-sm">{t('about', feat.titleKey)}</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">{t('about', feat.descKey)}</p>
+                    <h4 className="font-bold text-white text-sm">{feat.title}</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">{feat.desc}</p>
                   </div>
                 </div>
               ))}
@@ -272,31 +192,27 @@ export const Landing = () => {
       <section className="bg-[#0F1115] py-[70px] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">{t('features', 'tag')}</h2>
+            <h2 className="text-[30px] font-bold text-white tracking-tight">Everything You Need</h2>
             <p className="text-slate-400 text-sm">
-              {t('features', 'desc')}
+              All the tools and resources you need to excel in your +2 examinations.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: FileText, titleKey: "card1Title", descKey: "card1Desc", path: "/pyq" },
-              { icon: BookOpen, titleKey: "card2Title", descKey: "card2Desc", path: "/syllabus" },
-              { icon: Upload, titleKey: "card3Title", descKey: "card3Desc", path: "/contribute" },
-              { icon: Trophy, titleKey: "card4Title", descKey: "card4Desc", path: "/leaderboard" },
-              { icon: Users, titleKey: "card5Title", descKey: "card5Desc", path: "/chat" },
-              { icon: CheckCircle, titleKey: "card6Title", descKey: "card6Desc", path: "/syllabus" }
+              { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision." },
+              { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley." },
+              { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform." },
+              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions." },
+              { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal." },
+              { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns." }
             ].map((feature, i) => (
-              <div 
-                key={i} 
-                onClick={() => handleFeatureClick(feature.path)}
-                className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1 cursor-pointer"
-              >
+              <div key={i} className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
                 <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
                   <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
                 </div>
-                <h3 className="text-[16px] font-bold text-white mb-2">{t('features', feature.titleKey)}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{t('features', feature.descKey)}</p>
+                <h3 className="text-[16px] font-bold text-white mb-2">{feature.title}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -307,29 +223,25 @@ export const Landing = () => {
       <section className="bg-[#0F172A] py-[70px] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">{t('subjects', 'title')}</h2>
+            <h2 className="text-[30px] font-bold text-white tracking-tight">Access Course Subjects</h2>
             <p className="text-slate-400 text-sm">
-              {t('subjects', 'desc')}
+              Choose your course and access curated notes, questions, and guides.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { titleKey: "physics", count: "140+", color: "from-[#F5C21B] to-[#e0b018]" },
-              { titleKey: "chemistry", count: "120+", color: "from-[#F5C21B] to-[#e0b018]" },
-              { titleKey: "biology", count: "90+", color: "from-[#F5C21B] to-[#e0b018]" },
-              { titleKey: "math", count: "150+", color: "from-[#F5C21B] to-[#e0b018]" },
-              { titleKey: "cs", count: "80+", color: "from-[#F5C21B] to-[#e0b018]" },
-              { titleKey: "english", count: "70+", color: "from-[#F5C21B] to-[#e0b018]" }
+              { title: "Physics", count: "140+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
+              { title: "Chemistry", count: "120+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
+              { title: "Biology", count: "90+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
+              { title: "Mathematics", count: "150+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
+              { title: "Computer Science", count: "80+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
+              { title: "English", count: "70+ Files", color: "from-[#F5C21B] to-[#e0b018]" }
             ].map((sub, i) => (
-              <div 
-                key={i} 
-                onClick={() => handleFeatureClick('/syllabus')}
-                className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all cursor-pointer"
-              >
+              <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all cursor-pointer">
                 <div>
-                  <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{t('subjects', sub.titleKey)}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{sub.count} {t('subjects', 'filesCount')}</p>
+                  <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">{sub.count}</p>
                 </div>
                 <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${sub.color} text-black flex items-center justify-center font-black group-hover:scale-105 transition-transform text-sm`}>
                   &rarr;
@@ -344,27 +256,27 @@ export const Landing = () => {
       <section className="bg-[#0F1115] py-[70px] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">{t('feedback', 'title')}</h2>
+            <h2 className="text-[30px] font-bold text-white tracking-tight">Student Feedback</h2>
             <p className="text-slate-400 text-sm">
-              {t('feedback', 'desc')}
+              Hear what students and contributors from colleges across Nepal say.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { name: "Aashish Shrestha", roleKey: "student1Role", reviewKey: "student1Review" },
-              { name: "Priya Adhikari", roleKey: "student2Role", reviewKey: "student2Review" },
-              { name: "Rohit Gurung", roleKey: "student3Role", reviewKey: "student3Review" }
+              { name: "Aashish Shrestha", role: "St. Xavier's College", review: "The mathematics notes solved references are amazing. Saved a lot of time before my board terminals." },
+              { name: "Priya Adhikari", role: "Trinity International", review: "Direct downloads and neat interface. Highly recommend for NEB board exams preparation notes." },
+              { name: "Rohit Gurung", role: "KMC Lalitpur", review: "Contributing notes is highly motivating. The leaderboard badge adds a fun competitive touch." }
             ].map((test, i) => (
               <div key={i} className="p-6 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between space-y-4">
-                <p className="text-slate-300 italic text-[14px] leading-relaxed">"{t('feedback', test.reviewKey)}"</p>
+                <p className="text-slate-300 italic text-[14px] leading-relaxed">"{test.review}"</p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-[#F5C21B]/20 flex items-center justify-center font-bold text-[#F5C21B] text-sm">
                     {test.name[0]}
                   </div>
                   <div>
                     <h4 className="font-bold text-white text-xs">{test.name}</h4>
-                    <p className="text-[10px] text-slate-500">{t('feedback', test.roleKey)}</p>
+                    <p className="text-[10px] text-slate-500">{test.role}</p>
                   </div>
                 </div>
               </div>
@@ -377,29 +289,29 @@ export const Landing = () => {
       <section className="bg-[#0F172A] py-[70px] border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">{t('faq', 'title')}</h2>
+            <h2 className="text-[30px] font-bold text-white tracking-tight">Frequently Asked Questions</h2>
             <p className="text-slate-400 text-sm">
-              {t('faq', 'desc')}
+              Quick answers to the common questions about Hamro +2 Hub.
             </p>
           </div>
 
           <div className="space-y-3">
             {[
-              { qKey: "q1", aKey: "a1" },
-              { qKey: "q2", aKey: "a2" },
-              { qKey: "q3", aKey: "a3" },
-              { qKey: "q4", aKey: "a4" }
+              { q: "Is Hamro +2 Hub completely free to use?", a: "Yes, access to all note files, term papers, and solutions is 100% free with no hidden charges." },
+              { q: "How can I contribute my study materials?", a: "Register/Login with Google, click the Contribute tab in your dashboard, and upload your PDF files." },
+              { q: "Are the resources aligned with NEB board?", a: "Yes, all materials are verified according to the latest syllabus of Nepal National Examinations Board (NEB)." },
+              { q: "How does the student leaderboard badge system work?", a: "You earn repute points each time your contributed document is downloaded or approved by admin." }
             ].map((faq, i) => (
               <div key={i} className="border border-white/5 rounded-xl overflow-hidden bg-white/[0.01]">
                 <button 
                   onClick={() => toggleFaq(i)}
                   className="w-full flex justify-between items-center p-4 text-left font-bold text-[15px] text-white hover:bg-white/[0.02] transition-colors cursor-pointer"
                 >
-                  <span>{t('faq', faq.qKey)}</span>
+                  <span>{faq.q}</span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
                 </button>
                 <div className={`transition-all duration-300 overflow-hidden ${activeFaq === i ? 'max-h-40 border-t border-white/5 p-4' : 'max-h-0'}`}>
-                  <p className="text-slate-400 text-xs leading-relaxed">{t('faq', faq.aKey)}</p>
+                  <p className="text-slate-400 text-xs leading-relaxed">{faq.a}</p>
                 </div>
               </div>
             ))}
@@ -418,21 +330,21 @@ export const Landing = () => {
               <span className="text-base font-bold text-white">Hamro +2 Hub</span>
             </div>
             <p className="text-[11px] text-slate-500 leading-relaxed">
-              {t('footer', 'tagline')}
+              Nepal's collaborative platform for high school students. Quality resources, syllabus references, and term guides.
             </p>
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">{t('footer', 'quickLinks')}</h4>
+            <h4 className="font-bold text-white mb-3 text-sm">Quick Links</h4>
             <ul className="space-y-1.5 text-[11px]">
-              <li><button onClick={() => handleFeatureClick('/')} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none">{t('footer', 'dashboard')}</button></li>
-              <li><button onClick={() => handleFeatureClick('/contribute')} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none">{t('footer', 'contribute')}</button></li>
-              <li><button onClick={() => handleFeatureClick('/syllabus')} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none">{t('footer', 'syllabus')}</button></li>
+              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Study Dashboard</button></li>
+              <li><button onClick={() => openAuthModal('signup')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Contribute File</button></li>
+              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Course Syllabus</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">{t('footer', 'contactUs')}</h4>
+            <h4 className="font-bold text-white mb-3 text-sm">Contact Us</h4>
             <ul className="space-y-1.5 text-[11px]">
               <li className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> support@hamroplustwo.com</li>
               <li className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> +977-1-5555555</li>
@@ -441,7 +353,7 @@ export const Landing = () => {
           </div>
 
           <div className="space-y-3">
-            <h4 className="font-bold text-white mb-3 text-sm">{t('footer', 'followUs')}</h4>
+            <h4 className="font-bold text-white mb-3 text-sm">Follow Us</h4>
             <div className="flex gap-3">
               <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Github className="w-3.5 h-3.5" /></a>
               <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Twitter className="w-3.5 h-3.5" /></a>
@@ -451,10 +363,10 @@ export const Landing = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 md:px-[70px] border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] text-slate-600">
-          <div>&copy; {new Date().getFullYear()} {t('footer', 'copyright')}</div>
+          <div>&copy; {new Date().getFullYear()} Hamro +2 Hub. Made with love in Nepal. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link to="/privacy-policy" className="hover:text-slate-400">{t('footer', 'privacy')}</Link>
-            <Link to="/terms-conditions" className="hover:text-slate-400">{t('footer', 'terms')}</Link>
+            <Link to="/privacy-policy" className="hover:text-slate-400">Privacy Policy</Link>
+            <Link to="/terms-conditions" className="hover:text-slate-400">Terms & Conditions</Link>
           </div>
         </div>
       </footer>

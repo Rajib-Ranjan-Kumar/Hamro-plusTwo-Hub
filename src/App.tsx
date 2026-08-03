@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Outlet, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
 import { Landing } from './pages/Landing';
@@ -34,7 +34,6 @@ import { ViewerPage } from './pages/ViewerPage';
 
 const HomeRoute = () => {
   const { user, isLoading } = useAuth();
-  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -44,25 +43,7 @@ const HomeRoute = () => {
     );
   }
 
-  if (user) {
-    return <Layout />;
-  } else {
-    // If unauthenticated and visiting the root landing page path
-    if (location.pathname === '/') {
-      return <Landing />;
-    }
-    // If visiting other paths (e.g. public footer pages) when unauthenticated
-    return (
-      <div className="min-h-screen site-bg text-white p-6 md:p-12 flex flex-col justify-start">
-        <div className="max-w-4xl w-full mx-auto">
-          <Link to="/" className="inline-flex items-center gap-2 text-[#F5C21B] hover:underline mb-8 font-semibold">
-            &larr; Back to Home
-          </Link>
-          <Outlet />
-        </div>
-      </div>
-    );
-  }
+  return user ? <Layout /> : <Landing />;
 };
 
 export default function App() {
@@ -92,7 +73,7 @@ export default function App() {
               <Route path="disclaimer" element={<Disclaimer />} />
               <Route path="contact" element={<Contact />} />
               <Route path="faq" element={<FAQ />} />
-              <Route path="leaderboard" element={<ProtectedRoute><div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div></ProtectedRoute>} />
+              <Route path="leaderboard" element={<div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div>} />
               <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Route>
