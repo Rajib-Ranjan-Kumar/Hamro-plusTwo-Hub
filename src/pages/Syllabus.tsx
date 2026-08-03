@@ -122,10 +122,10 @@ export const Syllabus = () => {
             {activeSubject ? (
             <>
               {/* Tabs */}
-              <div className="glass-panel rounded-2xl p-1 flex flex-wrap gap-1 max-w-fit mb-6 relative z-20">
+              <div className="glass-panel rounded-2xl p-1 flex flex-wrap gap-1 max-w-fit mb-6 relative z-20 no-scrollbar overflow-x-hidden">
                 <button
                   onClick={() => setActiveTab('syllabus')}
-                  className={`px-6 py-2.5 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+                  className={`px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
                     activeTab === 'syllabus'
                       ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
                       : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
@@ -133,11 +133,21 @@ export const Syllabus = () => {
                 >
                   <BookOpen className="w-4 h-4" /> Syllabus
                 </button>
+                <button
+                  onClick={() => setActiveTab('notes')}
+                  className={`px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+                    activeTab === 'notes'
+                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+                      : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" /> Structured Notes
+                </button>
                 {contentTypes.filter(ct => ct.name.toLowerCase() !== 'pyq' && ct.name.toLowerCase() !== 'solution' && ct.name.toLowerCase() !== 'notes' && ct.name.toLowerCase() !== 'syllabus').map(ct => (
                   <button
                     key={ct.id}
                     onClick={() => setActiveTab(ct.name.toLowerCase())}
-                    className={`px-6 py-2.5 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+                    className={`px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
                       activeTab === ct.name.toLowerCase()
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
                         : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
