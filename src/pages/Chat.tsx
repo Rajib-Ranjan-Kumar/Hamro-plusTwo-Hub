@@ -132,7 +132,7 @@ export const Chat = () => {
         </div>
       </div>
 
-      <div className="flex-1 glass-panel p-4 overflow-y-auto space-y-4">
+      <div className="flex-1 glass-panel p-4 overflow-y-auto no-scrollbar space-y-4">
         {messages.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-2">
             <MessageSquare className="w-12 h-12 opacity-20" />

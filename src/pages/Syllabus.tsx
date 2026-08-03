@@ -143,7 +143,7 @@ export const Syllabus = () => {
                 >
                   <FileText className="w-4 h-4" /> Structured Notes
                 </button>
-                {contentTypes.filter(ct => ct.name.toLowerCase() !== 'pyq' && ct.name.toLowerCase() !== 'solution').map(ct => (
+                {contentTypes.filter(ct => ct.name.toLowerCase() !== 'pyq' && ct.name.toLowerCase() !== 'solution' && ct.name.toLowerCase() !== 'notes' && ct.name.toLowerCase() !== 'syllabus').map(ct => (
                   <button
                     key={ct.id}
                     onClick={() => setActiveTab(ct.name.toLowerCase())}
