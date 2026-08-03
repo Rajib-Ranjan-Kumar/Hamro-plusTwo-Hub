@@ -33,16 +33,57 @@
   --color-indigo-400: #FFE082;
 }
 
+:root {
+  --bg-image: url('/images/mobile-background.webp');
+}
+@media (min-width: 768px) {
+  :root {
+    --bg-image: url('/images/tablet-background.webp');
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --bg-image: url('/images/desktop-background.webp');
+  }
+}
+
+.site-bg {
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  image-rendering: -webkit-optimize-contrast;
+}
+@media (min-width: 1024px) {
+  .site-bg {
+    background-attachment: fixed;
+  }
+}
+
 @layer base {
   body {
-    @apply select-none bg-slate-900 text-slate-5/90 selection:bg-emerald-600/30;
+    @apply select-none text-slate-5/90 selection:bg-emerald-600/30;
     font-family: 'Poppins', sans-serif;
+    background-color: #0D0D0F;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    image-rendering: -webkit-optimize-contrast;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      background-attachment: fixed;
+    }
   }
 
   /* Dropdown & Input Global Overrides */

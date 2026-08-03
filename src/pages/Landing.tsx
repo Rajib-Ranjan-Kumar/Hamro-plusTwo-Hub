@@ -51,16 +51,13 @@ export const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1115] text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden">
       <SEO />
 
       {/* 100vh Hero Fold Section */}
       <div className="relative h-screen min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
         {/* Full Screen Clean Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" 
-          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
-        />
+        <div className="absolute inset-0 z-0 site-bg" />
         
         {/* Subtle dark gradient overlay behind left-aligned text for readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent z-0 pointer-events-none" />

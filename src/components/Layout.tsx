@@ -19,15 +19,9 @@ export const Layout = () => {
   return (
     <div className="flex h-screen bg-slate-900 text-white overflow-hidden relative">
       <SEO />
-      {/* Background Image - Nature Inspired */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      {/* Background Image - nature Inspired */}
+      <div className="absolute inset-0 z-0 pointer-events-none site-bg opacity-30">
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900/60 z-10"></div>
-        <img 
-          src="https://images.unsplash.com/photo-1543731068-7e0f5beff43a?q=80&w=2070&auto=format&fit=crop" 
-          alt="Nature Background" 
-          referrerPolicy="no-referrer"
-          className="absolute inset-0 w-full h-full object-cover blur-sm opacity-50"
-        />
       </div>
 
       {/* Mobile Header */}

@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>BCA Notes Nepal</title>
+    <!-- Preload only the current responsive background image to prevent flashes -->
+    <link rel="preload" as="image" href="/images/mobile-background.webp" media="(max-width: 767px)" />
+    <link rel="preload" as="image" href="/images/tablet-background.webp" media="(min-width: 768px) and (max-width: 1023px)" />
+    <link rel="preload" as="image" href="/images/desktop-background.webp" media="(min-width: 1024px)" />
   </head>
   <body>
     <div id="root"></div>

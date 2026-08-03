@@ -37,7 +37,7 @@ const HomeRoute = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0F1115]">
+      <div className="min-h-screen flex items-center justify-center bg-[#0D0D0F]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5C21B]"></div>
       </div>
     );
