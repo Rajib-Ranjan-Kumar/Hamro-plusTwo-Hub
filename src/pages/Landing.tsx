@@ -33,7 +33,11 @@ export const Landing = () => {
       const result = await signInWithPopup(auth, googleProvider);
       await handleSessionUpdate(result.user);
       setIsAuthModalOpen(false);
-      navigate('/');
+      
+      // Redirect to target destination originally clicked, fallback to root
+      const redirectPath = localStorage.getItem('redirect_after_login') || '/';
+      localStorage.removeItem('redirect_after_login');
+      navigate(redirectPath);
     } catch (err: any) {
       console.error("Google auth failed:", err);
       setError(getFirebaseErrorMessage(err));
@@ -44,6 +48,19 @@ export const Landing = () => {
   const openAuthModal = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
+  };
+
+  const ProtectedWrapper = ({ children, path }: { children: React.ReactElement; path: string; key?: React.Key }) => {
+    const handleClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      localStorage.setItem('redirect_after_login', path);
+      openAuthModal('login');
+    };
+
+    return React.cloneElement(children, {
+      onClick: handleClick,
+      className: `${children.props.className || ''} cursor-pointer`.trim()
+    });
   };
 
   const toggleFaq = (index: number) => {
@@ -122,20 +139,18 @@ export const Landing = () => {
               className="flex flex-wrap items-center gap-[16px] pt-1"
             >
               {/* Button 1: Get Started */}
-              <button 
-                onClick={() => openAuthModal('signup')}
-                className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer"
-              >
-                <span>🚀 Get Started</span>
-              </button>
+              <ProtectedWrapper path="/">
+                <button className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg">
+                  <span>🚀 Get Started</span>
+                </button>
+              </ProtectedWrapper>
 
               {/* Button 2: Explore Now */}
-              <a 
-                href="#about"
-                className="bg-black/35 hover:bg-black/50 border border-white/35 text-white font-normal text-[20px] h-[45px] w-[168px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-102 backdrop-blur-sm cursor-pointer"
-              >
-                <span>▶ Explore Now</span>
-              </a>
+              <ProtectedWrapper path="/syllabus">
+                <button className="bg-black/35 hover:bg-black/50 border border-white/35 text-white font-normal text-[20px] h-[45px] w-[168px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-102 backdrop-blur-sm">
+                  <span>▶ Explore Now</span>
+                </button>
+              </ProtectedWrapper>
             </motion.div>
           </div>
         </div>
@@ -200,20 +215,22 @@ export const Landing = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision." },
-              { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley." },
-              { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform." },
-              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions." },
-              { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal." },
-              { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns." }
+              { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision.", path: "/pyq" },
+              { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley.", path: "/syllabus" },
+              { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform.", path: "/contribute" },
+              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions.", path: "/leaderboard" },
+              { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal.", path: "/chat" },
+              { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns.", path: "/syllabus" }
             ].map((feature, i) => (
-              <div key={i} className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
-                <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
-                  <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
+              <ProtectedWrapper key={i} path={feature.path}>
+                <div className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
+                  <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
+                    <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
+                  </div>
+                  <h3 className="text-[16px] font-bold text-white mb-2">{feature.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
                 </div>
-                <h3 className="text-[16px] font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
-              </div>
+              </ProtectedWrapper>
             ))}
           </div>
         </div>
@@ -231,22 +248,24 @@ export const Landing = () => {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { title: "Physics", count: "140+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Chemistry", count: "120+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Biology", count: "90+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Mathematics", count: "150+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "Computer Science", count: "80+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
-              { title: "English", count: "70+ Files", color: "from-[#F5C21B] to-[#e0b018]" }
+              { title: "Physics", count: "140+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
+              { title: "Chemistry", count: "120+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
+              { title: "Biology", count: "90+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
+              { title: "Mathematics", count: "150+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
+              { title: "Computer Science", count: "80+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
+              { title: "English", count: "70+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" }
             ].map((sub, i) => (
-              <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all cursor-pointer">
-                <div>
-                  <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{sub.count}</p>
+              <ProtectedWrapper key={i} path={sub.path}>
+                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all">
+                  <div>
+                    <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">{sub.count}</p>
+                  </div>
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${sub.color} text-black flex items-center justify-center font-black group-hover:scale-105 transition-transform text-sm`}>
+                    &rarr;
+                  </div>
                 </div>
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${sub.color} text-black flex items-center justify-center font-black group-hover:scale-105 transition-transform text-sm`}>
-                  &rarr;
-                </div>
-              </div>
+              </ProtectedWrapper>
             ))}
           </div>
         </div>
