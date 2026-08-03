@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from '../components/SEO';
@@ -10,11 +10,21 @@ import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 
 export const Landing = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+
+  // Automatically trigger Auth Modal if redirected from a protected route
+  useEffect(() => {
+    if (location.state?.from) {
+      setAuthMode('login');
+      setIsAuthModalOpen(true);
+    }
+  }, [location.state]);
 
   const handleSessionUpdate = async (firebaseUser: any) => {
     const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -33,7 +43,9 @@ export const Landing = () => {
       const result = await signInWithPopup(auth, googleProvider);
       await handleSessionUpdate(result.user);
       setIsAuthModalOpen(false);
-      navigate('/');
+      
+      const destination = redirectPath || location.state?.from?.pathname || '/';
+      navigate(destination);
     } catch (err: any) {
       console.error("Google auth failed:", err);
       setError(getFirebaseErrorMessage(err));
@@ -44,6 +56,11 @@ export const Landing = () => {
   const openAuthModal = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
+  };
+
+  const handleFeatureClick = (path: string) => {
+    setRedirectPath(path);
+    openAuthModal('login');
   };
 
   const toggleFaq = (index: number) => {
@@ -67,8 +84,25 @@ export const Landing = () => {
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="absolute top-0 right-0 z-10 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[14px]"
+          className="absolute top-0 right-0 z-10 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[24px]"
         >
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center gap-[20px] text-[15px] font-medium text-white/80">
+            {/* Public Links */}
+            <a href="/" className="hover:text-white transition-colors">Home</a>
+            <a href="#about" className="hover:text-white transition-colors">About</a>
+            <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
+            <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            
+            {/* Protected Links */}
+            <button onClick={() => handleFeatureClick('/pyq')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">PYQs</button>
+            <button onClick={() => handleFeatureClick('/syllabus')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Notes</button>
+            <button onClick={() => handleFeatureClick('/syllabus')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Syllabus</button>
+            <button onClick={() => handleFeatureClick('/chat')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Chat</button>
+            <button onClick={() => handleFeatureClick('/get-premium')} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none">Membership</button>
+          </div>
+
           {/* Language Selector Pill */}
           <div className="relative group">
             <button className="flex items-center gap-1 h-[36px] px-[14px] border border-white/80 rounded-full text-white text-[15px] font-semibold hover:bg-white/10 transition-all cursor-pointer">
@@ -79,7 +113,10 @@ export const Landing = () => {
 
           {/* Log In Button - Gold Pill */}
           <button 
-            onClick={() => openAuthModal('login')}
+            onClick={() => {
+              setRedirectPath('/');
+              openAuthModal('login');
+            }}
             className="bg-[#F5C21B] hover:bg-[#e0b018] text-black h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102"
           >
             <User className="w-4 h-4 stroke-[2.5px]" />
@@ -123,7 +160,10 @@ export const Landing = () => {
             >
               {/* Button 1: Get Started */}
               <button 
-                onClick={() => openAuthModal('signup')}
+                onClick={() => {
+                  setRedirectPath('/');
+                  openAuthModal('signup');
+                }}
                 className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer"
               >
                 <span>🚀 Get Started</span>
@@ -200,14 +240,18 @@ export const Landing = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision." },
-              { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley." },
-              { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform." },
-              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions." },
-              { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal." },
-              { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns." }
+              { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision.", path: "/pyq" },
+              { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley.", path: "/syllabus" },
+              { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform.", path: "/contribute" },
+              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions.", path: "/leaderboard" },
+              { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal.", path: "/chat" },
+              { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns.", path: "/syllabus" }
             ].map((feature, i) => (
-              <div key={i} className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
+              <div 
+                key={i} 
+                onClick={() => handleFeatureClick(feature.path)}
+                className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1 cursor-pointer"
+              >
                 <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
                   <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
                 </div>
@@ -238,7 +282,11 @@ export const Landing = () => {
               { title: "Computer Science", count: "80+ Files", color: "from-[#F5C21B] to-[#e0b018]" },
               { title: "English", count: "70+ Files", color: "from-[#F5C21B] to-[#e0b018]" }
             ].map((sub, i) => (
-              <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all cursor-pointer">
+              <div 
+                key={i} 
+                onClick={() => handleFeatureClick('/syllabus')}
+                className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all cursor-pointer"
+              >
                 <div>
                   <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
                   <p className="text-xs text-slate-400 mt-0.5">{sub.count}</p>
@@ -337,9 +385,9 @@ export const Landing = () => {
           <div>
             <h4 className="font-bold text-white mb-3 text-sm">Quick Links</h4>
             <ul className="space-y-1.5 text-[11px]">
-              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Study Dashboard</button></li>
-              <li><button onClick={() => openAuthModal('signup')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Contribute File</button></li>
-              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Course Syllabus</button></li>
+              <li><button onClick={() => handleFeatureClick('/')} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none">Study Dashboard</button></li>
+              <li><button onClick={() => handleFeatureClick('/contribute')} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none">Contribute File</button></li>
+              <li><button onClick={() => handleFeatureClick('/syllabus')} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none">Course Syllabus</button></li>
             </ul>
           </div>
 
