@@ -69,7 +69,7 @@ export const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden pt-[72px] xl:pt-[88px]">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden pt-[60px] lg:pt-[64px] xl:pt-[68px]">
       <SEO />
 
       {/* Premium Navigation Header */}
@@ -77,18 +77,18 @@ export const Landing = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 w-full h-[72px] xl:h-[88px] bg-[#070C12]/88 backdrop-blur-md border-b border-white/8 z-50 flex items-center justify-between px-6 xl:px-8 transition-all duration-300"
+        className="fixed top-0 left-0 w-full h-[60px] lg:h-[64px] xl:h-[68px] bg-[#0A0C10]/95 backdrop-blur-md border-b border-white/8 z-50 flex items-center justify-between px-6 transition-all duration-300"
       >
         {/* Left: Logo Section */}
         <div className="flex items-center gap-2 shrink-0 select-none">
-          <div className="bg-[#F4B400] text-black text-[11px] font-black px-2 py-0.5 rounded shadow-[0_0_8px_rgba(244,180,0,0.3)]">
+          <div className="bg-[#F4B400] text-black text-[10px] font-black h-[34px] w-[34px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
             +2
           </div>
-          <span className="text-lg font-bold text-white tracking-wide shrink-0">Hamro +2 Hub</span>
+          <span className="text-[18px] font-bold text-white tracking-wide shrink-0">Hamro +2 Hub</span>
         </div>
 
         {/* Center: Navigation Links (Desktop/Laptop only, hidden on tablet/mobile) */}
-        <nav className="hidden xl:flex items-center gap-[48px] absolute left-1/2 -translate-x-1/2">
+        <nav className="hidden lg:flex items-center gap-[34px] absolute left-1/2 -translate-x-1/2">
           {[
             { name: 'Home', path: '/', active: true },
             { name: 'PYQs', path: '/pyq' },
@@ -99,12 +99,12 @@ export const Landing = () => {
             { name: 'About', path: '#about', isAnchor: true }
           ].map((item) => {
             const linkContent = (
-              <span className={`relative text-[22px] font-semibold transition-all duration-250 ease-in-out cursor-pointer ${item.active ? 'text-[#F4B400]' : 'text-white/80 hover:text-white'}`}>
+              <span className={`relative text-[18px] font-semibold transition-all duration-250 ease-in-out cursor-pointer ${item.active ? 'text-[#F4B400]' : 'text-white/80 hover:text-white'}`}>
                 {item.name}
                 {item.active && (
                   <motion.span 
                     layoutId="navbar-underline"
-                    className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 w-[58px] h-[3px] bg-[#F4B400] rounded-full"
+                    className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-[42px] h-[2.5px] bg-[#F4B400] rounded-full"
                   />
                 )}
               </span>
@@ -130,7 +130,7 @@ export const Landing = () => {
         <div className="flex items-center gap-[12px] sm:gap-[18px] shrink-0">
           {/* Language Selector Pill */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 h-[40px] xl:h-[54px] px-4 xl:px-6 border border-white/35 rounded-full text-white text-sm xl:text-[18px] font-semibold hover:border-white/60 bg-transparent transition-all cursor-pointer">
+            <button className="flex items-center gap-1.5 h-[46px] px-5 border border-white/35 rounded-full text-white text-sm lg:text-[16px] font-semibold hover:border-white/60 bg-transparent transition-all cursor-pointer">
               <span>English</span>
               <ChevronDown className="w-4 h-4 text-white" />
             </button>
@@ -139,16 +139,16 @@ export const Landing = () => {
           {/* Log In Button - Gold Pill */}
           <button 
             onClick={() => openAuthModal('login')}
-            className="bg-[#F4B400] hover:bg-[#F4B400]/95 text-black h-[40px] xl:h-[54px] px-4 xl:px-[28px] rounded-full font-semibold text-sm xl:text-[18px] transition-all flex items-center gap-[10px] shadow-[0_0_15px_rgba(244,180,0,0.3)] cursor-pointer hover:scale-102 hover:-translate-y-0.5 duration-250 shrink-0"
+            className="bg-[#F4B400] hover:bg-[#F4B400]/95 text-black h-[46px] px-6 rounded-full font-semibold text-sm lg:text-[16px] transition-all flex items-center gap-[10px] shadow-[0_0_15px_rgba(244,180,0,0.3)] cursor-pointer hover:scale-102 hover:-translate-y-0.5 duration-250 shrink-0"
           >
-            <User className="w-4 h-4 xl:w-5 xl:h-5 stroke-[2.5px]" />
+            <User className="w-[18px] h-[18px] stroke-[2.5px]" />
             <span>Log In</span>
           </button>
 
           {/* Hamburger Menu Toggle (Hidden on desktop/laptop) */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="xl:hidden p-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+            className="lg:hidden p-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -165,7 +165,7 @@ export const Landing = () => {
               animate={{ opacity: 0.4 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black z-40 xl:hidden"
+              className="fixed inset-0 bg-black z-40 lg:hidden"
             />
             {/* Drawer */}
             <motion.div
@@ -173,7 +173,7 @@ export const Landing = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-              className="fixed top-0 right-0 w-[280px] sm:w-[320px] h-full bg-[#070C12] border-l border-white/8 z-40 pt-[100px] px-6 shadow-2xl xl:hidden flex flex-col justify-between pb-8"
+              className="fixed top-0 right-0 w-[280px] sm:w-[320px] h-full bg-[#0A0C10]/95 backdrop-blur-md border-l border-white/8 z-40 pt-[100px] px-6 shadow-2xl lg:hidden flex flex-col justify-between pb-8"
             >
               {/* Menu Links */}
               <nav className="flex flex-col gap-6">
@@ -221,7 +221,7 @@ export const Landing = () => {
       </AnimatePresence>
 
       {/* 100vh Hero Fold Section */}
-      <div className="relative h-[calc(100vh-72px)] xl:h-[calc(100vh-88px)] min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
+      <div className="relative h-[calc(100vh-60px)] lg:h-[calc(100vh-64px)] xl:h-[calc(100vh-68px)] min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
         {/* Full Screen Clean Background Image */}
         <div className="absolute inset-0 z-0 site-bg" />
         
