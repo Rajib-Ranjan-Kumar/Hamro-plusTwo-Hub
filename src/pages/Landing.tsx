@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -16,6 +16,19 @@ export const Landing = () => {
   const [error, setError] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY >= 80) {
+        setHasScrolled(true);
+      } else {
+        setHasScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSessionUpdate = async (firebaseUser: any) => {
     const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -69,7 +82,7 @@ export const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden pt-[60px] lg:pt-[64px] xl:pt-[68px]">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden">
       <SEO />
 
       {/* Premium Navigation Header */}
@@ -77,7 +90,14 @@ export const Landing = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 w-full h-[60px] lg:h-[64px] xl:h-[68px] bg-[#0A0C10]/95 backdrop-blur-md border-b border-white/8 z-50 flex items-center justify-between px-6 transition-all duration-300"
+        className="fixed top-0 left-0 w-full h-[60px] lg:h-[64px] xl:h-[68px] z-[1000] flex items-center justify-between px-6 transition-all duration-300 border-b"
+        style={{
+          backgroundColor: hasScrolled ? 'rgba(10, 12, 18, 0.55)' : 'rgba(10, 10, 10, 0.08)',
+          backdropFilter: hasScrolled ? 'blur(18px)' : 'blur(8px)',
+          WebkitBackdropFilter: hasScrolled ? 'blur(18px)' : 'blur(8px)',
+          borderColor: hasScrolled ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.06)',
+          boxShadow: hasScrolled ? '0 2px 10px rgba(0, 0, 0, 0.08)' : 'none'
+        }}
       >
         {/* Left: Logo Section */}
         <div className="flex items-center gap-2 shrink-0 select-none">
@@ -221,7 +241,7 @@ export const Landing = () => {
       </AnimatePresence>
 
       {/* 100vh Hero Fold Section */}
-      <div className="relative h-[calc(100vh-60px)] lg:h-[calc(100vh-64px)] xl:h-[calc(100vh-68px)] min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
+      <div className="relative h-screen min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
         {/* Full Screen Clean Background Image */}
         <div className="absolute inset-0 z-0 site-bg" />
         
