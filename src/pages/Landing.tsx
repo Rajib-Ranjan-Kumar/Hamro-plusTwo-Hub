@@ -36,11 +36,7 @@ export const Landing = () => {
       navigate('/');
     } catch (err: any) {
       console.error("Google auth failed:", err);
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError(getFirebaseErrorMessage(err));
-        setAuthMode('login');
-        setIsAuthModalOpen(true);
-      }
+      setError(getFirebaseErrorMessage(err));
       setIsLoggingIn(false);
     }
   };
@@ -71,7 +67,7 @@ export const Landing = () => {
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="absolute top-0 right-0 z-10 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[14px]"
+          className="absolute top-0 right-0 z-30 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[14px]"
         >
           {/* Language Selector Pill */}
           <div className="relative group">
@@ -83,16 +79,11 @@ export const Landing = () => {
 
           {/* Log In Button - Gold Pill */}
           <button 
-            onClick={handleGoogleLogin}
-            disabled={isLoggingIn}
-            className="bg-[#F5C21B] hover:bg-[#e0b018] text-black h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102 disabled:opacity-50"
+            onClick={() => openAuthModal('login')}
+            className="bg-[#F5C21B] hover:bg-[#e0b018] text-black h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102"
           >
-            {isLoggingIn ? (
-              <Loader2 className="w-4 h-4 animate-spin text-black" />
-            ) : (
-              <User className="w-4 h-4 stroke-[2.5px]" />
-            )}
-            <span>{isLoggingIn ? 'Logging in...' : 'Log In'}</span>
+            <User className="w-4 h-4 stroke-[2.5px]" />
+            <span>Log In</span>
           </button>
         </motion.nav>
 
@@ -132,15 +123,10 @@ export const Landing = () => {
             >
               {/* Button 1: Get Started */}
               <button 
-                onClick={handleGoogleLogin}
-                disabled={isLoggingIn}
-                className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer disabled:opacity-50"
+                onClick={() => openAuthModal('signup')}
+                className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg cursor-pointer"
               >
-                {isLoggingIn ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-black" />
-                ) : (
-                  <span>🚀 Get Started</span>
-                )}
+                <span>🚀 Get Started</span>
               </button>
 
               {/* Button 2: Explore Now */}
@@ -351,9 +337,9 @@ export const Landing = () => {
           <div>
             <h4 className="font-bold text-white mb-3 text-sm">Quick Links</h4>
             <ul className="space-y-1.5 text-[11px]">
-              <li><button onClick={handleGoogleLogin} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none p-0 text-left font-normal text-slate-400">Study Dashboard</button></li>
-              <li><button onClick={handleGoogleLogin} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none p-0 text-left font-normal text-slate-400">Contribute File</button></li>
-              <li><button onClick={handleGoogleLogin} className="hover:text-[#F5C21B] transition-colors cursor-pointer bg-transparent border-none p-0 text-left font-normal text-slate-400">Course Syllabus</button></li>
+              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Study Dashboard</button></li>
+              <li><button onClick={() => openAuthModal('signup')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Contribute File</button></li>
+              <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Course Syllabus</button></li>
             </ul>
           </div>
 
