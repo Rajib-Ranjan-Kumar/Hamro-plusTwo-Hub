@@ -20,8 +20,8 @@ export const Layout = () => {
     <div className="flex h-screen bg-slate-900 text-white overflow-hidden relative">
       <SEO />
       {/* Background Image - nature Inspired */}
-      <div className="absolute inset-0 z-0 pointer-events-none site-bg opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900/60 z-10"></div>
+      <div className="absolute inset-0 z-0 pointer-events-none site-bg opacity-75">
+        <div className="absolute inset-0 bg-[#080A0E]/40 z-10"></div>
       </div>
 
       {/* Mobile Header */}

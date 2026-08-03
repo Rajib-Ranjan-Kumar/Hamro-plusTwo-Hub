@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { name: 'Dashboard', path: '/', icon: TrendingUp },
+  { name: 'Home', path: '/', icon: TrendingUp },
   { name: 'PYQs', path: '/pyq', icon: FileText, premium: true },
   { name: 'Syllabus & Notes', path: '/syllabus', icon: BookOpen, premium: true },
-  { name: 'Stream Chats', path: '/chat', icon: MessageSquare },
+  { name: 'Chat', path: '/chat', icon: MessageSquare },
   { name: 'Contribute & Earn', path: '/contribute', icon: Upload },
   { name: 'Leaderboard', path: '/leaderboard', icon: Trophy },
   { name: 'Settings', path: '/settings', icon: Settings },
