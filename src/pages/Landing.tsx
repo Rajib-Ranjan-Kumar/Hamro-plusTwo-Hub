@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube } from 'lucide-react';
+import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from '../components/SEO';
 import { auth, googleProvider, db } from '../firebase';
@@ -15,6 +15,7 @@ export const Landing = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSessionUpdate = async (firebaseUser: any) => {
     const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -68,27 +69,68 @@ export const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-[#F5C21B]/30 flex flex-col relative overflow-x-hidden pt-[72px] xl:pt-[88px]">
       <SEO />
 
-      {/* 100vh Hero Fold Section */}
-      <div className="relative h-screen min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
-        {/* Full Screen Clean Background Image */}
-        <div className="absolute inset-0 z-0 site-bg" />
-        
-        {/* Subtle dark gradient overlay behind left-aligned text for readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent z-0 pointer-events-none" />
+      {/* Premium Navigation Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="fixed top-0 left-0 w-full h-[72px] xl:h-[88px] bg-[#070C12]/88 backdrop-blur-md border-b border-white/8 z-50 flex items-center justify-between px-6 xl:px-8 transition-all duration-300"
+      >
+        {/* Left: Logo Section */}
+        <div className="flex items-center gap-2 shrink-0 select-none">
+          <div className="bg-[#F4B400] text-black text-[11px] font-black px-2 py-0.5 rounded shadow-[0_0_8px_rgba(244,180,0,0.3)]">
+            +2
+          </div>
+          <span className="text-lg font-bold text-white tracking-wide shrink-0">Hamro +2 Hub</span>
+        </div>
 
-        {/* Navbar - Positioned Top Right, scaled down to 70% */}
-        <motion.nav 
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="absolute top-0 right-0 z-30 pt-4 pr-6 sm:pt-[28px] sm:pr-[42px] flex items-center gap-[14px]"
-        >
+        {/* Center: Navigation Links (Desktop/Laptop only, hidden on tablet/mobile) */}
+        <nav className="hidden xl:flex items-center gap-[48px] absolute left-1/2 -translate-x-1/2">
+          {[
+            { name: 'Home', path: '/', active: true },
+            { name: 'PYQs', path: '/pyq' },
+            { name: 'Notes', path: '/syllabus' },
+            { name: 'Syllabus', path: '/syllabus' },
+            { name: 'Chat', path: '/chat' },
+            { name: 'Membership', path: '/get-premium' },
+            { name: 'About', path: '#about', isAnchor: true }
+          ].map((item) => {
+            const linkContent = (
+              <span className={`relative text-[22px] font-semibold transition-all duration-250 ease-in-out cursor-pointer ${item.active ? 'text-[#F4B400]' : 'text-white/80 hover:text-white'}`}>
+                {item.name}
+                {item.active && (
+                  <motion.span 
+                    layoutId="navbar-underline"
+                    className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 w-[58px] h-[3px] bg-[#F4B400] rounded-full"
+                  />
+                )}
+              </span>
+            );
+
+            if (item.isAnchor) {
+              return (
+                <a key={item.name} href={item.path} className="no-underline">
+                  {linkContent}
+                </a>
+              );
+            }
+
+            return (
+              <ProtectedWrapper key={item.name} path={item.path}>
+                {linkContent}
+              </ProtectedWrapper>
+            );
+          })}
+        </nav>
+
+        {/* Right: Language Selector + Login Button + Mobile Hamburger */}
+        <div className="flex items-center gap-[12px] sm:gap-[18px] shrink-0">
           {/* Language Selector Pill */}
           <div className="relative group">
-            <button className="flex items-center gap-1 h-[36px] px-[14px] border border-white/80 rounded-full text-white text-[15px] font-semibold hover:bg-white/10 transition-all cursor-pointer">
+            <button className="flex items-center gap-1.5 h-[40px] xl:h-[54px] px-4 xl:px-6 border border-white/35 rounded-full text-white text-sm xl:text-[18px] font-semibold hover:border-white/60 bg-transparent transition-all cursor-pointer">
               <span>English</span>
               <ChevronDown className="w-4 h-4 text-white" />
             </button>
@@ -97,12 +139,94 @@ export const Landing = () => {
           {/* Log In Button - Gold Pill */}
           <button 
             onClick={() => openAuthModal('login')}
-            className="bg-[#F5C21B] hover:bg-[#e0b018] text-black h-[36px] px-[21px] rounded-full font-semibold text-[14px] transition-all flex items-center gap-1.5 shadow-md cursor-pointer hover:scale-102"
+            className="bg-[#F4B400] hover:bg-[#F4B400]/95 text-black h-[40px] xl:h-[54px] px-4 xl:px-[28px] rounded-full font-semibold text-sm xl:text-[18px] transition-all flex items-center gap-[10px] shadow-[0_0_15px_rgba(244,180,0,0.3)] cursor-pointer hover:scale-102 hover:-translate-y-0.5 duration-250 shrink-0"
           >
-            <User className="w-4 h-4 stroke-[2.5px]" />
+            <User className="w-4 h-4 xl:w-5 xl:h-5 stroke-[2.5px]" />
             <span>Log In</span>
           </button>
-        </motion.nav>
+
+          {/* Hamburger Menu Toggle (Hidden on desktop/laptop) */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="xl:hidden p-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </motion.header>
+
+      {/* Mobile Drawer Navigation Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-black z-40 xl:hidden"
+            />
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+              className="fixed top-0 right-0 w-[280px] sm:w-[320px] h-full bg-[#070C12] border-l border-white/8 z-40 pt-[100px] px-6 shadow-2xl xl:hidden flex flex-col justify-between pb-8"
+            >
+              {/* Menu Links */}
+              <nav className="flex flex-col gap-6">
+                {[
+                  { name: 'Home', path: '/', active: true },
+                  { name: 'PYQs', path: '/pyq' },
+                  { name: 'Notes', path: '/syllabus' },
+                  { name: 'Syllabus', path: '/syllabus' },
+                  { name: 'Chat', path: '/chat' },
+                  { name: 'Membership', path: '/get-premium' },
+                  { name: 'About', path: '#about', isAnchor: true }
+                ].map((item) => {
+                  const linkContent = (
+                    <span 
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`text-lg font-semibold transition-all duration-200 block py-1 cursor-pointer ${item.active ? 'text-[#F4B400] border-l-2 border-[#F4B400] pl-3' : 'text-white/80 hover:text-white hover:pl-2'}`}
+                    >
+                      {item.name}
+                    </span>
+                  );
+
+                  if (item.isAnchor) {
+                    return (
+                      <a key={item.name} href={item.path} className="no-underline" onClick={() => setIsMenuOpen(false)}>
+                        {linkContent}
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <ProtectedWrapper key={item.name} path={item.path}>
+                      {linkContent}
+                    </ProtectedWrapper>
+                  );
+                })}
+              </nav>
+
+              {/* Bottom footer text inside drawer */}
+              <div className="text-[11px] text-slate-600 border-t border-white/5 pt-4">
+                &copy; {new Date().getFullYear()} Hamro +2 Hub
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* 100vh Hero Fold Section */}
+      <div className="relative h-[calc(100vh-72px)] xl:h-[calc(100vh-88px)] min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
+        {/* Full Screen Clean Background Image */}
+        <div className="absolute inset-0 z-0 site-bg" />
+        
+        {/* Subtle dark gradient overlay behind left-aligned text for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent z-0 pointer-events-none" />
 
         {/* Hero Left Content - Vertically Centered */}
         <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-[80px] flex flex-col justify-center">
