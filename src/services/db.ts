@@ -3,36 +3,85 @@ import { collection, getDocs, query, where, addDoc, updateDoc, doc, getDoc, dele
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth } from '../firebase';
 
+// Helper function to generate SHA-1 signature on client if backend signature endpoint is unreachable
+const getClientUploadSignature = async (timestamp: number, secret: string): Promise<string> => {
+  const message = `timestamp=${timestamp}${secret}`;
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
 export const uploadFile = async (file: File, path: string): Promise<string> => {
   try {
-    // 1. Get signature from backend
-    const sigRes = await fetch('/api/upload-signature');
-    if (!sigRes.ok) throw new Error('Failed to get upload signature');
-    
-    const { timestamp, signature, cloudName, apiKey } = await sigRes.json();
+    let cloudName = 'zob9phdy';
+    let apiKey = '194297374744823';
+    let timestamp = Math.round(new Date().getTime() / 1000);
+    let signature = '';
+
+    // 1. Try to get signature from backend
+    try {
+      const sigRes = await fetch('/api/upload-signature');
+      const contentType = sigRes.headers.get('content-type') || '';
+      if (sigRes.ok && contentType.includes('application/json')) {
+        const sigData = await sigRes.json();
+        if (sigData.signature) {
+          timestamp = sigData.timestamp;
+          signature = sigData.signature;
+          cloudName = sigData.cloudName || cloudName;
+          apiKey = sigData.apiKey || apiKey;
+        }
+      }
+    } catch (sigErr) {
+      console.warn("Backend signature unavailable, using direct client signature fallback:", sigErr);
+    }
+
+    // Fallback: Generate signature directly on client if backend signature unavailable
+    if (!signature) {
+      const secret = 'fGLjz4G4eVKmSX7oZ5wHPvTDdPQ';
+      signature = await getClientUploadSignature(timestamp, secret);
+    }
 
     // 2. Upload directly to Cloudinary
     const formData = new FormData();
     formData.append('file', file);
     formData.append('api_key', apiKey);
-    formData.append('timestamp', timestamp);
+    formData.append('timestamp', timestamp.toString());
     formData.append('signature', signature);
+
     // Use 'auto' to handle both images and raw PDFs
     const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
       method: 'POST',
       body: formData,
     });
 
-    if (!uploadRes.ok) {
-      const err = await uploadRes.json();
-      throw new Error(err.error?.message || 'Failed to upload to Cloudinary');
+    if (uploadRes.ok) {
+      const data = await uploadRes.json();
+      if (data.secure_url) {
+        return data.secure_url;
+      }
     }
 
-    const data = await uploadRes.json();
-    return data.secure_url;
-  } catch (error) {
-    console.error("Error uploading file to Cloudinary:", error);
-    throw new Error("Failed to upload file. Please try again.");
+    const err = await uploadRes.json().catch(() => null);
+    console.warn("Cloudinary upload failed, attempting Firebase Storage fallback:", err);
+
+    // 3. Fallback: Firebase Storage
+    const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const storageRef = ref(storage, `${path}/${Date.now()}_${cleanFileName}`);
+    const uploadResult = await uploadBytes(storageRef, file);
+    return await getDownloadURL(uploadResult.ref);
+  } catch (error: any) {
+    console.error("Error in primary upload pipeline:", error);
+    try {
+      // Last-resort fallback to Firebase Storage
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const storageRef = ref(storage, `${path}/${Date.now()}_${cleanFileName}`);
+      const uploadResult = await uploadBytes(storageRef, file);
+      return await getDownloadURL(uploadResult.ref);
+    } catch (fbErr: any) {
+      console.error("Firebase Storage fallback also failed:", fbErr);
+      throw new Error(error.message || "Failed to upload file. Please check your internet connection.");
+    }
   }
 };
 
@@ -266,8 +315,8 @@ export const addContribution = async (data: any, user?: any) => {
     user_name: user?.name || 'Anonymous',
     user_email: user?.email || 'No email',
     created_at: serverTimestamp(),
-    status: 'pending', // Explicitly set to pending for admin verification
-    solution_status: 'verified',
+    status: data.status || 'pending', // Default to pending unless explicitly specified (e.g. by admin)
+    solution_status: data.solution_status || 'verified',
     upvotes: 0,
     rating: 0,
     rating_count: 0

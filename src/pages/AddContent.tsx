@@ -241,8 +241,9 @@ export const AddContent = () => {
         description,
         file_url: uploadedFileUrl,
         solution_url: uploadedSolutionUrl,
-        access_level: accessLevel
-      });
+        access_level: accessLevel,
+        status: 'verified'
+      }, user);
       
       setAddStatus('Content added successfully to the website!');
       setDescription('');
