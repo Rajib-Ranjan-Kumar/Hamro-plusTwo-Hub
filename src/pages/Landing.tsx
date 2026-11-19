@@ -567,9 +567,9 @@ export const Landing = () => {
           <div>
             <h4 className="font-bold text-white mb-2.5 sm:mb-3 text-sm">Contact Us</h4>
             <ul className="space-y-2 text-xs sm:text-[11px]">
-              <li className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 shrink-0" /> support@hamroplustwo.com</li>
-              <li className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 shrink-0" /> +977-1-5555555</li>
-              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0" /> Kathmandu, Nepal</li>
+              <li className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 shrink-0 text-[#F5C21B]" /> <a href="mailto:hamroplus2support@gmail.com" className="hover:text-white transition-colors">hamroplus2support@gmail.com</a></li>
+              <li className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 shrink-0 text-emerald-400" /> <a href="tel:+9779800000000" className="hover:text-white transition-colors">+977 9800000000</a></li>
+              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0 text-rose-400" /> Kathmandu, Nepal</li>
             </ul>
           </div>
 

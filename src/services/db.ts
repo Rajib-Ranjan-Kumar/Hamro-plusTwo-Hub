@@ -139,6 +139,9 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 export interface GlobalSettings {
   site_name?: string;
   support_email?: string;
+  support_phone?: string;
+  contact_location?: string;
+  contact_hours?: string;
   site_description?: string;
   premium_only_mode?: boolean;
   notify_registrations?: boolean;
@@ -146,17 +149,30 @@ export interface GlobalSettings {
   notify_reports?: boolean;
 }
 
+export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
+  site_name: 'Hamro +2 Hub',
+  support_email: 'hamroplus2support@gmail.com',
+  support_phone: '+977 9800000000',
+  contact_location: 'Kathmandu, Nepal',
+  contact_hours: 'Sunday – Friday, 9:00 AM – 6:00 PM NPT',
+  site_description: 'The premier academic resource platform for Class 11 and 12 in Nepal.',
+  premium_only_mode: true,
+  notify_registrations: true,
+  notify_subscriptions: true,
+  notify_reports: true,
+};
+
 export const getGlobalSettings = async (): Promise<GlobalSettings> => {
   try {
     const docRef = doc(db, 'settings', 'global');
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return docSnap.data() as GlobalSettings;
+      return { ...DEFAULT_GLOBAL_SETTINGS, ...(docSnap.data() as GlobalSettings) };
     }
-    return { premium_only_mode: true }; // Default
+    return DEFAULT_GLOBAL_SETTINGS;
   } catch (error) {
     console.error("Failed to get global settings:", error);
-    return { premium_only_mode: true };
+    return DEFAULT_GLOBAL_SETTINGS;
   }
 };
 
@@ -164,13 +180,13 @@ export const subscribeToGlobalSettings = (callback: (settings: GlobalSettings) =
   const docRef = doc(db, 'settings', 'global');
   return onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
-      callback(docSnap.data() as GlobalSettings);
+      callback({ ...DEFAULT_GLOBAL_SETTINGS, ...(docSnap.data() as GlobalSettings) });
     } else {
-      callback({ premium_only_mode: true });
+      callback(DEFAULT_GLOBAL_SETTINGS);
     }
   }, (err) => {
     console.warn("Failed to subscribe to global settings:", err);
-    callback({ premium_only_mode: true });
+    callback(DEFAULT_GLOBAL_SETTINGS);
   });
 };
 
@@ -872,8 +888,10 @@ export const seedDefaultCurriculumData = async () => {
     const globalRef = doc(db, 'settings', 'global');
     const globalSnap = await getDoc(globalRef);
     if (!globalSnap.exists()) {
-      await setDoc(globalRef, { premium_only_mode: true, updated_at: serverTimestamp() });
+      await setDoc(globalRef, { ...DEFAULT_GLOBAL_SETTINGS, updated_at: serverTimestamp() });
       countAdded++;
+    } else {
+      await setDoc(globalRef, { support_email: 'hamroplus2support@gmail.com' }, { merge: true });
     }
 
     // 2. Content Types for Class 11 and Class 12

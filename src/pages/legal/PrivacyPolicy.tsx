@@ -65,7 +65,7 @@ export const PrivacyPolicy = () => {
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">6. Contact Us</h2>
-          <p>If you have any questions about this privacy policy or our privacy practices, please contact us at support@hamroplus2hub.com.</p>
+          <p>If you have any questions about this privacy policy or our privacy practices, please contact us at <a href="mailto:hamroplus2support@gmail.com" className="text-[#F5C21B] hover:underline font-mono">hamroplus2support@gmail.com</a>.</p>
         </section>
       </div>
     </div>

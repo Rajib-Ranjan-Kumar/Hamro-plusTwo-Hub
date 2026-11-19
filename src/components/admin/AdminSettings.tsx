@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Bell, Shield, Globe, Mail, AlertTriangle, Trash2 } from 'lucide-react';
+import { Save, Bell, Shield, Globe, Mail, AlertTriangle, Trash2, Phone, MapPin, Clock } from 'lucide-react';
 import { getGlobalSettings, updateGlobalSettings } from '../../services/db';
 import { PurgeDataModal } from './PurgeDataModal';
 
 export const AdminSettings = () => {
-  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'danger'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'security' | 'notifications' | 'danger'>('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   
-  // General Settings
-  const [siteName, setSiteName] = useState('StudyNotes');
-  const [supportEmail, setSupportEmail] = useState('support@studynotes.com');
-  const [siteDescription, setSiteDescription] = useState('The best platform for college notes and PYQs.');
+  // General & Contact Settings
+  const [siteName, setSiteName] = useState('Hamro +2 Hub');
+  const [supportEmail, setSupportEmail] = useState('hamroplus2support@gmail.com');
+  const [supportPhone, setSupportPhone] = useState('+977 9800000000');
+  const [contactLocation, setContactLocation] = useState('Kathmandu, Nepal');
+  const [contactHours, setContactHours] = useState('Sunday – Friday, 9:00 AM – 6:00 PM NPT');
+  const [siteDescription, setSiteDescription] = useState('Nepal\'s #1 Academic Resource Platform for NEB Class 11 and 12.');
   const [premiumOnlyMode, setPremiumOnlyMode] = useState(true);
   
   // Notification Settings
@@ -31,6 +34,9 @@ export const AdminSettings = () => {
       if (settings) {
         if (settings.site_name) setSiteName(settings.site_name);
         if (settings.support_email) setSupportEmail(settings.support_email);
+        if (settings.support_phone) setSupportPhone(settings.support_phone);
+        if (settings.contact_location) setContactLocation(settings.contact_location);
+        if (settings.contact_hours) setContactHours(settings.contact_hours);
         if (settings.site_description) setSiteDescription(settings.site_description);
         if (settings.premium_only_mode !== undefined) setPremiumOnlyMode(settings.premium_only_mode);
         
@@ -58,6 +64,24 @@ export const AdminSettings = () => {
     } catch (error) {
       console.error("Failed to save settings:", error);
       alert('Failed to save settings.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveContact = async () => {
+    try {
+      setSaving(true);
+      await updateGlobalSettings({
+        support_email: supportEmail,
+        support_phone: supportPhone,
+        contact_location: contactLocation,
+        contact_hours: contactHours,
+      });
+      alert('Contact Us details updated successfully!');
+    } catch (error) {
+      console.error("Failed to save contact settings:", error);
+      alert('Failed to save contact settings.');
     } finally {
       setSaving(false);
     }
@@ -100,6 +124,17 @@ export const AdminSettings = () => {
             >
               <Globe className={`w-4 h-4 ${activeTab === 'general' ? 'text-emerald-500' : 'text-slate-400'}`} />
               General Settings
+            </button>
+            <button
+              onClick={() => setActiveTab('contact')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                activeTab === 'contact'
+                  ? 'bg-slate-100 text-white dark:bg-slate-800 dark:text-white'
+                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-white'
+              }`}
+            >
+              <Mail className={`w-4 h-4 ${activeTab === 'contact' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              Contact Us Details
             </button>
             <button
               onClick={() => setActiveTab('security')}
@@ -218,9 +253,92 @@ export const AdminSettings = () => {
                   <button 
                     onClick={handleSaveGeneral}
                     disabled={saving || loading}
-                    className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors shadow-sm cursor-pointer"
                   >
                     <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'contact' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Contact Us Details</h3>
+                  <p className="text-sm text-slate-400">
+                    Manage the official contact information displayed on the Contact Us page, Landing page footer, and support dialogs. Only administrators can modify these values.
+                  </p>
+                </div>
+
+                <div className="space-y-5 max-w-2xl bg-slate-900/40 p-5 rounded-2xl border border-slate-700">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1 flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-amber-400" />
+                      <span>Official Support Email</span>
+                    </label>
+                    <input 
+                      type="email" 
+                      value={supportEmail}
+                      onChange={(e) => setSupportEmail(e.target.value)}
+                      placeholder="hamroplus2support@gmail.com"
+                      className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-[#F5C21B] outline-none text-white font-mono"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">This email address receives student inquiries and support requests.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1 flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-emerald-400" />
+                      <span>Support Phone / Helpline</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      value={supportPhone}
+                      onChange={(e) => setSupportPhone(e.target.value)}
+                      placeholder="+977 9800000000"
+                      className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-[#F5C21B] outline-none text-white font-mono"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Official phone number shown to users for quick assistance.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1 flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-rose-400" />
+                      <span>Office / Physical Location</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      value={contactLocation}
+                      onChange={(e) => setContactLocation(e.target.value)}
+                      placeholder="Kathmandu, Nepal"
+                      className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-[#F5C21B] outline-none text-white"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Displayed as the office address on the Contact Us page.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-indigo-400" />
+                      <span>Support & Response Hours</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      value={contactHours}
+                      onChange={(e) => setContactHours(e.target.value)}
+                      placeholder="Sunday – Friday, 9:00 AM – 6:00 PM NPT"
+                      className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-[#F5C21B] outline-none text-white"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Working schedule and expected response times for inquiries.</p>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-700 flex justify-end">
+                  <button 
+                    onClick={handleSaveContact}
+                    disabled={saving || loading}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[#F5C21B] hover:bg-[#e0b018] disabled:opacity-50 text-black font-semibold rounded-xl text-sm transition-all shadow cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Contact Details'}
                   </button>
                 </div>
               </div>
