@@ -35,6 +35,8 @@ import { Analytics } from './components/Analytics';
 import { TopProgressBar } from './components/TopProgressBar';
 import { LoadingProvider } from './context/LoadingContext';
 import { ViewerPage } from './pages/ViewerPage';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 
 const HomeRoute = () => {
   const { user, isLoading } = useAuth();
@@ -91,6 +93,8 @@ export default function App() {
               <Route path="/cookie-policy" element={<PublicPage><CookiePolicy /></PublicPage>} />
               <Route path="/disclaimer" element={<PublicPage><Disclaimer /></PublicPage>} />
               <Route path="/landing" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
               {/* Main Authenticated Application */}
               <Route path="/" element={<HomeRoute />}>
