@@ -242,5 +242,11 @@ service cloud.firestore {
       allow create: if true; // Anyone can submit a contact message
       allow update, delete: if isAdmin();
     }
+
+    match /academic_resources/{resourceId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (isAdmin() || resource.data.user_id == request.auth.uid);
+    }
   }
 }

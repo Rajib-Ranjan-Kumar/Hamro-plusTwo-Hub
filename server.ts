@@ -19,16 +19,12 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
-  // Generate a signature for direct upload to Cloudinary
+  // Generate a signature for direct upload to Cloudinary (supports dynamic folder)
   app.get("/api/upload-signature", (req, res) => {
     try {
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const apiKey = process.env.CLOUDINARY_API_KEY;
-      const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-      if (!cloudName || !apiKey || !apiSecret) {
-        return res.status(500).json({ error: "Cloudinary credentials missing in environment variables." });
-      }
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'zob9phdy';
+      const apiKey = process.env.CLOUDINARY_API_KEY || '194297374744823';
+      const apiSecret = process.env.CLOUDINARY_API_SECRET || 'fGLjz4G4eVKmSX7oZ5wHPvTDdPQ';
 
       cloudinary.config({
         cloud_name: cloudName,
@@ -36,23 +32,59 @@ async function startServer() {
         api_secret: apiSecret,
       });
 
+      const folder = (req.query?.folder as string) || (req.body?.folder as string);
       const timestamp = Math.round(new Date().getTime() / 1000);
-      const signature = cloudinary.utils.api_sign_request(
-        {
-          timestamp: timestamp,
-        },
-        apiSecret
-      );
+
+      const paramsToSign: Record<string, any> = {
+        timestamp: timestamp,
+      };
+
+      if (folder) {
+        paramsToSign.folder = folder;
+      }
+
+      const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
 
       res.json({
         timestamp,
         signature,
         cloudName,
         apiKey,
+        folder: folder || null,
       });
     } catch (error: any) {
       console.error("Error generating Cloudinary signature:", error);
       res.status(500).json({ error: error.message || "Failed to generate upload signature" });
+    }
+  });
+
+  // Delete an asset from Cloudinary
+  app.post("/api/delete-asset", async (req, res) => {
+    try {
+      const { publicId, resourceType = 'image' } = req.body || {};
+      if (!publicId) {
+        return res.status(400).json({ error: "Missing publicId in request body." });
+      }
+
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'zob9phdy';
+      const apiKey = process.env.CLOUDINARY_API_KEY || '194297374744823';
+      const apiSecret = process.env.CLOUDINARY_API_SECRET || 'fGLjz4G4eVKmSX7oZ5wHPvTDdPQ';
+
+      cloudinary.config({
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret,
+      });
+
+      let result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+      if (result.result !== 'ok' && resourceType !== 'raw') {
+        result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+      }
+
+      res.json({ success: true, result });
+    } catch (error: any) {
+      console.error("Error deleting Cloudinary asset:", error);
+      res.status(500).json({ error: error.message || "Failed to delete asset from Cloudinary" });
     }
   });
 

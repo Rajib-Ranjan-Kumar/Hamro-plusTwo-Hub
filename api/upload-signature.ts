@@ -26,19 +26,25 @@ export default function handler(req: any, res: any) {
       api_secret: apiSecret,
     });
 
+    const folder = req.query?.folder || req.body?.folder;
     const timestamp = Math.round(new Date().getTime() / 1000);
-    const signature = cloudinary.utils.api_sign_request(
-      {
-        timestamp: timestamp,
-      },
-      apiSecret
-    );
+
+    const paramsToSign: Record<string, any> = {
+      timestamp: timestamp,
+    };
+
+    if (folder) {
+      paramsToSign.folder = folder;
+    }
+
+    const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
 
     res.status(200).json({
       timestamp,
       signature,
       cloudName,
       apiKey,
+      folder: folder || null,
     });
   } catch (error: any) {
     console.error('Error generating Cloudinary signature:', error);
