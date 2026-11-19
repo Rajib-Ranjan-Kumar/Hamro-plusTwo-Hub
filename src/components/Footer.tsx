@@ -13,7 +13,7 @@ export const Footer = () => {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-400">
-          <Link to="/#about" className="hover:text-[#F4B400] transition-colors">About Us</Link>
+          <Link to="/about" className="hover:text-[#F4B400] transition-colors">About Us</Link>
           <Link to="/contact" className="hover:text-[#F4B400] transition-colors">Contact</Link>
           <Link to="/faq" className="hover:text-[#F4B400] transition-colors">FAQ</Link>
           <Link to="/privacy-policy" className="hover:text-[#F4B400] transition-colors">Privacy Policy</Link>

@@ -395,6 +395,12 @@ export const Landing = () => {
                 </div>
               ))}
             </div>
+
+            <div className="pt-1">
+              <Link to="/about" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#F5C21B] hover:text-amber-300 transition-colors cursor-pointer">
+                <span>Learn more about our mission & story &rarr;</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

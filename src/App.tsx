@@ -26,6 +26,7 @@ import { CookiePolicy } from './pages/legal/CookiePolicy';
 import { Disclaimer } from './pages/legal/Disclaimer';
 import { Contact } from './pages/Contact';
 import { FAQ } from './pages/FAQ';
+import { About } from './pages/About';
 import { NotFound } from './pages/NotFound';
 import { ServerError } from './pages/ServerError';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -77,6 +78,8 @@ export default function App() {
               <Route path="disclaimer" element={<Disclaimer />} />
               <Route path="contact" element={<Contact />} />
               <Route path="faq" element={<FAQ />} />
+              <Route path="about" element={<About />} />
+              <Route path="about-us" element={<Navigate to="/about" replace />} />
               <Route path="leaderboard" element={<div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div>} />
               <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
