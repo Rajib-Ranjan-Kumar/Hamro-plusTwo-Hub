@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLoading } from '../context/LoadingContext';
-import { PlusCircle, FileText, Building2, BookOpen, Tag, Calendar, Database, Trash2, Clock, RefreshCw, Loader2 } from 'lucide-react';
+import { PlusCircle, FileText, Building2, BookOpen, Tag, Calendar, Database, Trash2, Clock, RefreshCw, Loader2, Search, Eye, ExternalLink, Filter } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
@@ -52,6 +52,7 @@ export const AddContent = () => {
   const [allExamYears, setAllExamYears] = useState<any[]>([]);
 
   // Delete Form State
+  const [searchQuery, setSearchQuery] = useState('');
   const [delCollegeId, setDelCollegeId] = useState('0');
   const [delSubjectId, setDelSubjectId] = useState('');
   const [delContentType, setDelContentType] = useState('');
@@ -147,6 +148,25 @@ export const AddContent = () => {
   };
 
   const filteredDataList = dataList.filter(item => {
+    // Search query filter across all fields
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const subjectName = (allSubjects.find(s => s.id === item.subject_id)?.name || '').toLowerCase();
+      const collegeName = (colleges.find(c => c.id === item.college_id)?.name || '').toLowerCase();
+      const match = 
+        (item.description && item.description.toLowerCase().includes(q)) ||
+        (item.title && item.title.toLowerCase().includes(q)) ||
+        (item.name && item.name.toLowerCase().includes(q)) ||
+        (item.year_value && item.year_value.toString().toLowerCase().includes(q)) ||
+        (item.year && item.year.toLowerCase().includes(q)) ||
+        (item.term && item.term.toLowerCase().includes(q)) ||
+        (item.type && item.type.toLowerCase().includes(q)) ||
+        (item.stream && item.stream.toLowerCase().includes(q)) ||
+        subjectName.includes(q) ||
+        collegeName.includes(q);
+      if (!match) return false;
+    }
+
     if (manageDataType === 'materials') {
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
       if (delSubjectId && item.subject_id !== delSubjectId) return false;
@@ -163,13 +183,19 @@ export const AddContent = () => {
   });
 
   const handleDeleteData = async (id: string, fileType?: 'file_url' | 'solution_url') => {
+    const itemToDelete = dataList.find(d => d.id === id);
+    const itemName = itemToDelete?.title || itemToDelete?.description || itemToDelete?.name || 'Item';
+
     setConfirmModal({
       isOpen: true,
-      title: 'Delete Item',
-      message: `Are you sure you want to delete this ${fileType ? 'file' : 'item'}? This action cannot be undone.`,
+      title: fileType ? `Delete ${fileType === 'file_url' ? 'Question Paper' : 'Solution'} File` : 'Delete Item & Cloud Storage Files',
+      message: fileType 
+        ? `Are you sure you want to permanently delete this ${fileType === 'file_url' ? 'question paper' : 'solution'} file from Cloudinary and database? This action cannot be undone.`
+        : `Are you sure you want to permanently delete "${itemName}"? All associated PDF documents will be removed from Cloudinary and the database record will be deleted. This cannot be undone.`,
       onConfirm: async () => {
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
         setIsDeleting(id);
+        startLoading(35, 'Permanently deleting files from Cloudinary and database...');
         try {
           if (fileType && manageDataType === 'materials') {
             await deleteContributionFile(id, fileType);
@@ -183,7 +209,6 @@ export const AddContent = () => {
             }
           }
           await fetchDataList();
-          // Also refresh the dropdowns if we deleted something
           fetchColleges();
           fetchSubjects(contentCollegeId);
         } catch (err) {
@@ -191,6 +216,7 @@ export const AddContent = () => {
           alert('Failed to delete item.');
         } finally {
           setIsDeleting(null);
+          stopLoading();
         }
       }
     });
@@ -973,59 +999,77 @@ export const AddContent = () => {
       )}
       {activeTab === 'manage_data' && (
         <div className="glass-panel rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-slate-700">
-            <h2 className="text-xl font-bold text-white">Manage Data</h2>
-            <p className="text-sm text-slate-400 mt-1">View and delete existing data.</p>
+          <div className="p-6 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Database className="w-5 h-5 text-emerald-400" />
+                Manage & Delete Data
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                View, filter, preview, and permanently remove content and cloud-stored PDF files.
+              </p>
+            </div>
+            <div className="text-xs px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 self-start sm:self-auto">
+              Total items: <span className="font-bold text-emerald-400">{filteredDataList.length}</span>
+            </div>
           </div>
-          <div className="p-6">
-            <div className="flex flex-wrap gap-2 mb-6">
-              {(['colleges', 'subjects', 'content_types', 'exam_years', 'materials'] as const).map((type) => (
+
+          <div className="p-4 sm:p-6 space-y-6">
+            {/* Category Selector Tabs */}
+            <div className="flex flex-wrap gap-2">
+              {(['materials', 'subjects', 'colleges', 'content_types', 'exam_years'] as const).map((type) => (
                 <button
                   key={type}
-                  onClick={() => setManageDataType(type)}
-                  className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                  onClick={() => {
+                    setManageDataType(type);
+                    setSearchQuery('');
+                    setDelItemId('');
+                  }}
+                  className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer ${
                     manageDataType === type
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
+                      ? 'bg-[#F4B400] text-black shadow-md'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
                   }`}
                 >
-                  {type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                  {type === 'materials' ? '📄 Materials (PDFs)' : type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                 </button>
               ))}
             </div>
 
-            <div className="max-w-md">
-              <div className="space-y-4 mb-6">
-                {/* College Filter (Applicable to all) */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Filter by College</label>
-                  <select 
-                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
-                    value={delCollegeId}
-                    onChange={(e) => {
-                      setDelCollegeId(e.target.value);
-                      setDelSubjectId('');
-                      setDelContentType('');
-                      setDelExamYear('');
-                      setDelItemId('');
-                    }}
-                  >
-                    <option value="0">All Colleges / Global</option>
-                    {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
+            {/* Search & Dynamic Filter Bar */}
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <input
+                  type="text"
+                  placeholder="Search by title, subject, college, term, year..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500"
+                />
+              </div>
 
-                {/* Subject Filter (For Materials) */}
-                {manageDataType === 'materials' && (
+              {/* Secondary Filters for Materials */}
+              {manageDataType === 'materials' && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Filter by Subject</label>
-                    <select 
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    <label className="text-[11px] text-slate-400 font-medium block mb-1">College</label>
+                    <select
+                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                      value={delCollegeId}
+                      onChange={(e) => setDelCollegeId(e.target.value)}
+                    >
+                      <option value="0">All Colleges / Global</option>
+                      {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] text-slate-400 font-medium block mb-1">Subject</label>
+                    <select
+                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
                       value={delSubjectId}
-                      onChange={(e) => {
-                        setDelSubjectId(e.target.value);
-                        setDelItemId('');
-                      }}
+                      onChange={(e) => setDelSubjectId(e.target.value)}
                     >
                       <option value="">All Subjects</option>
                       {allSubjects
@@ -1033,142 +1077,188 @@ export const AddContent = () => {
                         .map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
-                )}
 
-                {/* Class Filter (For Content Types and Exam Years) */}
-                {(manageDataType === 'content_types' || manageDataType === 'exam_years') && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Filter by Class</label>
-                    <select 
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
-                      value={delYear}
-                      onChange={(e) => {
-                        setDelYear(e.target.value);
-                        setDelItemId('');
-                      }}
-                    >
-                      <option value="">All Classes</option>
-                      <option value="Class 11">Class 11</option>
-                      <option value="Class 12">Class 12</option>
-                    </select>
-                  </div>
-                )}
-
-                {/* Content Type Filter (For Materials) */}
-                {manageDataType === 'materials' && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Filter by Content Type</label>
-                    <select 
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    <label className="text-[11px] text-slate-400 font-medium block mb-1">Content Type</label>
+                    <select
+                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
                       value={delContentType}
-                      onChange={(e) => {
-                        setDelContentType(e.target.value);
-                        setDelItemId('');
-                      }}
+                      onChange={(e) => setDelContentType(e.target.value)}
                     >
                       <option value="">All Types</option>
-                      {allContentTypes
-                        .filter(t => delCollegeId === '0' || t.college_id === delCollegeId || !t.college_id)
-                        .map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
+                      <option value="pyq">PYQ</option>
+                      <option value="notes">Notes</option>
+                      <option value="syllabus">Syllabus</option>
+                      <option value="solutions">Solutions</option>
+                      <option value="model_questions">Model Questions</option>
                     </select>
                   </div>
-                )}
 
-                {/* Term Filter (For Materials) */}
-                {manageDataType === 'materials' && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Filter by Term</label>
-                    <select 
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    <label className="text-[11px] text-slate-400 font-medium block mb-1">Term</label>
+                    <select
+                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
                       value={delTerm}
-                      onChange={(e) => {
-                        setDelTerm(e.target.value);
-                        setDelItemId('');
-                      }}
+                      onChange={(e) => setDelTerm(e.target.value)}
                     >
                       <option value="">All Terms</option>
-                      <option value="First Term">First Term</option>
-                      <option value="Second Term">Second Term</option>
-                      <option value="Third Term">Third Term</option>
+                      <option value="1st Term">1st Term</option>
+                      <option value="2nd Term">2nd Term</option>
+                      <option value="3rd Term">3rd Term</option>
                       <option value="Final Term">Final Term</option>
                     </select>
                   </div>
-                )}
-
-                {/* Exam Year Filter (For Materials) */}
-                {manageDataType === 'materials' && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Filter by Exam Year</label>
-                    <select 
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
-                      value={delExamYear}
-                      onChange={(e) => {
-                        setDelExamYear(e.target.value);
-                        setDelItemId('');
-                      }}
-                    >
-                      <option value="">All Exam Years</option>
-                      {allExamYears
-                        .filter(y => delCollegeId === '0' || y.college_id === delCollegeId || !y.college_id)
-                        .map(y => <option key={y.id} value={y.value}>{y.value}</option>)}
-                    </select>
-                  </div>
-                )}
-
-                {/* Final Selection Dropdown */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Select {manageDataType.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} to Delete
-                  </label>
-                  <select 
-                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
-                    value={delItemId}
-                    onChange={(e) => setDelItemId(e.target.value)}
-                  >
-                    <option value="">-- Select Item --</option>
-                    {filteredDataList.map(item => (
-                      <option key={item.id} value={item.id}>
-                        {item.name || item.title || item.description || item.year_value || item.value || 'Unnamed'} {item.college_id ? `(College ID: ${item.college_id.substring(0,4)})` : '(Global)'}
-                      </option>
-                    ))}
-                  </select>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => {
-                    if (delItemId) handleDeleteData(delItemId);
-                  }}
-                  disabled={!delItemId || isDeleting === delItemId}
-                  className="w-full px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <Trash2 className="w-5 h-5" />
-                  {isDeleting === delItemId ? 'Deleting...' : `Delete Entire ${manageDataType.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ').slice(0, -1)}`}
-                </button>
-
-                {manageDataType === 'materials' && delItemId && (
-                  <div className="grid grid-cols-2 gap-3 mt-2">
-                    <button
-                      onClick={() => handleDeleteData(delItemId, 'file_url')}
-                      disabled={isDeleting === delItemId}
-                      className="px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 font-medium rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete Question Paper
-                    </button>
-                    <button
-                      onClick={() => handleDeleteData(delItemId, 'solution_url')}
-                      disabled={isDeleting === delItemId}
-                      className="px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 font-medium rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete Solution
-                    </button>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
+
+            {/* List View */}
+            {filteredDataList.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 border border-dashed border-slate-800 rounded-2xl">
+                <Database className="w-10 h-10 mx-auto mb-2 text-slate-600" />
+                <p className="text-sm font-medium">No items found matching your filters.</p>
+                <p className="text-xs text-slate-500 mt-1">Try clearing the search query or reset filters.</p>
+              </div>
+            ) : manageDataType === 'materials' ? (
+              /* Materials (PDFs) Management Cards */
+              <div className="space-y-3">
+                {filteredDataList.map((item) => {
+                  const subjectName = allSubjects.find(s => s.id === item.subject_id)?.name || item.subject_id || 'General';
+                  const collegeName = colleges.find(c => c.id === item.college_id)?.name || (item.college_id ? `College #${item.college_id}` : 'Global');
+                  const isItemDeleting = isDeleting === item.id;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    >
+                      {/* Left: Info */}
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-white truncate">
+                            {item.description || item.title || 'Untitled Document'}
+                          </span>
+                          <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                            {item.type || 'Material'}
+                          </span>
+                          {item.access_level === 'premium' && (
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
+                              Premium
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                          <span className="font-medium text-slate-300">{subjectName}</span>
+                          <span>•</span>
+                          <span>{collegeName}</span>
+                          {item.year && <span>• {item.year}</span>}
+                          {item.stream && <span>• {item.stream}</span>}
+                          {item.term && <span>• {item.term}</span>}
+                          {item.exam_year && <span>• {item.exam_year}</span>}
+                        </div>
+                      </div>
+
+                      {/* Right: File Previews & Delete Actions */}
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {/* Question Paper File Action */}
+                        {item.file_url && (
+                          <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-lg border border-slate-800">
+                            <a
+                              href={`/viewer?url=${encodeURIComponent(item.file_url)}&title=${encodeURIComponent(item.description || 'Document')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-2.5 py-1 text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 hover:underline cursor-pointer"
+                              title="Preview Question Paper PDF"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Paper</span>
+                            </a>
+                            <button
+                              onClick={() => handleDeleteData(item.id, 'file_url')}
+                              disabled={isItemDeleting}
+                              className="p-1 text-orange-400 hover:text-orange-300 hover:bg-orange-950/50 rounded transition-colors cursor-pointer disabled:opacity-50"
+                              title="Delete Question Paper file from Cloudinary"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Solution File Action */}
+                        {item.solution_url && (
+                          <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-lg border border-slate-800">
+                            <a
+                              href={`/viewer?url=${encodeURIComponent(item.solution_url)}&title=${encodeURIComponent(item.description || 'Solution')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-2.5 py-1 text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 hover:underline cursor-pointer"
+                              title="Preview Solution PDF"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Solution</span>
+                            </a>
+                            <button
+                              onClick={() => handleDeleteData(item.id, 'solution_url')}
+                              disabled={isItemDeleting}
+                              className="p-1 text-orange-400 hover:text-orange-300 hover:bg-orange-950/50 rounded transition-colors cursor-pointer disabled:opacity-50"
+                              title="Delete Solution file from Cloudinary"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Delete Entire Document & All Files */}
+                        <button
+                          onClick={() => handleDeleteData(item.id)}
+                          disabled={isItemDeleting}
+                          className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 border border-rose-500/40 text-rose-300 hover:text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>{isItemDeleting ? 'Deleting...' : 'Delete Material'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Non-Materials (Colleges, Subjects, Types, Years) Clean Card Grid */
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {filteredDataList.map((item) => {
+                  const isItemDeleting = isDeleting === item.id;
+                  const collegeName = colleges.find(c => c.id === item.college_id)?.name || (item.college_id ? `College #${item.college_id}` : 'Global');
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">
+                          {item.name || item.year_value || item.value || 'Unnamed Item'}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5 truncate">
+                          {item.stream ? `${item.stream} • ` : ''}
+                          {item.year ? `${item.year} • ` : ''}
+                          {collegeName}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => handleDeleteData(item.id)}
+                        disabled={isItemDeleting}
+                        className="p-2 bg-rose-600/20 hover:bg-rose-600 border border-rose-500/40 text-rose-300 hover:text-white rounded-lg transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                        title="Delete item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

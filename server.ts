@@ -77,8 +77,17 @@ async function startServer() {
       });
 
       let result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
-      if (result.result !== 'ok' && resourceType !== 'raw') {
+      if (result.result !== 'ok') {
         result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+      }
+      if (result.result !== 'ok' && !publicId.endsWith('.pdf')) {
+        const rawRes = await cloudinary.uploader.destroy(`${publicId}.pdf`, { resource_type: 'raw' });
+        if (rawRes.result === 'ok') result = rawRes;
+      }
+      if (result.result !== 'ok' && publicId.endsWith('.pdf')) {
+        const strippedId = publicId.replace(/\.pdf$/, '');
+        const imgRes = await cloudinary.uploader.destroy(strippedId, { resource_type: 'image' });
+        if (imgRes.result === 'ok') result = imgRes;
       }
 
       res.json({ success: true, result });

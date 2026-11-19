@@ -38,8 +38,23 @@ export default async function handler(req: any, res: any) {
 
     // Cloudinary can categorize PDFs as 'image' or 'raw' depending on the upload mode
     let result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
-    if (result.result !== 'ok' && resourceType !== 'raw') {
+    
+    // If not found as image, try raw
+    if (result.result !== 'ok') {
       result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+    }
+
+    // If still not found and publicId doesn't end with .pdf, try appending .pdf
+    if (result.result !== 'ok' && !publicId.endsWith('.pdf')) {
+      const rawRes = await cloudinary.uploader.destroy(`${publicId}.pdf`, { resource_type: 'raw' });
+      if (rawRes.result === 'ok') result = rawRes;
+    }
+
+    // If still not found and publicId has .pdf, try stripping .pdf
+    if (result.result !== 'ok' && publicId.endsWith('.pdf')) {
+      const strippedId = publicId.replace(/\.pdf$/, '');
+      const imgRes = await cloudinary.uploader.destroy(strippedId, { resource_type: 'image' });
+      if (imgRes.result === 'ok') result = imgRes;
     }
 
     return res.status(200).json({ success: true, result });

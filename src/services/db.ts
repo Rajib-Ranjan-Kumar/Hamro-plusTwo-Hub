@@ -1,6 +1,6 @@
 import { db, storage } from '../firebase';
 import { collection, getDocs, query, where, addDoc, updateDoc, doc, getDoc, deleteDoc, orderBy, serverTimestamp, writeBatch, setDoc, onSnapshot } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { auth } from '../firebase';
 
 // Helper function to generate SHA-1 signature on client if backend signature endpoint is unreachable
@@ -663,9 +663,86 @@ export const updateWithdrawalStatus = async (id: string, status: string, comment
   }
 };
 
+export const extractCloudinaryPublicId = (url: string): { publicId: string; resourceType: string } | null => {
+  if (!url || !url.includes('cloudinary.com')) return null;
+
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+    const parts = pathname.split('/');
+    const uploadIndex = parts.indexOf('upload');
+    if (uploadIndex === -1) return null;
+
+    const resourceType = parts[uploadIndex - 1] || 'image';
+    let afterUpload = parts.slice(uploadIndex + 1);
+
+    if (afterUpload[0] && /^v\d+$/.test(afterUpload[0])) {
+      afterUpload = afterUpload.slice(1);
+    }
+
+    const fullPathWithExt = afterUpload.join('/');
+    const publicId = resourceType === 'raw' 
+      ? fullPathWithExt 
+      : fullPathWithExt.replace(/\.[^/.]+$/, '');
+
+    return { publicId, resourceType };
+  } catch (e) {
+    console.warn("Failed to extract Cloudinary publicId:", e);
+    return null;
+  }
+};
+
+export const deleteStorageAsset = async (fileUrl?: string): Promise<boolean> => {
+  if (!fileUrl) return false;
+
+  // 1. Cloudinary asset
+  if (fileUrl.includes('cloudinary.com')) {
+    const extracted = extractCloudinaryPublicId(fileUrl);
+    if (extracted) {
+      try {
+        const res = await fetch('/api/delete-asset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId: extracted.publicId, resourceType: extracted.resourceType })
+        });
+        return res.ok;
+      } catch (err) {
+        console.warn("Could not delete Cloudinary asset:", err);
+      }
+    }
+  }
+
+  // 2. Firebase Storage asset
+  if (fileUrl.includes('firebasestorage.googleapis.com')) {
+    try {
+      const urlObj = new URL(fileUrl);
+      const pathname = urlObj.pathname;
+      const match = pathname.match(/\/o\/(.+)$/);
+      if (match && match[1]) {
+        const decodedPath = decodeURIComponent(match[1]);
+        const storageRef = ref(storage, decodedPath);
+        await deleteObject(storageRef);
+        return true;
+      }
+    } catch (err) {
+      console.warn("Could not delete Firebase Storage asset:", err);
+    }
+  }
+
+  return false;
+};
+
 export const deleteContribution = async (id: string) => {
   try {
-    await deleteDoc(doc(db, 'contributions', id));
+    const docRef = doc(db, 'contributions', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      // Permanently remove physical assets from Cloudinary / Firebase Storage
+      if (data.file_url) await deleteStorageAsset(data.file_url);
+      if (data.solution_url) await deleteStorageAsset(data.solution_url);
+    }
+    await deleteDoc(docRef);
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, `contributions/${id}`);
   }
@@ -673,8 +750,17 @@ export const deleteContribution = async (id: string) => {
 
 export const deleteContributionFile = async (id: string, fileType: 'file_url' | 'solution_url') => {
   try {
-    const ref = doc(db, 'contributions', id);
-    await updateDoc(ref, { [fileType]: '' });
+    const docRef = doc(db, 'contributions', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const targetUrl = data[fileType];
+      if (targetUrl) {
+        // Permanently remove specific file asset from Cloudinary / Firebase Storage
+        await deleteStorageAsset(targetUrl);
+      }
+    }
+    await updateDoc(docRef, { [fileType]: '' });
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `contributions/${id}`);
   }
@@ -682,10 +768,15 @@ export const deleteContributionFile = async (id: string, fileType: 'file_url' | 
 
 export const deleteSubject = async (id: string) => {
   try {
-    // Delete related contributions
+    // Delete related contributions and their underlying files
     const q = query(collection(db, 'contributions'), where('subject_id', '==', id));
     const snapshot = await getDocs(q);
-    const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+    const deletePromises = snapshot.docs.map(async (docSnap) => {
+      const data = docSnap.data();
+      if (data.file_url) await deleteStorageAsset(data.file_url);
+      if (data.solution_url) await deleteStorageAsset(data.solution_url);
+      return deleteDoc(docSnap.ref);
+    });
     await Promise.all(deletePromises);
     
     // Delete the subject
