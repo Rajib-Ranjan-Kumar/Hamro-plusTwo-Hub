@@ -40,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [premiumOnlyMode, setPremiumOnlyMode] = useState<boolean>(true);
+  const unsubscribeSnapshotRef = React.useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const unsubSettings = subscribeToGlobalSettings((settings) => {
@@ -51,6 +52,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = async () => {
+    if (unsubscribeSnapshotRef.current) {
+      unsubscribeSnapshotRef.current();
+      unsubscribeSnapshotRef.current = null;
+    }
     if (auth.currentUser) {
       localStorage.removeItem(`session_${auth.currentUser.uid}`);
     }
@@ -60,9 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    let unsubscribeSnapshot: (() => void) | null = null;
-
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      setIsLoading(true);
       try {
         if (firebaseUser) {
           const idToken = await firebaseUser.getIdToken();
@@ -86,6 +90,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             newUrl.searchParams.delete('session_id');
             window.history.replaceState({}, document.title, newUrl.toString());
           }
+
+          const isExplicitSignIn = sessionStorage.getItem('hamro_signing_in') === 'true';
+          if (isExplicitSignIn) {
+            sessionStorage.removeItem('hamro_signing_in');
+          }
           
           if (userDoc.exists()) {
             const userData = userDoc.data() as User;
@@ -96,14 +105,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               await setDoc(userRef, { role: 'admin' }, { merge: true });
             }
             
-            // If no session ID in local storage, this is a new login on this device
-            if (!currentSessionId) {
+            // If explicit sign in OR no session ID in local storage, establish new session
+            if (isExplicitSignIn || !currentSessionId) {
               currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
               localStorage.setItem(`session_${firebaseUser.uid}`, currentSessionId);
-              await setDoc(userRef, { ...userData, session_id: currentSessionId }, { merge: true });
+              await setDoc(userRef, { session_id: currentSessionId }, { merge: true });
+            } else if (userData.session_id && userData.session_id !== currentSessionId) {
+              // Another device signed in while this browser was closed/idle
+              console.log('Session mismatch on initial load: Another device is active.');
+              if (auth.currentUser) {
+                localStorage.removeItem(`session_${auth.currentUser.uid}`);
+              }
+              await firebaseSignOut(auth);
+              setToken(null);
+              setUser(null);
+              setIsLoading(false);
+              return;
             }
             
-            setUser({ id: firebaseUser.uid, ...userData, session_id: userData.session_id } as User);
+            setUser({ id: firebaseUser.uid, ...userData, session_id: currentSessionId } as User);
           } else {
             // Create default user doc if it doesn't exist
             currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -127,9 +147,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
 
           // Listen for session changes (Single Device Login)
-          if (unsubscribeSnapshot) unsubscribeSnapshot();
+          if (unsubscribeSnapshotRef.current) {
+            unsubscribeSnapshotRef.current();
+            unsubscribeSnapshotRef.current = null;
+          }
           
-          unsubscribeSnapshot = onSnapshot(userRef, (snapshot) => {
+          unsubscribeSnapshotRef.current = onSnapshot(userRef, (snapshot) => {
+            // Ignore optimistic local uncommitted writes
+            if (snapshot.metadata.hasPendingWrites) return;
+
             if (snapshot.exists()) {
               const data = snapshot.data();
               const latestSessionId = data.session_id;
@@ -147,9 +173,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           setUser(null);
           setToken(null);
-          if (unsubscribeSnapshot) {
-            unsubscribeSnapshot();
-            unsubscribeSnapshot = null;
+          if (unsubscribeSnapshotRef.current) {
+            unsubscribeSnapshotRef.current();
+            unsubscribeSnapshotRef.current = null;
           }
         }
       } catch (err) {
@@ -175,7 +201,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       unsubscribeAuth();
-      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      if (unsubscribeSnapshotRef.current) {
+        unsubscribeSnapshotRef.current();
+        unsubscribeSnapshotRef.current = null;
+      }
     };
   }, []);
 

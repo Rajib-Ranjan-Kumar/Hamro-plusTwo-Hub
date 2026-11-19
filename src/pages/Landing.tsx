@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from '../components/SEO';
-import { auth, googleProvider, db } from '../firebase';
+import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
 import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 
 export const Landing = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -17,6 +18,13 @@ export const Landing = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setIsLoggingIn(false);
+      setIsAuthModalOpen(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,29 +38,21 @@ export const Landing = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSessionUpdate = async (firebaseUser: any) => {
-    const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
-    localStorage.setItem(`session_${firebaseUser.uid}`, newSessionId);
-    
-    const userRef = doc(db, 'users', firebaseUser.uid);
-    await updateDoc(userRef, { session_id: newSessionId }).catch(() => {
-      // If doc doesn't exist, AuthContext will handle creation
-    });
-  };
-
   const handleGoogleLogin = async () => {
     setIsLoggingIn(true);
     setError('');
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      await handleSessionUpdate(result.user);
-      setIsAuthModalOpen(false);
+      sessionStorage.setItem('hamro_signing_in', 'true');
+      await signInWithPopup(auth, googleProvider);
       
       // Redirect to target destination originally clicked, fallback to root
       const redirectPath = localStorage.getItem('redirect_after_login') || '/';
       localStorage.removeItem('redirect_after_login');
-      navigate(redirectPath);
+      if (redirectPath !== '/') {
+        navigate(redirectPath);
+      }
     } catch (err: any) {
+      sessionStorage.removeItem('hamro_signing_in');
       console.error("Google auth failed:", err);
       setError(getFirebaseErrorMessage(err));
       setIsLoggingIn(false);
@@ -634,7 +634,10 @@ export const Landing = () => {
                 className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-bold rounded-full transition-all border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] cursor-pointer"
               >
                 {isLoggingIn ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-slate-700" />
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin text-slate-800" />
+                    <span>Signing in...</span>
+                  </>
                 ) : (
                   <>
                     <svg className="w-5 h-5" viewBox="0 0 24 24">

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { auth, googleProvider, db } from '../firebase';
+import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
 import { Loader2, Mail, Lock, AlertCircle, ShieldCheck } from 'lucide-react';
 import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 import { useAuth } from '../context/AuthContext';
@@ -60,16 +59,6 @@ export const Login = () => {
     );
   }
 
-  const handleSessionUpdate = async (firebaseUser: any) => {
-    const newSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
-    localStorage.setItem(`session_${firebaseUser.uid}`, newSessionId);
-    
-    const userRef = doc(db, 'users', firebaseUser.uid);
-    await updateDoc(userRef, { session_id: newSessionId }).catch(() => {
-      // If doc doesn't exist, AuthContext will handle creation
-    });
-  };
-
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -92,17 +81,19 @@ export const Login = () => {
     setError('');
     setMessage('');
     try {
+      sessionStorage.setItem('hamro_signing_in', 'true');
       const result = await signInWithEmailAndPassword(auth, email, password);
       if (!result.user.emailVerified) {
+        sessionStorage.removeItem('hamro_signing_in');
         setError('Please verify your email before logging in.');
         auth.signOut();
         setIsSubmitting(false);
         return;
       }
-      await handleSessionUpdate(result.user);
       resetAttempts();
       navigate('/');
     } catch (err: any) {
+      sessionStorage.removeItem('hamro_signing_in');
       console.error("Email login failed:", err);
       setError(getFirebaseErrorMessage(err));
       setIsSubmitting(false);
@@ -116,10 +107,11 @@ export const Login = () => {
     setError('');
     setMessage('');
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      await handleSessionUpdate(result.user);
+      sessionStorage.setItem('hamro_signing_in', 'true');
+      await signInWithPopup(auth, googleProvider);
       navigate('/');
     } catch (err: any) {
+      sessionStorage.removeItem('hamro_signing_in');
       console.error("Google login failed:", err);
       setError(getFirebaseErrorMessage(err));
       setIsSubmitting(false);
