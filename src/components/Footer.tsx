@@ -3,26 +3,26 @@ import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-slate-200 dark:border-slate-800 py-8 bg-white dark:bg-slate-900 mt-auto">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-2">
-          <div className="bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded">
+    <footer className="border-t border-slate-700/50 py-6 sm:py-8 bg-slate-900/80 backdrop-blur-md mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+        <div className="flex items-center gap-2 select-none">
+          <div className="bg-[#F4B400] text-black text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-[5px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
             +2
           </div>
-          <span className="text-sm font-bold text-white">Hamro +2 Hub</span>
+          <span className="text-sm font-bold text-white tracking-wide">Hamro +2 Hub</span>
         </div>
-        
-        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400">
-          <Link to="/about" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">About Us</Link>
-          <Link to="/contact" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact</Link>
-          <Link to="/faq" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">FAQ</Link>
-          <Link to="/privacy-policy" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy Policy</Link>
-          <Link to="/terms-conditions" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
-          <Link to="/cookie-policy" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Cookie Policy</Link>
-          <Link to="/disclaimer" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Disclaimer</Link>
+
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-400">
+          <Link to="/#about" className="hover:text-[#F4B400] transition-colors">About Us</Link>
+          <Link to="/contact" className="hover:text-[#F4B400] transition-colors">Contact</Link>
+          <Link to="/faq" className="hover:text-[#F4B400] transition-colors">FAQ</Link>
+          <Link to="/privacy-policy" className="hover:text-[#F4B400] transition-colors">Privacy Policy</Link>
+          <Link to="/terms-conditions" className="hover:text-[#F4B400] transition-colors">Terms & Conditions</Link>
+          <Link to="/cookie-policy" className="hover:text-[#F4B400] transition-colors">Cookie Policy</Link>
+          <Link to="/disclaimer" className="hover:text-[#F4B400] transition-colors">Disclaimer</Link>
         </div>
-        
-        <div className="text-xs text-slate-500 dark:text-slate-500">
+
+        <div className="text-[11px] sm:text-xs text-slate-500 text-center">
           &copy; {new Date().getFullYear()} Hamro +2 Hub. Made with love in Nepal.
         </div>
       </div>

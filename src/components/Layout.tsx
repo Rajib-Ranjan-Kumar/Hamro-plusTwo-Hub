@@ -25,20 +25,26 @@ export const Layout = () => {
       </div>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 glass-panel flex items-center justify-between px-4 z-50">
-        <h1 className="text-xl font-bold text-emerald-400">Hamro +2 Hub</h1>
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 sm:h-16 bg-slate-900/90 backdrop-blur-xl border-b border-slate-700/60 flex items-center justify-between px-4 z-50">
+        <div className="flex items-center gap-2 select-none">
+          <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
+            +2
+          </div>
+          <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">Hamro +2 Hub</h1>
+        </div>
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-slate-300 hover:bg-slate-800/50 rounded-lg"
+          aria-label="Toggle navigation menu"
+          className="p-2 text-slate-200 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
         </button>
       </div>
 
       <Sidebar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
       
       <main className="flex-1 min-w-0 overflow-y-auto relative z-10 flex flex-col">
-        <div className="flex-1 p-4 md:p-8 pt-20 md:pt-8">
+        <div className="flex-1 p-3.5 sm:p-6 md:p-8 pt-18 sm:pt-20 md:pt-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

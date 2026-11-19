@@ -38,31 +38,31 @@ export const FAQ = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center p-4 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl mb-6">
-          <HelpCircle className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+    <div className="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-8 sm:mb-12">
+        <div className="inline-flex items-center justify-center p-3 sm:p-4 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl mb-4 sm:mb-6">
+          <HelpCircle className="w-8 h-8 sm:w-12 sm:h-12 text-indigo-400" />
         </div>
-        <h1 className="text-4xl font-bold text-white mb-4">Frequently Asked Questions</h1>
-        <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+        <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Frequently Asked Questions</h1>
+        <p className="text-xs sm:text-base text-slate-400 max-w-2xl mx-auto">
           Find answers to common questions about Hamro +2 Hub, earning points, subscriptions, and more.
         </p>
       </div>
 
       {/* Search Bar */}
-      <div className="relative max-w-2xl mx-auto mb-12">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+      <div className="relative max-w-2xl mx-auto mb-8 sm:mb-12">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
         <input
           type="text"
           placeholder="Search for answers..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 dark:text-white shadow-sm transition-shadow"
+          className="w-full pl-11 sm:pl-12 pr-4 py-3 sm:py-4 bg-slate-800 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 dark:text-white shadow-sm transition-shadow text-xs sm:text-sm"
         />
       </div>
 
       {/* FAQ Accordion */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {filteredFaqs.length > 0 ? (
           filteredFaqs.map((faq, index) => (
             <div 
@@ -71,26 +71,26 @@ export const FAQ = () => {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                className="w-full flex items-center justify-between p-4 sm:p-6 text-left focus:outline-none cursor-pointer"
               >
-                <span className="text-lg font-medium text-white pr-8">
+                <span className="text-sm sm:text-lg font-medium text-white pr-4">
                   {faq.question}
                 </span>
-                <div className={`p-2 rounded-full flex-shrink-0 transition-colors ${
+                <div className={`p-1.5 sm:p-2 rounded-full flex-shrink-0 transition-colors ${
                   openIndex === index 
                     ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' 
                     : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                 }`}>
-                  {openIndex === index ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  {openIndex === index ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </div>
               </button>
               
               <div 
-                className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${
-                  openIndex === index ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'
+                className={`px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out ${
+                  openIndex === index ? 'max-h-96 pb-4 sm:pb-6 opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   {faq.answer}
                 </p>
               </div>
@@ -98,24 +98,24 @@ export const FAQ = () => {
           ))
         ) : (
           <div className="text-center py-12 bg-slate-800 rounded-2xl border border-slate-700">
-            <HelpCircle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">No results found</h3>
-            <p className="text-slate-400">
-              We couldn't find any FAQs matching "{searchQuery}". Please try a different search term or contact support.
+            <HelpCircle className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+            <h3 className="text-base font-medium text-white mb-1">No results found</h3>
+            <p className="text-slate-400 text-xs sm:text-sm">
+              We couldn't find any FAQs matching "{searchQuery}".
             </p>
           </div>
         )}
       </div>
 
       {/* Still need help? */}
-      <div className="mt-16 text-center bg-indigo-50 dark:bg-indigo-900/10 rounded-3xl p-8 border border-indigo-100 dark:border-indigo-900/30">
-        <h3 className="text-xl font-bold text-white mb-2">Still have questions?</h3>
-        <p className="text-slate-400 mb-6">
+      <div className="mt-10 sm:mt-16 text-center bg-indigo-900/10 rounded-3xl p-6 sm:p-8 border border-indigo-900/30">
+        <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Still have questions?</h3>
+        <p className="text-slate-400 text-xs sm:text-sm mb-5 sm:mb-6">
           Can't find the answer you're looking for? Our support team is here to help.
         </p>
         <a 
           href="/contact" 
-          className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors shadow-sm shadow-indigo-600/20"
+          className="inline-flex items-center justify-center px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors shadow-sm text-xs sm:text-sm"
         >
           Contact Support
         </a>

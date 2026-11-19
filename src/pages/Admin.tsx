@@ -51,10 +51,10 @@ export const Admin = () => {
       </div>
 
       <div className="flex flex-col xl:flex-row gap-6">
-        {/* Sidebar Navigation for Admin */}
+        {/* Navigation for Admin (Horizontal pills on mobile/tablet, vertical sidebar on desktop) */}
         <div className="w-full xl:w-64 shrink-0">
-          <div className="glass-panel rounded-2xl p-4 sticky top-6">
-            <nav className="space-y-1">
+          <div className="glass-panel rounded-2xl p-2.5 sm:p-4 sticky top-16 md:top-6 z-20">
+            <nav className="flex flex-row overflow-x-auto no-scrollbar gap-2 pb-1 xl:flex-col xl:pb-0">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -62,14 +62,14 @@ export const Admin = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as AdminTab)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    className={`shrink-0 flex items-center gap-2 sm:gap-3 px-3.5 py-2 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                       isActive
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-white'
+                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} />
-                    {tab.label}
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
+                    <span>{tab.label}</span>
                   </button>
                 );
               })}
@@ -79,7 +79,7 @@ export const Admin = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
-          <div className="glass-panel rounded-2xl p-6 min-h-[600px]">
+          <div className="glass-panel rounded-2xl p-4 sm:p-6 min-h-[500px]">
             {activeTab === 'overview' && <DashboardOverview />}
             {activeTab === 'users' && <UserManagement />}
             {activeTab === 'withdrawals' && <WithdrawalManagement />}

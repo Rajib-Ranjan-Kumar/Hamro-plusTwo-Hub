@@ -90,21 +90,21 @@ export const Landing = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 w-full h-[60px] lg:h-[64px] xl:h-[68px] z-[1000] flex items-center justify-between px-6 transition-all duration-300 border-b"
+        className="fixed top-0 left-0 w-full h-[56px] sm:h-[64px] xl:h-[68px] z-[1000] flex items-center justify-between px-3 sm:px-6 transition-all duration-300 border-b"
         style={{
-          backgroundColor: hasScrolled ? 'rgba(10, 12, 18, 0.55)' : 'rgba(10, 10, 10, 0.08)',
-          backdropFilter: hasScrolled ? 'blur(18px)' : 'blur(8px)',
-          WebkitBackdropFilter: hasScrolled ? 'blur(18px)' : 'blur(8px)',
-          borderColor: hasScrolled ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.06)',
-          boxShadow: hasScrolled ? '0 2px 10px rgba(0, 0, 0, 0.08)' : 'none'
+          backgroundColor: hasScrolled ? 'rgba(10, 12, 18, 0.85)' : 'rgba(10, 10, 10, 0.25)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderColor: hasScrolled ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.08)',
+          boxShadow: hasScrolled ? '0 2px 10px rgba(0, 0, 0, 0.2)' : 'none'
         }}
       >
         {/* Left: Logo Section */}
         <div className="flex items-center gap-2 shrink-0 select-none">
-          <div className="bg-[#F4B400] text-black text-[10px] font-black h-[34px] w-[34px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
+          <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] sm:h-[34px] sm:w-[34px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
             +2
           </div>
-          <span className="text-[18px] font-bold text-white tracking-wide shrink-0">Hamro +2 Hub</span>
+          <span className="text-[16px] sm:text-[18px] font-bold text-white tracking-wide shrink-0">Hamro +2 Hub</span>
         </div>
 
         {/* Center: Navigation Links (Desktop/Laptop only, hidden on tablet/mobile) */}
@@ -147,30 +147,31 @@ export const Landing = () => {
         </nav>
 
         {/* Right: Language Selector + Login Button + Mobile Hamburger */}
-        <div className="flex items-center gap-[12px] sm:gap-[18px] shrink-0">
-          {/* Language Selector Pill */}
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 h-[46px] px-5 border border-white/35 rounded-full text-white text-sm lg:text-[16px] font-semibold hover:border-white/60 bg-transparent transition-all cursor-pointer">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* Language Selector Pill - hidden on compact mobile to prevent header overflow */}
+          <div className="relative group hidden sm:block">
+            <button className="flex items-center gap-1.5 h-[38px] sm:h-[44px] px-3 sm:px-5 border border-white/35 rounded-full text-white text-xs sm:text-sm lg:text-[16px] font-semibold hover:border-white/60 bg-transparent transition-all cursor-pointer">
               <span>English</span>
-              <ChevronDown className="w-4 h-4 text-white" />
+              <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>
 
           {/* Log In Button - Gold Pill */}
           <button 
             onClick={() => openAuthModal('login')}
-            className="bg-[#F4B400] hover:bg-[#F4B400]/95 text-black h-[46px] px-6 rounded-full font-semibold text-sm lg:text-[16px] transition-all flex items-center gap-[10px] shadow-[0_0_15px_rgba(244,180,0,0.3)] cursor-pointer hover:scale-102 hover:-translate-y-0.5 duration-250 shrink-0"
+            className="bg-[#F4B400] hover:bg-[#F4B400]/95 text-black h-[36px] sm:h-[44px] px-3 sm:px-5 rounded-full font-semibold text-xs sm:text-sm lg:text-[16px] transition-all flex items-center gap-1.5 sm:gap-2 shadow-[0_0_15px_rgba(244,180,0,0.3)] cursor-pointer hover:scale-102 hover:-translate-y-0.5 duration-250 shrink-0"
           >
-            <User className="w-[18px] h-[18px] stroke-[2.5px]" />
+            <User className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] stroke-[2.5px]" />
             <span>Log In</span>
           </button>
 
           {/* Hamburger Menu Toggle (Hidden on desktop/laptop) */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+            aria-label="Toggle navigation menu"
+            className="lg:hidden p-1.5 sm:p-2 text-slate-200 hover:text-white hover:bg-white/10 rounded-lg transition-all cursor-pointer shrink-0"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
           </button>
         </div>
       </motion.header>
@@ -182,10 +183,10 @@ export const Landing = () => {
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
+              animate={{ opacity: 0.6 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black z-40 lg:hidden"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[1001] lg:hidden"
             />
             {/* Drawer */}
             <motion.div
@@ -193,47 +194,98 @@ export const Landing = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-              className="fixed top-0 right-0 w-[280px] sm:w-[320px] h-full bg-[#0A0C10]/95 backdrop-blur-md border-l border-white/8 z-40 pt-[100px] px-6 shadow-2xl lg:hidden flex flex-col justify-between pb-8"
+              className="fixed top-0 right-0 w-[290px] sm:w-[320px] max-w-[85vw] h-full bg-[#0A0C10]/98 backdrop-blur-xl border-l border-white/10 z-[1002] pt-5 px-5 sm:px-6 shadow-2xl lg:hidden flex flex-col justify-between pb-6 overflow-y-auto"
             >
-              {/* Menu Links */}
-              <nav className="flex flex-col gap-6">
-                {[
-                  { name: 'Home', path: '/', active: true },
-                  { name: 'PYQs', path: '/pyq' },
-                  { name: 'Notes', path: '/syllabus' },
-                  { name: 'Syllabus', path: '/syllabus' },
-                  { name: 'Chat', path: '/chat' },
-                  { name: 'Membership', path: '/get-premium' },
-                  { name: 'About', path: '#about', isAnchor: true }
-                ].map((item) => {
-                  const linkContent = (
-                    <span 
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`text-lg font-semibold transition-all duration-200 block py-1 cursor-pointer ${item.active ? 'text-[#F4B400] border-l-2 border-[#F4B400] pl-3' : 'text-white/80 hover:text-white hover:pl-2'}`}
-                    >
-                      {item.name}
-                    </span>
-                  );
+              <div>
+                {/* Drawer Header with Close Button */}
+                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                  <div className="flex items-center gap-2 select-none">
+                    <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px]">
+                      +2
+                    </div>
+                    <span className="text-base font-bold text-white tracking-wide">Hamro +2 Hub</span>
+                  </div>
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    aria-label="Close menu"
+                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
-                  if (item.isAnchor) {
-                    return (
-                      <a key={item.name} href={item.path} className="no-underline" onClick={() => setIsMenuOpen(false)}>
-                        {linkContent}
-                      </a>
+                {/* Mobile Auth Buttons inside Drawer */}
+                <div className="mb-5 space-y-2">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openAuthModal('login');
+                    }}
+                    className="w-full h-[42px] bg-[#F4B400] text-black font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg text-sm"
+                  >
+                    <User className="w-4 h-4 stroke-[2.5px]" />
+                    <span>Log In</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openAuthModal('signup');
+                    }}
+                    className="w-full h-[38px] bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl flex items-center justify-center border border-white/10 transition-all text-xs"
+                  >
+                    Create Free Account
+                  </button>
+                </div>
+
+                {/* Mobile Language Selector */}
+                <div className="mb-5 sm:hidden">
+                  <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white">
+                    <span className="text-slate-400">Language</span>
+                    <span className="text-[#F4B400] font-semibold">English</span>
+                  </div>
+                </div>
+
+                {/* Navigation Links */}
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Navigation</p>
+                <nav className="flex flex-col gap-2">
+                  {[
+                    { name: 'Home', path: '/', active: true },
+                    { name: 'PYQs', path: '/pyq' },
+                    { name: 'Notes', path: '/syllabus' },
+                    { name: 'Syllabus', path: '/syllabus' },
+                    { name: 'Chat', path: '/chat' },
+                    { name: 'Membership', path: '/get-premium' },
+                    { name: 'About', path: '#about', isAnchor: true }
+                  ].map((item) => {
+                    const linkContent = (
+                      <span 
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`text-base font-medium transition-all duration-200 block py-1.5 px-3 rounded-lg cursor-pointer ${item.active ? 'text-[#F4B400] bg-[#F4B400]/10 font-semibold' : 'text-white/80 hover:text-white hover:bg-white/5'}`}
+                      >
+                        {item.name}
+                      </span>
                     );
-                  }
 
-                  return (
-                    <ProtectedWrapper key={item.name} path={item.path}>
-                      {linkContent}
-                    </ProtectedWrapper>
-                  );
-                })}
-              </nav>
+                    if (item.isAnchor) {
+                      return (
+                        <a key={item.name} href={item.path} className="no-underline" onClick={() => setIsMenuOpen(false)}>
+                          {linkContent}
+                        </a>
+                      );
+                    }
+
+                    return (
+                      <ProtectedWrapper key={item.name} path={item.path}>
+                        {linkContent}
+                      </ProtectedWrapper>
+                    );
+                  })}
+                </nav>
+              </div>
 
               {/* Bottom footer text inside drawer */}
-              <div className="text-[11px] text-slate-600 border-t border-white/5 pt-4">
-                &copy; {new Date().getFullYear()} Hamro +2 Hub
+              <div className="text-[11px] text-slate-500 border-t border-white/10 pt-4 mt-6">
+                &copy; {new Date().getFullYear()} Hamro +2 Hub. Made for Nepal.
               </div>
             </motion.div>
           </>
@@ -241,57 +293,57 @@ export const Landing = () => {
       </AnimatePresence>
 
       {/* 100vh Hero Fold Section */}
-      <div className="relative h-screen min-h-[500px] sm:min-h-[700px] w-full flex flex-col justify-between overflow-hidden">
+      <div className="relative min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden pt-[56px] sm:pt-[64px]">
         {/* Full Screen Clean Background Image */}
         <div className="absolute inset-0 z-0 site-bg" />
         
         {/* Subtle dark gradient overlay behind left-aligned text for readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent z-0 pointer-events-none" />
 
         {/* Hero Left Content - Vertically Centered */}
-        <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-[80px] flex flex-col justify-center">
-          <div className="max-w-[520px] text-left space-y-[24px]">
-            {/* Main Title - Nepali (Fluid size using clamp inline style) */}
+        <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-[80px] flex flex-col justify-center py-6 sm:py-12">
+          <div className="max-w-[520px] text-left space-y-4 sm:space-y-6">
+            {/* Main Title - Nepali */}
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              style={{ fontSize: 'clamp(20px, 6.5vw, 72px)' }}
-              className="font-extrabold text-white leading-[1.15] tracking-tight whitespace-pre-line select-text"
+              style={{ fontSize: 'clamp(28px, 6.5vw, 68px)' }}
+              className="font-extrabold text-white leading-[1.2] tracking-tight whitespace-pre-line select-text"
             >
               तपाईँको मेहनत,{"\n"}
               हाम्रो सहयोग
             </motion.h1>
 
-            {/* Subtitle (Fluid size using clamp inline style) */}
+            {/* Subtitle */}
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              style={{ fontSize: 'clamp(12px, 2.8vw, 32px)' }}
-              className="font-normal text-white leading-[1.3] whitespace-pre-line select-text"
+              style={{ fontSize: 'clamp(14px, 3.2vw, 24px)' }}
+              className="font-normal text-white/95 leading-[1.35] whitespace-pre-line select-text"
             >
               PYQs, Notes & Study Materials{"\n"}
               for Your Success...
             </motion.p>
 
-            {/* Interactive Action Buttons - Scaled down to 70% */}
+            {/* Interactive Action Buttons */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.4 }}
-              className="flex flex-wrap items-center gap-[16px] pt-1"
+              className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1 sm:pt-2"
             >
               {/* Button 1: Get Started */}
               <ProtectedWrapper path="/">
-                <button className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-[20px] h-[45px] w-[154px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-103 shadow-lg">
+                <button className="bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-base sm:text-[18px] h-[44px] sm:h-[48px] px-5 sm:px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg active:scale-98">
                   <span>🚀 Get Started</span>
                 </button>
               </ProtectedWrapper>
 
               {/* Button 2: Explore Now */}
               <ProtectedWrapper path="/syllabus">
-                <button className="bg-black/35 hover:bg-black/50 border border-white/35 text-white font-normal text-[20px] h-[45px] w-[168px] rounded-[12px] flex items-center justify-center gap-1.5 transition-all hover:scale-102 backdrop-blur-sm">
+                <button className="bg-black/45 hover:bg-black/60 border border-white/35 text-white font-medium text-base sm:text-[18px] h-[44px] sm:h-[48px] px-5 sm:px-6 rounded-xl flex items-center justify-center gap-1.5 transition-all backdrop-blur-sm active:scale-98">
                   <span>▶ Explore Now</span>
                 </button>
               </ProtectedWrapper>
@@ -300,20 +352,20 @@ export const Landing = () => {
         </div>
 
         {/* Empty Spacer to preserve bottom-aligned village background scenery */}
-        <div className="h-12 w-full z-0" />
+        <div className="h-8 sm:h-12 w-full z-0" />
       </div>
 
-      {/* About Section - Scaled down by ~30% */}
-      <section id="about" className="min-h-screen bg-[#0F172A] py-[70px] px-6 md:px-[70px] flex items-center border-t border-white/5 relative">
-        <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-[56px] items-center">
+      {/* About Section */}
+      <section id="about" className="min-h-0 bg-[#0F172A] py-12 md:py-[70px] px-4 sm:px-6 md:px-[70px] flex items-center border-t border-white/5 relative">
+        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-[56px] items-center">
           {/* Left Side - Embedded Video Placeholder */}
           <div className="space-y-4">
-            <h3 className="text-base font-bold text-[#F5C21B] tracking-wide uppercase">Watch How Hamro +2 Works</h3>
+            <h3 className="text-sm sm:text-base font-bold text-[#F5C21B] tracking-wide uppercase">Watch How Hamro +2 Works</h3>
             <div className="aspect-video w-full rounded-[16px] overflow-hidden bg-slate-900 border border-white/10 shadow-2xl relative group">
               <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
               <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center">
-                <button className="w-14 h-14 rounded-full bg-[#F5C21B] hover:bg-[#e0b018] text-black flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer">
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                <button className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#F5C21B] hover:bg-[#e0b018] text-black flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer">
+                  <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5" />
                 </button>
               </div>
             </div>
@@ -347,17 +399,17 @@ export const Landing = () => {
         </div>
       </section>
 
-      {/* Features Grid Section - Scaled down by ~30% */}
-      <section className="bg-[#0F1115] py-[70px] border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Everything You Need</h2>
-            <p className="text-slate-400 text-sm">
+      {/* Features Grid Section */}
+      <section className="bg-[#0F1115] py-12 md:py-[70px] border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[70px]">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-[30px] font-bold text-white tracking-tight">Everything You Need</h2>
+            <p className="text-slate-400 text-xs sm:text-sm">
               All the tools and resources you need to excel in your +2 examinations.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[
               { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision.", path: "/pyq" },
               { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley.", path: "/syllabus" },
@@ -367,11 +419,11 @@ export const Landing = () => {
               { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns.", path: "/syllabus" }
             ].map((feature, i) => (
               <ProtectedWrapper key={i} path={feature.path}>
-                <div className="p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
-                  <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
+                <div className="p-5 sm:p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
+                  <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
                     <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
                   </div>
-                  <h3 className="text-[16px] font-bold text-white mb-2">{feature.title}</h3>
+                  <h3 className="text-base sm:text-[16px] font-bold text-white mb-1.5 sm:mb-2">{feature.title}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
                 </div>
               </ProtectedWrapper>
@@ -380,17 +432,17 @@ export const Landing = () => {
         </div>
       </section>
 
-      {/* Subjects Section - Scaled down by ~30% */}
-      <section className="bg-[#0F172A] py-[70px] border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Access Course Subjects</h2>
-            <p className="text-slate-400 text-sm">
+      {/* Subjects Section */}
+      <section className="bg-[#0F172A] py-12 md:py-[70px] border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[70px]">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-[30px] font-bold text-white tracking-tight">Access Course Subjects</h2>
+            <p className="text-slate-400 text-xs sm:text-sm">
               Choose your course and access curated notes, questions, and guides.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5">
             {[
               { title: "Physics", count: "140+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
               { title: "Chemistry", count: "120+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" },
@@ -400,9 +452,9 @@ export const Landing = () => {
               { title: "English", count: "70+ Files", color: "from-[#F5C21B] to-[#e0b018]", path: "/syllabus" }
             ].map((sub, i) => (
               <ProtectedWrapper key={i} path={sub.path}>
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all">
+                <div className="p-3.5 sm:p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center group hover:bg-white/[0.04] transition-all">
                   <div>
-                    <h3 className="text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
+                    <h3 className="text-base sm:text-[18px] font-bold text-white group-hover:text-[#F5C21B] transition-colors">{sub.title}</h3>
                     <p className="text-xs text-slate-400 mt-0.5">{sub.count}</p>
                   </div>
                   <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${sub.color} text-black flex items-center justify-center font-black group-hover:scale-105 transition-transform text-sm`}>
@@ -415,24 +467,24 @@ export const Landing = () => {
         </div>
       </section>
 
-      {/* Testimonials - Scaled down by ~30% */}
-      <section className="bg-[#0F1115] py-[70px] border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 md:px-[70px]">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Student Feedback</h2>
-            <p className="text-slate-400 text-sm">
+      {/* Testimonials */}
+      <section className="bg-[#0F1115] py-12 md:py-[70px] border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[70px]">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-[30px] font-bold text-white tracking-tight">Student Feedback</h2>
+            <p className="text-slate-400 text-xs sm:text-sm">
               Hear what students and contributors from colleges across Nepal say.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
             {[
               { name: "Aashish Shrestha", role: "St. Xavier's College", review: "The mathematics notes solved references are amazing. Saved a lot of time before my board terminals." },
               { name: "Priya Adhikari", role: "Trinity International", review: "Direct downloads and neat interface. Highly recommend for NEB board exams preparation notes." },
               { name: "Rohit Gurung", role: "KMC Lalitpur", review: "Contributing notes is highly motivating. The leaderboard badge adds a fun competitive touch." }
             ].map((test, i) => (
-              <div key={i} className="p-6 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between space-y-4">
-                <p className="text-slate-300 italic text-[14px] leading-relaxed">"{test.review}"</p>
+              <div key={i} className="p-5 sm:p-6 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between space-y-4">
+                <p className="text-slate-300 italic text-[13px] sm:text-[14px] leading-relaxed">"{test.review}"</p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-[#F5C21B]/20 flex items-center justify-center font-bold text-[#F5C21B] text-sm">
                     {test.name[0]}
@@ -448,17 +500,17 @@ export const Landing = () => {
         </div>
       </section>
 
-      {/* FAQ Accordion Section - Scaled down by ~30% */}
-      <section className="bg-[#0F172A] py-[70px] border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-12 space-y-3">
-            <h2 className="text-[30px] font-bold text-white tracking-tight">Frequently Asked Questions</h2>
-            <p className="text-slate-400 text-sm">
+      {/* FAQ Accordion Section */}
+      <section className="bg-[#0F172A] py-12 md:py-[70px] border-t border-white/5">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12 space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-[30px] font-bold text-white tracking-tight">Frequently Asked Questions</h2>
+            <p className="text-slate-400 text-xs sm:text-sm">
               Quick answers to the common questions about Hamro +2 Hub.
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5 sm:space-y-3">
             {[
               { q: "Is Hamro +2 Hub completely free to use?", a: "Yes, access to all note files, term papers, and solutions is 100% free with no hidden charges." },
               { q: "How can I contribute my study materials?", a: "Register/Login with Google, click the Contribute tab in your dashboard, and upload your PDF files." },
@@ -468,13 +520,13 @@ export const Landing = () => {
               <div key={i} className="border border-white/5 rounded-xl overflow-hidden bg-white/[0.01]">
                 <button 
                   onClick={() => toggleFaq(i)}
-                  className="w-full flex justify-between items-center p-4 text-left font-bold text-[15px] text-white hover:bg-white/[0.02] transition-colors cursor-pointer"
+                  className="w-full flex justify-between items-center p-3.5 sm:p-4 text-left font-semibold text-sm sm:text-[15px] text-white hover:bg-white/[0.02] transition-colors cursor-pointer"
                 >
-                  <span>{faq.q}</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
+                  <span className="pr-2">{faq.q}</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
                 </button>
-                <div className={`transition-all duration-300 overflow-hidden ${activeFaq === i ? 'max-h-40 border-t border-white/5 p-4' : 'max-h-0'}`}>
-                  <p className="text-slate-400 text-xs leading-relaxed">{faq.a}</p>
+                <div className={`transition-all duration-300 overflow-hidden ${activeFaq === i ? 'max-h-40 border-t border-white/5 p-3.5 sm:p-4' : 'max-h-0'}`}>
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">{faq.a}</p>
                 </div>
               </div>
             ))}
@@ -483,8 +535,8 @@ export const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0D0D0F] border-t border-white/5 py-10 text-slate-400 text-[13px]">
-        <div className="max-w-7xl mx-auto px-6 md:px-[70px] grid md:grid-cols-4 gap-6 mb-8">
+      <footer className="bg-[#0D0D0F] border-t border-white/5 py-8 sm:py-10 text-slate-400 text-[13px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[70px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="bg-[#F5C21B] text-black text-[10px] font-black px-2 py-0.5 rounded">
@@ -492,14 +544,14 @@ export const Landing = () => {
               </div>
               <span className="text-base font-bold text-white">Hamro +2 Hub</span>
             </div>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
+            <p className="text-xs sm:text-[11px] text-slate-500 leading-relaxed">
               Nepal's collaborative platform for high school students. Quality resources, syllabus references, and term guides.
             </p>
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Quick Links</h4>
-            <ul className="space-y-1.5 text-[11px]">
+            <h4 className="font-bold text-white mb-2.5 sm:mb-3 text-sm">Quick Links</h4>
+            <ul className="space-y-2 text-xs sm:text-[11px]">
               <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Study Dashboard</button></li>
               <li><button onClick={() => openAuthModal('signup')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Contribute File</button></li>
               <li><button onClick={() => openAuthModal('login')} className="hover:text-[#F5C21B] transition-colors cursor-pointer">Course Syllabus</button></li>
@@ -507,29 +559,29 @@ export const Landing = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Contact Us</h4>
-            <ul className="space-y-1.5 text-[11px]">
-              <li className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> support@hamroplustwo.com</li>
-              <li className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> +977-1-5555555</li>
-              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Kathmandu, Nepal</li>
+            <h4 className="font-bold text-white mb-2.5 sm:mb-3 text-sm">Contact Us</h4>
+            <ul className="space-y-2 text-xs sm:text-[11px]">
+              <li className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 shrink-0" /> support@hamroplustwo.com</li>
+              <li className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 shrink-0" /> +977-1-5555555</li>
+              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0" /> Kathmandu, Nepal</li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <h4 className="font-bold text-white mb-3 text-sm">Follow Us</h4>
+            <h4 className="font-bold text-white mb-2.5 sm:mb-3 text-sm">Follow Us</h4>
             <div className="flex gap-3">
-              <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Github className="w-3.5 h-3.5" /></a>
-              <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Twitter className="w-3.5 h-3.5" /></a>
-              <a href="#" className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Youtube className="w-3.5 h-3.5" /></a>
+              <a href="#" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Github className="w-4 h-4" /></a>
+              <a href="#" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Twitter className="w-4 h-4" /></a>
+              <a href="#" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F5C21B]/15 hover:text-[#F5C21B] flex items-center justify-center transition-colors"><Youtube className="w-4 h-4" /></a>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-[70px] border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] text-slate-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[70px] border-t border-white/5 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs sm:text-[11px] text-slate-500 text-center sm:text-left">
           <div>&copy; {new Date().getFullYear()} Hamro +2 Hub. Made with love in Nepal. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link to="/privacy-policy" className="hover:text-slate-400">Privacy Policy</Link>
-            <Link to="/terms-conditions" className="hover:text-slate-400">Terms & Conditions</Link>
+            <Link to="/privacy-policy" className="hover:text-slate-300">Privacy Policy</Link>
+            <Link to="/terms-conditions" className="hover:text-slate-300">Terms & Conditions</Link>
           </div>
         </div>
       </footer>
@@ -541,7 +593,7 @@ export const Landing = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-55 flex items-center justify-center bg-black/45 backdrop-blur-[6px] p-4"
+            className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/60 backdrop-blur-[8px] p-4"
           >
             {/* Modal Card */}
             <motion.div 
@@ -549,7 +601,7 @@ export const Landing = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative w-full max-w-md bg-slate-800/95 border border-slate-700/80 backdrop-blur-md rounded-3xl p-8 sm:p-10 shadow-2xl flex flex-col justify-center"
+              className="relative w-full max-w-md bg-slate-800/98 border border-slate-700/80 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col justify-center"
             >
               {/* Close Button */}
               <button 

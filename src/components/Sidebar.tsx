@@ -13,7 +13,8 @@ import {
   Settings, 
   MessageSquare,
   Crown,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react';
 
 const navItems = [
@@ -42,25 +43,40 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[55] md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
       
       <aside className={cn(
-        "fixed md:static inset-y-0 left-0 z-50 w-64 shrink-0 glass-panel border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0",
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed md:static inset-y-0 left-0 z-[60] md:z-auto w-72 sm:w-64 max-w-[85vw] shrink-0 glass-panel border-r border-slate-700/60 bg-slate-900/98 md:bg-slate-900/80 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0",
+        isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
       )}>
-        <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-          <h1 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 hidden md:block">Hamro +2 Hub</h1>
-          <div className="flex items-center gap-2 mt-1 md:mt-2">
-            <p className="text-sm text-slate-500">{user?.name}</p>
-            {user?.is_premium && <Crown className="w-4 h-4 text-amber-500 fill-amber-500" />}
+        <div className="p-5 sm:p-6 border-b border-slate-700/60 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 select-none">
+              <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
+                +2
+              </div>
+              <h1 className="text-xl font-bold text-white tracking-wide">Hamro +2 Hub</h1>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">{user?.name}</p>
+              {user?.is_premium && <Crown className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" />}
+            </div>
+            <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
+            <div className="mt-2 flex items-center gap-2 text-xs sm:text-sm font-semibold text-emerald-400">
+              <span>Wallet: NPR {typeof user?.wallet_balance === 'number' ? user.wallet_balance.toFixed(2) : (user?.wallet_balance || '0.00')}</span>
+            </div>
           </div>
-          <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
-          <div className="mt-2 flex items-center gap-2 text-sm font-medium text-emerald-600">
-            <span>Wallet: NPR {user?.wallet_balance}</span>
-          </div>
+          {/* Close button for mobile inside sidebar */}
+          <button
+            onClick={() => setIsOpen(false)}
+            aria-label="Close sidebar"
+            className="md:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
         
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

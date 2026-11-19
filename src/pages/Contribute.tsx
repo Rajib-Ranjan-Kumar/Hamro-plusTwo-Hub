@@ -171,28 +171,28 @@ export const Contribute = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-6xl mx-auto"
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <DollarSign className="w-6 h-6 text-emerald-300" />
+          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300" />
             Contribute & Earn
           </h1>
-          <p className="text-emerald-100 mt-1">Share your study materials and earn real money!</p>
+          <p className="text-xs sm:text-sm text-emerald-100 mt-1">Share your study materials and earn real money!</p>
         </div>
-        <div className="bg-slate-800/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 flex items-center gap-6">
+        <div className="bg-slate-800/20 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 flex flex-wrap items-center justify-between sm:justify-start gap-3 sm:gap-6 w-full sm:w-auto">
           <div>
-            <p className="text-emerald-100 text-sm font-medium">Available Balance</p>
-            <p className="text-3xl font-bold text-emerald-300">NPR {user?.wallet_balance?.toFixed(2) || '0.00'}</p>
+            <p className="text-emerald-100 text-xs sm:text-sm font-medium">Available Balance</p>
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-300">NPR {user?.wallet_balance?.toFixed(2) || '0.00'}</p>
           </div>
           {(user?.holding_balance || 0) > 0 && (
-            <div className="hidden sm:block border-l border-white/20 pl-6">
-              <p className="text-emerald-100 text-sm font-medium">On Hold</p>
-              <p className="text-xl font-bold text-amber-300">NPR {user?.holding_balance?.toFixed(2)}</p>
+            <div className="border-l border-white/20 pl-3 sm:pl-6">
+              <p className="text-emerald-100 text-xs sm:text-sm font-medium">On Hold</p>
+              <p className="text-lg sm:text-xl font-bold text-amber-300">NPR {user?.holding_balance?.toFixed(2)}</p>
             </div>
           )}
           <button 
             onClick={() => setActiveTab('withdraw')}
-            className="px-4 py-2 bg-slate-800 text-emerald-600 font-bold rounded-lg shadow-sm hover:bg-emerald-50 transition-colors hover-lift ml-2"
+            className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-slate-900 text-emerald-400 font-bold rounded-lg shadow-sm hover:bg-slate-800 transition-colors hover-lift text-xs sm:text-sm ml-auto sm:ml-2"
           >
             Withdraw
           </button>

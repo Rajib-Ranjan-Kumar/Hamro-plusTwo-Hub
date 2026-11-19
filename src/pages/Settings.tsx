@@ -154,53 +154,53 @@ export const Settings = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl mx-auto space-y-8 pb-12"
+      className="max-w-3xl mx-auto space-y-6 sm:space-y-8 pb-12"
     >
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl">
-          <SettingsIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+      <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <div className="p-2.5 sm:p-3 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl">
+          <SettingsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
         </div>
-        <h1 className="text-3xl font-bold text-white">Account Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Account Settings</h1>
       </div>
 
       {/* Profile Settings */}
-      <div className="bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-700 shadow-sm">
-        <h2 className="text-xl font-semibold text-white mb-6">Profile Information</h2>
-        <form onSubmit={handleSaveProfile} className="space-y-6">
+      <div className="bg-slate-800 rounded-2xl p-4 sm:p-6 md:p-8 border border-slate-700 shadow-sm">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Profile Information</h2>
+        <form onSubmit={handleSaveProfile} className="space-y-5 sm:space-y-6">
           {profileStatus.message && (
-            <div className={`p-4 rounded-xl text-sm ${profileStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800'}`}>
+            <div className={`p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm ${profileStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800'}`}>
               {profileStatus.message}
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">Full Name</label>
               <input 
                 type="text"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors"
+                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors text-sm"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">Email Address</label>
               <input 
                 type="email"
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-400 cursor-not-allowed"
+                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-400 cursor-not-allowed text-sm"
                 value={user?.email || ''}
                 disabled
               />
-              <p className="text-xs text-slate-500 mt-1">Email cannot be changed.</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-1">Email cannot be changed.</p>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">College</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">College</label>
               <select 
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors"
+                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors text-sm"
                 value={collegeId}
                 onChange={(e) => setCollegeId(e.target.value)}
               >
@@ -212,9 +212,9 @@ export const Settings = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Stream</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">Stream</label>
               <select 
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors"
+                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors text-sm"
                 value={stream}
                 onChange={(e) => setStream(e.target.value)}
               >
@@ -225,9 +225,9 @@ export const Settings = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Class</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-1.5 sm:mb-2">Class</label>
               <select 
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors"
+                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors text-sm"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
               >
@@ -240,9 +240,9 @@ export const Settings = () => {
           <div className="flex justify-end">
             <button 
               type="submit"
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full transition-colors flex items-center gap-2 shadow-sm shadow-indigo-600/20"
+              className="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 shadow-sm shadow-indigo-600/20 text-sm"
             >
-              <Save className="w-5 h-5" /> Save Profile
+              <Save className="w-4 h-4 sm:w-5 sm:h-5" /> Save Profile
             </button>
           </div>
         </form>

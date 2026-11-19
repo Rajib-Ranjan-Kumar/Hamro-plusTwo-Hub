@@ -90,11 +90,11 @@ export const Syllabus = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Step 2: Subject Selection */}
-        <div className="xl:col-span-1 space-y-4">
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+        <div className="xl:col-span-1 space-y-3 sm:space-y-4">
+          <h2 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider">
             Select Subject
           </h2>
-          <div className="space-y-2">
+          <div className="flex flex-row overflow-x-auto no-scrollbar gap-2 pb-2 xl:flex-col xl:space-y-2 xl:pb-0">
             {subjects.length === 0 ? (
               <p className="text-sm text-slate-500">No subjects found for this year.</p>
             ) : (
@@ -102,14 +102,14 @@ export const Syllabus = () => {
                 <button
                   key={subject.id}
                   onClick={() => setActiveSubject(subject)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-between ${
+                  className={`shrink-0 text-left px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-2 cursor-pointer ${
                     activeSubject?.id === subject.id
                       ? 'bg-emerald-600 text-white shadow-md ring-2 ring-emerald-600 ring-offset-2 dark:ring-offset-slate-900'
-                      : 'glass-panel text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700/50'
+                      : 'glass-panel text-slate-300 hover:bg-slate-700/50'
                   }`}
                 >
-                  <span className="truncate pr-2">{subject.name}</span>
-                  {activeSubject?.id === subject.id && <CheckCircle2 className="w-4 h-4 flex-shrink-0" />}
+                  <span className="truncate pr-1">{subject.name}</span>
+                  {activeSubject?.id === subject.id && <CheckCircle2 className="w-4 h-4 shrink-0" />}
                 </button>
               ))
             )}

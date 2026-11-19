@@ -161,102 +161,102 @@ export const GetPremium = () => {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-4xl mx-auto space-y-8 pb-12"
     >
-      <div className="text-center space-y-4">
-        <div className="inline-flex p-3 bg-amber-100 dark:bg-amber-900/30 rounded-2xl">
-          <Crown className="w-8 h-8 text-amber-500" />
+      <div className="text-center space-y-3 sm:space-y-4 px-2">
+        <div className="inline-flex p-2.5 sm:p-3 bg-amber-100 dark:bg-amber-900/30 rounded-2xl">
+          <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500" />
         </div>
-        <h1 className="text-3xl font-bold text-white">Upgrade to Premium</h1>
-        <p className="text-slate-400 max-w-lg mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Upgrade to Premium</h1>
+        <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
           Get exclusive access to all Past Year Questions (PYQs), detailed Syllabus, and comprehensive Notes.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         {/* Payment Info Section */}
-        <div className="glass-panel rounded-2xl p-6 space-y-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-emerald-600" />
+        <div className="glass-panel rounded-2xl p-4 sm:p-6 space-y-6">
+          <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-emerald-400" />
             Payment Details
           </h2>
           
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
             </div>
           ) : paymentInfo ? (
             <div className="space-y-6">
               {paymentInfo.esewa_qr_url && (
                 <div className="text-center space-y-2">
-                  <p className="text-sm font-medium text-slate-500">Scan QR to Pay via eSewa</p>
-                  <div className="bg-white/50 dark:bg-slate-900/50 p-4 rounded-xl inline-block border border-slate-700/50 backdrop-blur-sm">
+                  <p className="text-xs sm:text-sm font-medium text-slate-400">Scan QR to Pay via eSewa</p>
+                  <div className="bg-white/50 dark:bg-slate-900/50 p-3 sm:p-4 rounded-xl inline-block border border-slate-700/50 backdrop-blur-sm max-w-full">
                     <img 
                       src={paymentInfo.esewa_qr_url} 
                       alt="eSewa QR" 
-                      className="w-48 h-48 object-contain mx-auto"
+                      className="w-40 h-40 sm:w-48 sm:h-48 object-contain mx-auto"
                       referrerPolicy="no-referrer"
                     />
                   </div>
                 </div>
               )}
               
-              <div className="space-y-3 bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
+              <div className="space-y-3 bg-emerald-50 dark:bg-emerald-900/20 p-3.5 sm:p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
                 <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Bank Transfer Details</p>
-                <div className="grid grid-cols-2 gap-y-2 text-sm">
-                  <span className="text-slate-500">Bank Name:</span>
-                  <span className="font-medium text-white">{paymentInfo.bank_name || 'N/A'}</span>
-                  <span className="text-slate-500">Account Holder:</span>
-                  <span className="font-medium text-white">{paymentInfo.account_holder || 'N/A'}</span>
-                  <span className="text-slate-500">Account Number:</span>
-                  <span className="font-medium text-white font-mono">{paymentInfo.account_number || 'N/A'}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs sm:text-sm">
+                  <span className="text-slate-400">Bank Name:</span>
+                  <span className="font-medium text-white break-words">{paymentInfo.bank_name || 'N/A'}</span>
+                  <span className="text-slate-400">Account Holder:</span>
+                  <span className="font-medium text-white break-words">{paymentInfo.account_holder || 'N/A'}</span>
+                  <span className="text-slate-400">Account Number:</span>
+                  <span className="font-medium text-white font-mono break-all">{paymentInfo.account_number || 'N/A'}</span>
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
               <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-2" />
-              <p className="text-slate-500">Admin hasn't set up payment info yet.</p>
+              <p className="text-slate-500 text-sm">Admin hasn't set up payment info yet.</p>
             </div>
           )}
         </div>
 
         {/* Upload Section */}
-        <div className="glass-panel rounded-2xl p-6 space-y-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Upload className="w-5 h-5 text-emerald-600" />
+        <div className="glass-panel rounded-2xl p-4 sm:p-6 space-y-6">
+          <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+            <Upload className="w-5 h-5 text-emerald-400" />
             Upload Proof
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             {status && (
               <div className={cn(
-                "p-4 rounded-xl text-sm flex items-start gap-3",
+                "p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm flex items-start gap-3",
                 status.type === 'success' ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
               )}>
                 {status.type === 'success' ? <CheckCircle className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
-                {status.message}
+                <span>{status.message}</span>
               </div>
             )}
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Plan</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Plan</label>
                   <select
                     value={planSelected}
                     onChange={(e) => setPlanSelected(e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
                   >
                     <option value="Basic">Basic</option>
                     <option value="Premium">Premium</option>
                     <option value="Pro">Pro</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Payment Method</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Payment Method</label>
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
                   >
                     <option value="eSewa">eSewa</option>
                     <option value="Bank Transfer">Bank Transfer</option>
@@ -265,26 +265,26 @@ export const GetPremium = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Amount Paid</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Amount Paid</label>
                   <input
                     type="number"
                     required
                     value={amountPaid}
                     onChange={(e) => setAmountPaid(e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
                     placeholder="e.g. 500"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-300">Transaction ID</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Transaction ID</label>
                   <input
                     type="text"
                     required
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value)}
-                    className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
                     placeholder="e.g. 123456789"
                   />
                 </div>
@@ -292,10 +292,10 @@ export const GetPremium = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-300">Transaction Screenshot</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-300">Transaction Screenshot</label>
               <div 
                 className={cn(
-                  "relative border-2 border-dashed rounded-xl transition-all flex flex-col items-center justify-center p-8 text-center cursor-pointer",
+                  "relative border-2 border-dashed rounded-xl transition-all flex flex-col items-center justify-center p-5 sm:p-8 text-center cursor-pointer",
                   previewUrl ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/10" : "border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50"
                 )}
                 onClick={() => document.getElementById('screenshot-upload')?.click()}

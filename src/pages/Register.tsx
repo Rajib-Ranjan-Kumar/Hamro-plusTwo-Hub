@@ -155,21 +155,21 @@ export const Register = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-6 bg-[#0F1115] text-white font-sans selection:bg-[#F4B400]/30 overflow-hidden">
+    <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-6 bg-[#0F1115] text-white font-sans selection:bg-[#F4B400]/30 overflow-hidden">
       {/* Full-screen Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" 
         style={{ backgroundImage: "url('/hero-bg.jpg')" }}
       />
       {/* Dark tint overlay */}
-      <div className="absolute inset-0 bg-black/35 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/45 z-0 pointer-events-none" />
 
       {/* Top right Brand Badge */}
-      <div className="absolute top-8 right-8 z-10 flex items-center gap-2">
-        <div className="bg-[#F4B400] text-black text-xs font-black px-2.5 py-1 rounded">
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 flex items-center gap-2">
+        <div className="bg-[#F4B400] text-black text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded">
           +2
         </div>
-        <span className="text-lg font-bold tracking-tight text-white">Hamro +2</span>
+        <span className="text-base sm:text-lg font-bold tracking-tight text-white">Hamro +2</span>
       </div>
 
       {/* Centered Glass Register Form Card */}
@@ -177,11 +177,11 @@ export const Register = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 max-w-md w-full bg-slate-800/90 border border-slate-700/80 backdrop-blur-md rounded-3xl p-8 sm:p-10 shadow-2xl flex flex-col justify-center"
+        className="relative z-10 max-w-md w-full bg-slate-800/95 border border-slate-700/80 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col justify-center my-8"
       >
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Create an Account</h2>
-          <p className="text-slate-400 text-sm">Join thousands of +2 students in Nepal.</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight">Create an Account</h2>
+          <p className="text-slate-400 text-xs sm:text-sm">Join thousands of +2 students in Nepal.</p>
         </div>
 
         {isLocked && (
