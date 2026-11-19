@@ -44,7 +44,6 @@ export const Chat = () => {
       where('college_id', '==', user.college_id),
       where('stream', '==', user.stream),
       where('year', '==', user.year),
-      orderBy('timestamp', 'asc'),
       limit(100)
     );
 
@@ -53,6 +52,11 @@ export const Chat = () => {
         id: doc.id,
         ...doc.data()
       })) as Message[];
+      newMessages.sort((a: any, b: any) => {
+        const timeA = a.timestamp?.seconds ? a.timestamp.seconds * 1000 : new Date(a.timestamp || 0).getTime();
+        const timeB = b.timestamp?.seconds ? b.timestamp.seconds * 1000 : new Date(b.timestamp || 0).getTime();
+        return timeA - timeB;
+      });
       setMessages(newMessages);
     }, (error) => {
       console.error('Chat onSnapshot error:', error);

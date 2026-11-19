@@ -195,51 +195,104 @@ export const getColleges = async () => {
 };
 
 export const getSubjects = async (collegeId?: string) => {
-  let q = collection(db, 'subjects') as any;
-  if (collegeId === 'all') {
-    // No filter, fetch all
-  } else if (collegeId && collegeId !== '0') {
-    const collegeIds = Array.from(new Set([collegeId, null]));
-    q = query(q, where('college_id', 'in', collegeIds));
-  } else {
-    q = query(q, where('college_id', '==', null));
+  try {
+    let q = collection(db, 'subjects') as any;
+    if (collegeId === 'all') {
+      // No filter, fetch all
+    } else if (collegeId && collegeId !== '0') {
+      const collegeIds = Array.from(new Set([collegeId, null]));
+      q = query(q, where('college_id', 'in', collegeIds));
+    } else {
+      q = query(q, where('college_id', '==', null));
+    }
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  } catch (error) {
+    console.warn("getSubjects direct query error, attempting collection fallback:", error);
+    try {
+      const snap = await getDocs(collection(db, 'subjects'));
+      const all = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
+      if (collegeId && collegeId !== 'all' && collegeId !== '0') {
+        return all.filter(s => s.college_id === collegeId || !s.college_id);
+      } else if (collegeId === '0') {
+        return all.filter(s => !s.college_id);
+      }
+      return all;
+    } catch (e) {
+      console.error("Failed to fetch subjects:", e);
+      return [];
+    }
   }
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 };
+
+const DEFAULT_CONTENT_TYPES = [
+  { id: 'def-syllabus', name: 'syllabus', college_id: null },
+  { id: 'def-notes', name: 'notes', college_id: null },
+  { id: 'def-pyq', name: 'pyq', college_id: null },
+  { id: 'def-solutions', name: 'solutions', college_id: null },
+  { id: 'def-model_questions', name: 'model_questions', college_id: null }
+];
 
 export const getContentTypes = async (collegeId?: string, year?: string) => {
-  let q = collection(db, 'content_types') as any;
-  if (collegeId === 'all') {
-    // No filter
-  } else if (collegeId && collegeId !== '0') {
-    const collegeIds = Array.from(new Set([collegeId, null]));
-    q = query(q, where('college_id', 'in', collegeIds));
-  } else {
-    q = query(q, where('college_id', '==', null));
+  try {
+    let q = collection(db, 'content_types') as any;
+    if (collegeId === 'all') {
+      // No filter
+    } else if (collegeId && collegeId !== '0') {
+      const collegeIds = Array.from(new Set([collegeId, null]));
+      q = query(q, where('college_id', 'in', collegeIds));
+    } else {
+      q = query(q, where('college_id', '==', null));
+    }
+    if (year && year !== 'all') {
+      q = query(q, where('year', '==', year));
+    }
+    const snapshot = await getDocs(q);
+    const results = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    if (results.length > 0) return results;
+    
+    // If no custom content types found for this class/college, provide standard defaults
+    return DEFAULT_CONTENT_TYPES.map(t => ({ ...t, year: year || 'Class 11' }));
+  } catch (error) {
+    console.warn("getContentTypes direct query error, using standard defaults:", error);
+    return DEFAULT_CONTENT_TYPES.map(t => ({ ...t, year: year || 'Class 11' }));
   }
-  if (year && year !== 'all') {
-    q = query(q, where('year', '==', year));
-  }
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 };
 
+const DEFAULT_EXAM_YEARS = [
+  { id: 'def-2026', year_value: '2026', college_id: null },
+  { id: 'def-2025', year_value: '2025', college_id: null },
+  { id: 'def-2024', year_value: '2024', college_id: null },
+  { id: 'def-2023', year_value: '2023', college_id: null },
+  { id: 'def-2022', year_value: '2022', college_id: null },
+  { id: 'def-2021', year_value: '2021', college_id: null },
+  { id: 'def-2020', year_value: '2020', college_id: null }
+];
+
 export const getExamYears = async (collegeId?: string, year?: string) => {
-  let q = collection(db, 'exam_years') as any;
-  if (collegeId === 'all') {
-    // No filter
-  } else if (collegeId && collegeId !== '0') {
-    const collegeIds = Array.from(new Set([collegeId, null]));
-    q = query(q, where('college_id', 'in', collegeIds));
-  } else {
-    q = query(q, where('college_id', '==', null));
+  try {
+    let q = collection(db, 'exam_years') as any;
+    if (collegeId === 'all') {
+      // No filter
+    } else if (collegeId && collegeId !== '0') {
+      const collegeIds = Array.from(new Set([collegeId, null]));
+      q = query(q, where('college_id', 'in', collegeIds));
+    } else {
+      q = query(q, where('college_id', '==', null));
+    }
+    if (year && year !== 'all') {
+      q = query(q, where('year', '==', year));
+    }
+    const snapshot = await getDocs(q);
+    const results = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    if (results.length > 0) return results;
+
+    // Fallback: Return standard default exam years
+    return DEFAULT_EXAM_YEARS.map(y => ({ ...y, year: year || 'Class 11' }));
+  } catch (error) {
+    console.warn("getExamYears direct query error, using standard defaults:", error);
+    return DEFAULT_EXAM_YEARS.map(y => ({ ...y, year: year || 'Class 11' }));
   }
-  if (year && year !== 'all') {
-    q = query(q, where('year', '==', year));
-  }
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 };
 
 export const getContributions = async (userId?: string) => {
@@ -340,29 +393,60 @@ export const addExamYear = async (data: any) => {
 };
 
 export const getContent = async (type: string, subjectId?: string, year?: string, term?: string, examYear?: string, collegeId?: string, includePending: boolean = false) => {
-  let q = collection(db, 'contributions') as any;
-  q = query(q, where('type', '==', type));
-  
-  // Only show verified content unless explicitly requested (e.g., for admin)
-  if (!includePending) {
-    q = query(q, where('status', '==', 'verified'));
+  try {
+    let q = collection(db, 'contributions') as any;
+    q = query(q, where('type', '==', type));
+    
+    // Only show verified content unless explicitly requested (e.g., for admin)
+    if (!includePending) {
+      q = query(q, where('status', '==', 'verified'));
+    }
+    
+    if (subjectId) q = query(q, where('subject_id', '==', subjectId));
+    if (term) q = query(q, where('term', '==', term));
+    if (examYear) q = query(q, where('exam_year', '==', examYear));
+    
+    if (collegeId === 'all') {
+      // Admin sees all
+    } else if (collegeId && collegeId !== '0') {
+      const collegeIds = Array.from(new Set([collegeId, null]));
+      q = query(q, where('college_id', 'in', collegeIds));
+    } else if (collegeId !== undefined) {
+      q = query(q, where('college_id', '==', null));
+    }
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  } catch (error) {
+    console.warn("Direct query failed (likely missing composite index), activating resilient in-memory filter fallback:", error);
+    try {
+      let fallbackQ = query(collection(db, 'contributions'), where('type', '==', type));
+      if (!includePending) {
+        fallbackQ = query(fallbackQ, where('status', '==', 'verified'));
+      }
+      const snapshot = await getDocs(fallbackQ);
+      let results = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+
+      if (subjectId) {
+        results = results.filter(item => item.subject_id === subjectId);
+      }
+      if (term) {
+        results = results.filter(item => item.term === term);
+      }
+      if (examYear) {
+        results = results.filter(item => item.exam_year === examYear);
+      }
+      if (collegeId && collegeId !== 'all' && collegeId !== '0') {
+        results = results.filter(item => item.college_id === collegeId || item.college_id === null || !item.college_id);
+      } else if (collegeId === '0') {
+        results = results.filter(item => !item.college_id);
+      }
+      return results;
+    } catch (fallbackError) {
+      console.error("Fallback getContent error:", fallbackError);
+      return [];
+    }
   }
-  
-  if (subjectId) q = query(q, where('subject_id', '==', subjectId));
-  if (term) q = query(q, where('term', '==', term));
-  if (examYear) q = query(q, where('exam_year', '==', examYear));
-  
-  if (collegeId === 'all') {
-    // Admin sees all
-  } else if (collegeId && collegeId !== '0') {
-    const collegeIds = Array.from(new Set([collegeId, null]));
-    q = query(q, where('college_id', 'in', collegeIds));
-  } else if (collegeId !== undefined) {
-    q = query(q, where('college_id', '==', null));
-  }
-  
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 };
 
 export const upvoteContent = async (id: string, userId: string) => {
@@ -687,5 +771,128 @@ export const getCollegeExamTimer = async (collegeId: string) => {
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, `college_exams/${collegeId}`);
     return null;
+  }
+};
+
+export const seedDefaultCurriculumData = async () => {
+  let countAdded = 0;
+  try {
+    // 1. Settings / Global
+    const globalRef = doc(db, 'settings', 'global');
+    const globalSnap = await getDoc(globalRef);
+    if (!globalSnap.exists()) {
+      await setDoc(globalRef, { premium_only_mode: true, updated_at: serverTimestamp() });
+      countAdded++;
+    }
+
+    // 2. Content Types for Class 11 and Class 12
+    const typesSnap = await getDocs(collection(db, 'content_types'));
+    const existingTypes = typesSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+    const defaultTypes = [
+      { name: 'syllabus', years: ['Class 11', 'Class 12'] },
+      { name: 'notes', years: ['Class 11', 'Class 12'] },
+      { name: 'pyq', years: ['Class 11', 'Class 12'] },
+      { name: 'solutions', years: ['Class 11', 'Class 12'] },
+      { name: 'model_questions', years: ['Class 11', 'Class 12'] }
+    ];
+
+    for (const t of defaultTypes) {
+      for (const yr of t.years) {
+        const exists = existingTypes.some(e => e.name?.toLowerCase() === t.name.toLowerCase() && e.year === yr && (!e.college_id || e.college_id === null));
+        if (!exists) {
+          await addDoc(collection(db, 'content_types'), {
+            name: t.name,
+            year: yr,
+            college_id: null
+          });
+          countAdded++;
+        }
+      }
+    }
+
+    // 3. Exam Years for Class 11 and Class 12
+    const examYearsSnap = await getDocs(collection(db, 'exam_years'));
+    const existingExamYears = examYearsSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+    const standardYears = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
+
+    for (const yv of standardYears) {
+      for (const cl of ['Class 11', 'Class 12']) {
+        const exists = existingExamYears.some(e => e.year_value === yv && e.year === cl && (!e.college_id || e.college_id === null));
+        if (!exists) {
+          await addDoc(collection(db, 'exam_years'), {
+            year_value: yv,
+            year: cl,
+            college_id: null
+          });
+          countAdded++;
+        }
+      }
+    }
+
+    // 4. Standard Subjects
+    const subjectsSnap = await getDocs(collection(db, 'subjects'));
+    const existingSubjects = subjectsSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+
+    const standardSubjects = [
+      // Class 11 Science
+      { name: 'Physics', code: 'PHY-101', stream: 'Science', year: 'Class 11' },
+      { name: 'Chemistry', code: 'CHE-101', stream: 'Science', year: 'Class 11' },
+      { name: 'Mathematics', code: 'MTH-101', stream: 'Science', year: 'Class 11' },
+      { name: 'Biology', code: 'BIO-101', stream: 'Science', year: 'Class 11' },
+      { name: 'English', code: 'ENG-101', stream: 'Science', year: 'Class 11' },
+      { name: 'Nepali', code: 'NEP-101', stream: 'Science', year: 'Class 11' },
+      { name: 'Computer Science', code: 'COM-101', stream: 'Science', year: 'Class 11' },
+
+      // Class 12 Science
+      { name: 'Physics', code: 'PHY-201', stream: 'Science', year: 'Class 12' },
+      { name: 'Chemistry', code: 'CHE-201', stream: 'Science', year: 'Class 12' },
+      { name: 'Mathematics', code: 'MTH-201', stream: 'Science', year: 'Class 12' },
+      { name: 'Biology', code: 'BIO-201', stream: 'Science', year: 'Class 12' },
+      { name: 'English', code: 'ENG-201', stream: 'Science', year: 'Class 12' },
+      { name: 'Nepali', code: 'NEP-201', stream: 'Science', year: 'Class 12' },
+      { name: 'Computer Science', code: 'COM-201', stream: 'Science', year: 'Class 12' },
+
+      // Class 11 Management
+      { name: 'Accountancy', code: 'ACC-101', stream: 'Management', year: 'Class 11' },
+      { name: 'Economics', code: 'ECO-101', stream: 'Management', year: 'Class 11' },
+      { name: 'Business Studies', code: 'BST-101', stream: 'Management', year: 'Class 11' },
+      { name: 'English', code: 'ENG-101', stream: 'Management', year: 'Class 11' },
+      { name: 'Nepali', code: 'NEP-101', stream: 'Management', year: 'Class 11' },
+      { name: 'Basic Mathematics', code: 'BMTH-101', stream: 'Management', year: 'Class 11' },
+      { name: 'Computer Science', code: 'COM-101', stream: 'Management', year: 'Class 11' },
+
+      // Class 12 Management
+      { name: 'Accountancy', code: 'ACC-201', stream: 'Management', year: 'Class 12' },
+      { name: 'Economics', code: 'ECO-201', stream: 'Management', year: 'Class 12' },
+      { name: 'Business Studies', code: 'BST-201', stream: 'Management', year: 'Class 12' },
+      { name: 'English', code: 'ENG-201', stream: 'Management', year: 'Class 12' },
+      { name: 'Nepali', code: 'NEP-201', stream: 'Management', year: 'Class 12' },
+      { name: 'Business Mathematics', code: 'BMTH-201', stream: 'Management', year: 'Class 12' },
+      { name: 'Computer Science', code: 'COM-201', stream: 'Management', year: 'Class 12' }
+    ];
+
+    for (const s of standardSubjects) {
+      const exists = existingSubjects.some(e => 
+        e.name?.toLowerCase() === s.name.toLowerCase() && 
+        e.stream?.toLowerCase() === s.stream.toLowerCase() && 
+        e.year === s.year && 
+        (!e.college_id || e.college_id === null)
+      );
+      if (!exists) {
+        await addDoc(collection(db, 'subjects'), {
+          name: s.name,
+          code: s.code,
+          stream: s.stream,
+          year: s.year,
+          college_id: null
+        });
+        countAdded++;
+      }
+    }
+
+    return { success: true, countAdded };
+  } catch (error: any) {
+    console.error("Error in seedDefaultCurriculumData:", error);
+    throw error;
   }
 };

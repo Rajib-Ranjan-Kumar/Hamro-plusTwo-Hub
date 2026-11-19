@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { PlusCircle, FileText, Building2, BookOpen, Tag, Calendar, Database, Trash2, Clock } from 'lucide-react';
+import { PlusCircle, FileText, Building2, BookOpen, Tag, Calendar, Database, Trash2, Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
@@ -21,7 +21,8 @@ import {
   deleteExamYear,
   deleteContribution,
   deleteContributionFile,
-  setCollegeExamTimer
+  setCollegeExamTimer,
+  seedDefaultCurriculumData
 } from '../services/db';
 import { ConfirmModal } from '../components/ConfirmModal';
 
@@ -345,6 +346,27 @@ export const AddContent = () => {
     }
   };
 
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState('');
+
+  const handleSyncDefaults = async () => {
+    setIsSyncing(true);
+    setSyncStatus('Syncing...');
+    try {
+      const res = await seedDefaultCurriculumData();
+      setSyncStatus(`Synced! (${res.countAdded} added)`);
+      fetchColleges();
+      fetchSubjects(contentCollegeId);
+      setTimeout(() => setSyncStatus(''), 4000);
+    } catch (err: any) {
+      console.error(err);
+      setSyncStatus('Sync failed');
+      setTimeout(() => setSyncStatus(''), 4000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   if (user?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
@@ -355,10 +377,18 @@ export const AddContent = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-6xl mx-auto"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white">
           Manage Content
         </h1>
+        <button
+          onClick={handleSyncDefaults}
+          disabled={isSyncing}
+          className="px-4 py-2 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow cursor-pointer disabled:opacity-50"
+        >
+          {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-slate-800" /> : <RefreshCw className="w-4 h-4" />}
+          <span>{syncStatus || "Sync / Seed NEB Curriculum"}</span>
+        </button>
       </div>
 
       {/* Tabs */}

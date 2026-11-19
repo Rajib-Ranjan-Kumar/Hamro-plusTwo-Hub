@@ -129,7 +129,7 @@ service cloud.firestore {
     // ===============================================================
 
     match /settings/{settingId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
@@ -187,7 +187,7 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidContribution(request.resource.data);
       allow update: if isAuthenticated() && isValidContribution(request.resource.data) && (
         isAdmin() ||
-        (isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'status', 'reward', 'admin_comment', 'upvotes', 'rating', 'rating_count', 'reported', 'solution_status', 'created_at'])) ||
+        (isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'status', 'reward', 'admin_comment', 'solution_status', 'created_at'])) ||
         (!isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'college_id', 'title', 'description', 'type', 'subject_id', 'term', 'exam_year', 'file_url', 'solution_url', 'access_level', 'status', 'reward', 'admin_comment', 'solution_status', 'created_at']))
       );
       allow delete: if isAdmin();
@@ -231,10 +231,10 @@ service cloud.firestore {
     }
 
     match /notifications/{notificationId} {
-      allow read: if isAuthenticated() && isDocOwner();
+      allow read: if isAuthenticated() && (isDocOwner() || isAdmin());
       allow create: if isAdmin();
       allow update: if isAuthenticated() && isDocOwner() && areImmutableFieldsUnchanged(['user_id', 'title', 'message', 'created_at']);
-      allow delete: if isAuthenticated() && isDocOwner();
+      allow delete: if isAuthenticated() && (isDocOwner() || isAdmin());
     }
 
     match /contact_messages/{messageId} {
