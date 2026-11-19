@@ -8,14 +8,18 @@ import { CompleteProfileModal } from './CompleteProfileModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from './SEO';
 
-export const Layout = () => {
+interface LayoutProps {
+  children?: React.ReactNode;
+}
+
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isChatPage = location.pathname.startsWith('/chat');
 
   if (isLoading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
-  if (!user) return <Navigate to="/landing" replace />;
+  if (!user) return <Navigate to="/" replace />;
 
   return (
     <div className="flex h-screen bg-slate-900 text-white overflow-hidden relative">
@@ -55,7 +59,7 @@ export const Layout = () => {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className={isChatPage ? 'h-full flex flex-col min-h-0' : 'h-full'}
             >
-              <Outlet />
+              {children || <Outlet />}
             </motion.div>
           </AnimatePresence>
         </div>

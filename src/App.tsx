@@ -7,6 +7,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
+import { PublicLayout } from './components/PublicLayout';
 import { Landing } from './pages/Landing';
 import { Dashboard } from './pages/Dashboard';
 import { Contribute } from './pages/Contribute';
@@ -49,6 +50,24 @@ const HomeRoute = () => {
   return user ? <Layout /> : <Landing />;
 };
 
+/**
+ * Wraps informational, legal, and error pages so they render properly
+ * for both authenticated users (inside Layout) and guests (inside PublicLayout).
+ */
+const PublicPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0D0D0F]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5C21B]"></div>
+      </div>
+    );
+  }
+
+  return user ? <Layout>{children}</Layout> : <PublicLayout>{children}</PublicLayout>;
+};
+
 export default function App() {
   return (
     <HelmetProvider>
@@ -58,33 +77,42 @@ export default function App() {
             <TopProgressBar />
             <Analytics />
             <Routes>
-            <Route path="/500" element={<ServerError />} />
-            <Route path="/viewer" element={<ProtectedRoute><ViewerPage /></ProtectedRoute>} />
-            <Route path="/" element={<HomeRoute />}>
-              <Route index element={<Dashboard />} />
-              <Route path="contribute" element={<ProtectedRoute><Contribute /></ProtectedRoute>} />
-              <Route path="syllabus" element={<ProtectedRoute><Syllabus /></ProtectedRoute>} />
-              <Route path="admin/*" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
-              <Route path="add-content" element={<ProtectedRoute requireAdmin><AddContent /></ProtectedRoute>} />
-              <Route path="pyq" element={<ProtectedRoute><PYQ /></ProtectedRoute>} />
-              <Route path="chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-              <Route path="get-premium" element={<ProtectedRoute><GetPremium /></ProtectedRoute>} />
-              <Route path="premium" element={<Navigate to="/get-premium" replace />} />
-              <Route path="verify-subscriptions" element={<ProtectedRoute requireAdmin><VerifySubscriptions /></ProtectedRoute>} />
-              <Route path="verify-contributions" element={<ProtectedRoute requireAdmin><VerifyContributions /></ProtectedRoute>} />
-              <Route path="privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="terms-conditions" element={<TermsConditions />} />
-              <Route path="cookie-policy" element={<CookiePolicy />} />
-              <Route path="disclaimer" element={<Disclaimer />} />
-              <Route path="contact" element={<Contact />} />
-              <Route path="faq" element={<FAQ />} />
-              <Route path="about" element={<About />} />
-              <Route path="about-us" element={<Navigate to="/about" replace />} />
-              <Route path="leaderboard" element={<div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div>} />
-              <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
+              {/* Standalone Error Routes */}
+              <Route path="/500" element={<PublicPage><ServerError /></PublicPage>} />
+              <Route path="/viewer" element={<ProtectedRoute><ViewerPage /></ProtectedRoute>} />
+
+              {/* Public & Legal Pages (Accessible to everyone) */}
+              <Route path="/about" element={<PublicPage><About /></PublicPage>} />
+              <Route path="/about-us" element={<Navigate to="/about" replace />} />
+              <Route path="/contact" element={<PublicPage><Contact /></PublicPage>} />
+              <Route path="/faq" element={<PublicPage><FAQ /></PublicPage>} />
+              <Route path="/privacy-policy" element={<PublicPage><PrivacyPolicy /></PublicPage>} />
+              <Route path="/terms-conditions" element={<PublicPage><TermsConditions /></PublicPage>} />
+              <Route path="/cookie-policy" element={<PublicPage><CookiePolicy /></PublicPage>} />
+              <Route path="/disclaimer" element={<PublicPage><Disclaimer /></PublicPage>} />
+              <Route path="/landing" element={<Landing />} />
+
+              {/* Main Authenticated Application */}
+              <Route path="/" element={<HomeRoute />}>
+                <Route index element={<Dashboard />} />
+                <Route path="dashboard" element={<Navigate to="/" replace />} />
+                <Route path="contribute" element={<ProtectedRoute><Contribute /></ProtectedRoute>} />
+                <Route path="syllabus" element={<ProtectedRoute><Syllabus /></ProtectedRoute>} />
+                <Route path="admin/*" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
+                <Route path="add-content" element={<ProtectedRoute requireAdmin><AddContent /></ProtectedRoute>} />
+                <Route path="pyq" element={<ProtectedRoute><PYQ /></ProtectedRoute>} />
+                <Route path="chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+                <Route path="get-premium" element={<ProtectedRoute><GetPremium /></ProtectedRoute>} />
+                <Route path="premium" element={<Navigate to="/get-premium" replace />} />
+                <Route path="verify-subscriptions" element={<ProtectedRoute requireAdmin><VerifySubscriptions /></ProtectedRoute>} />
+                <Route path="verify-contributions" element={<ProtectedRoute requireAdmin><VerifyContributions /></ProtectedRoute>} />
+                <Route path="leaderboard" element={<div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div>} />
+                <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              </Route>
+
+              {/* Global 404 Catch-All */}
+              <Route path="*" element={<PublicPage><NotFound /></PublicPage>} />
+            </Routes>
           </LoadingProvider>
         </Router>
       </AuthProvider>

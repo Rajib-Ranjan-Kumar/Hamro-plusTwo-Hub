@@ -5,6 +5,7 @@ import { collection, addDoc, getDocs, query, limit, where } from 'firebase/fires
 import { Crown, Upload, CheckCircle, AlertCircle, Loader2, CreditCard, ExternalLink, Clock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { uploadFile, handleFirestoreError, OperationType } from '../services/db';
+import { getFriendlyErrorMessage } from '../utils/friendlyErrors';
 import { motion } from 'motion/react';
 
 export const GetPremium = () => {
@@ -105,14 +106,10 @@ export const GetPremium = () => {
       setHasPendingRequest(true);
     } catch (err) {
       console.error("Error submitting request:", err);
-      try {
-        handleFirestoreError(err, OperationType.CREATE, 'subscription_requests');
-      } catch (jsonErr: any) {
-        const errorData = JSON.parse(jsonErr.message);
-        setStatus({ type: 'error', message: `Failed to submit request: ${errorData.error}` });
-        return;
-      }
-      setStatus({ type: 'error', message: 'Failed to submit request. Please try again.' });
+      setStatus({ 
+        type: 'error', 
+        message: getFriendlyErrorMessage(err, 'Unable to submit your subscription request. Please try again or contact support.') 
+      });
     } finally {
       setIsSubmitting(false);
     }
