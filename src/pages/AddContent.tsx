@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLoading } from '../context/LoadingContext';
 import { PlusCircle, FileText, Building2, BookOpen, Tag, Calendar, Database, Trash2, Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -28,7 +29,10 @@ import { ConfirmModal } from '../components/ConfirmModal';
 
 export const AddContent = () => {
   const { user } = useAuth();
+  const { startLoading, setProgress, stopLoading } = useLoading();
   const [activeTab, setActiveTab] = useState<'add_content' | 'add_college' | 'add_subject' | 'add_type' | 'add_exam_year' | 'manage_data' | 'add_exam_timer'>('add_content');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStep, setUploadStep] = useState('');
   
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, title: string, message: string, onConfirm: () => void}>({
     isOpen: false, title: '', message: '', onConfirm: () => {}
@@ -219,9 +223,16 @@ export const AddContent = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setAddStatus('');
+    setUploadProgress(15);
+    setUploadStep('Preparing content upload...');
+    startLoading(20, 'Preparing content upload...');
+
     try {
       let uploadedFileUrl = 'https://example.com/dummy.pdf';
       if (file) {
+        setUploadProgress(35);
+        setUploadStep('Uploading main PDF file...');
+        setProgress(45, 'Uploading main PDF file...');
         uploadedFileUrl = await uploadFile(file, 'content');
       } else {
         throw new Error("Please select a file to upload.");
@@ -229,8 +240,15 @@ export const AddContent = () => {
 
       let uploadedSolutionUrl = '';
       if (solutionFile) {
+        setUploadProgress(65);
+        setUploadStep('Uploading solution PDF file...');
+        setProgress(65, 'Uploading solution PDF file...');
         uploadedSolutionUrl = await uploadFile(solutionFile, 'solutions');
       }
+
+      setUploadProgress(85);
+      setUploadStep('Publishing content to platform...');
+      setProgress(85, 'Publishing content to platform...');
 
       await addContribution({
         user_id: user?.id,
@@ -246,17 +264,25 @@ export const AddContent = () => {
         status: 'verified'
       }, user);
       
+      setUploadProgress(100);
+      setUploadStep('Content published successfully!');
+      setProgress(100, 'Content published successfully!');
       setAddStatus('Content added successfully to the website!');
       setDescription('');
       setFile(null);
       setSolutionFile(null);
       (e.target as HTMLFormElement).reset();
-      setTimeout(() => setAddStatus(''), 3000);
+      setTimeout(() => setAddStatus(''), 4000);
     } catch (err: any) {
       console.error(err);
       setAddStatus(err.message || 'Error uploading file.');
     } finally {
       setIsSubmitting(false);
+      stopLoading();
+      setTimeout(() => {
+        setUploadProgress(0);
+        setUploadStep('');
+      }, 2500);
     }
   };
 
@@ -603,13 +629,40 @@ export const AddContent = () => {
                 </select>
               </div>
 
+              {isSubmitting && (
+                <div className="p-3.5 bg-slate-900/80 rounded-xl border border-amber-400/30 space-y-2">
+                  <div className="flex justify-between items-center text-xs text-amber-300 font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                      {uploadStep || 'Uploading to server...'}
+                    </span>
+                    <span className="text-white font-bold">{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                    <div 
+                      className="bg-gradient-to-r from-amber-500 via-[#F4B400] to-yellow-300 h-2 rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(244,180,0,0.5)]"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <button 
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-medium rounded-xl transition-colors flex items-center gap-2"
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-medium rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
               >
-                <PlusCircle className="w-5 h-5" />
-                {isSubmitting ? 'Publishing...' : 'Publish Content'}
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Uploading {uploadProgress}%...
+                  </span>
+                ) : (
+                  <>
+                    <PlusCircle className="w-5 h-5" />
+                    Publish Content
+                  </>
+                )}
               </button>
             </form>
           </div>

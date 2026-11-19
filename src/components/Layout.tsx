@@ -12,6 +12,7 @@ export const Layout = () => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isChatPage = location.pathname.startsWith('/chat');
 
   if (isLoading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
   if (!user) return <Navigate to="/landing" replace />;
@@ -43,8 +44,8 @@ export const Layout = () => {
 
       <Sidebar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
       
-      <main className="flex-1 min-w-0 overflow-y-auto relative z-10 flex flex-col">
-        <div className="flex-1 p-3.5 sm:p-6 md:p-8 pt-18 sm:pt-20 md:pt-8">
+      <main className={`flex-1 min-w-0 ${isChatPage ? 'overflow-hidden flex flex-col h-full' : 'overflow-y-auto flex flex-col'} relative z-10`}>
+        <div className={`flex-1 ${isChatPage ? 'p-2 sm:p-4 pt-16 sm:pt-18 md:pt-4 pb-2 flex flex-col overflow-hidden h-full min-h-0' : 'p-3.5 sm:p-6 md:p-8 pt-18 sm:pt-20 md:pt-8'}`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -52,13 +53,13 @@ export const Layout = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="h-full"
+              className={isChatPage ? 'h-full flex flex-col min-h-0' : 'h-full'}
             >
               <Outlet />
             </motion.div>
           </AnimatePresence>
         </div>
-        <Footer />
+        {!isChatPage && <Footer />}
       </main>
 
       {!user.college_id && <CompleteProfileModal />}

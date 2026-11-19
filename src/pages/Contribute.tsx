@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Upload, FileText, CheckCircle, DollarSign, AlertCircle, CreditCard, History } from 'lucide-react';
+import { useLoading } from '../context/LoadingContext';
+import { Upload, FileText, CheckCircle, DollarSign, AlertCircle, CreditCard, History, Loader2 } from 'lucide-react';
 import { getColleges, getSubjects, getContentTypes, getExamYears, getContributions, getWithdrawals, addContribution, addWithdrawal, uploadFile } from '../services/db';
 import { motion } from 'motion/react';
 
 export const Contribute = () => {
   const { user, fetchUser } = useAuth();
+  const { startLoading, setProgress, stopLoading } = useLoading();
   const [colleges, setColleges] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [contentTypes, setContentTypes] = useState<any[]>([]);
   const [examYears, setExamYears] = useState<any[]>([]);
   const [contributions, setContributions] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStep, setUploadStep] = useState('');
   
   const [activeTab, setActiveTab] = useState<'submit' | 'withdraw'>('submit');
 
@@ -84,11 +88,20 @@ export const Contribute = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setStatus({ type: null, message: '' });
+    setUploadProgress(15);
+    setUploadStep('Preparing document upload...');
+    startLoading(20, 'Preparing document upload...');
 
     try {
       let file_url = '';
       if (file) {
+        setUploadProgress(35);
+        setUploadStep('Uploading file to Cloudinary...');
+        setProgress(45, 'Uploading file to Cloudinary...');
         file_url = await uploadFile(file, 'contributions');
+        setUploadProgress(75);
+        setUploadStep('Saving contribution details to database...');
+        setProgress(80, 'Saving contribution details...');
       } else {
         throw new Error("Please select a file to upload.");
       }
@@ -100,6 +113,10 @@ export const Contribute = () => {
         college_id: formData.college_id === '0' ? null : formData.college_id,
       }, user);
       
+      setUploadProgress(100);
+      setUploadStep('Uploaded successfully!');
+      setProgress(100, 'Uploaded successfully!');
+
       setStatus({ type: 'success', message: 'Contribution submitted successfully! Waiting for admin approval.' });
       setFormData({
         ...formData,
@@ -114,6 +131,11 @@ export const Contribute = () => {
       setStatus({ type: 'error', message: err.message || 'An error occurred. Please try again.' });
     } finally {
       setIsSubmitting(false);
+      stopLoading();
+      setTimeout(() => {
+        setUploadProgress(0);
+        setUploadStep('');
+      }, 2000);
     }
   };
 
@@ -396,12 +418,35 @@ export const Contribute = () => {
                     </div>
                   </div>
 
+                  {isSubmitting && (
+                    <div className="p-3.5 bg-slate-900/80 rounded-xl border border-amber-400/30 space-y-2">
+                      <div className="flex justify-between items-center text-xs text-amber-300 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                          {uploadStep || 'Uploading to server...'}
+                        </span>
+                        <span className="text-white font-bold">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div 
+                          className="bg-gradient-to-r from-amber-500 via-[#F4B400] to-yellow-300 h-2 rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(244,180,0,0.5)]"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 disabled:opacity-70 hover-lift"
+                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 disabled:opacity-70 hover-lift cursor-pointer"
                   >
-                    {isSubmitting ? 'Submitting...' : (
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Uploading {uploadProgress}%...
+                      </span>
+                    ) : (
                       <>
                         <Upload className="w-5 h-5" />
                         Submit Contribution

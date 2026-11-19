@@ -30,6 +30,8 @@ import { NotFound } from './pages/NotFound';
 import { ServerError } from './pages/ServerError';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Analytics } from './components/Analytics';
+import { TopProgressBar } from './components/TopProgressBar';
+import { LoadingProvider } from './context/LoadingContext';
 import { ViewerPage } from './pages/ViewerPage';
 
 const HomeRoute = () => {
@@ -51,8 +53,10 @@ export default function App() {
     <HelmetProvider>
       <AuthProvider>
         <Router>
-          <Analytics />
-          <Routes>
+          <LoadingProvider>
+            <TopProgressBar />
+            <Analytics />
+            <Routes>
             <Route path="/500" element={<ServerError />} />
             <Route path="/viewer" element={<ProtectedRoute><ViewerPage /></ProtectedRoute>} />
             <Route path="/" element={<HomeRoute />}>
@@ -78,6 +82,7 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
+          </LoadingProvider>
         </Router>
       </AuthProvider>
     </HelmetProvider>

@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLoading } from '../context/LoadingContext';
 import { db } from '../firebase';
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, limit } from 'firebase/firestore';
-import { Send, Users, MessageSquare } from 'lucide-react';
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, writeBatch, doc } from 'firebase/firestore';
+import { Send, Users, MessageSquare, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
+
+const MAX_MESSAGES = 75;
 
 interface Message {
   id?: string;
@@ -21,9 +24,11 @@ interface Message {
 
 export const Chat = () => {
   const { user } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isConnected, setIsConnected] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -43,8 +48,7 @@ export const Chat = () => {
       collection(db, 'messages'),
       where('college_id', '==', user.college_id),
       where('stream', '==', user.stream),
-      where('year', '==', user.year),
-      limit(100)
+      where('year', '==', user.year)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -52,28 +56,37 @@ export const Chat = () => {
         id: doc.id,
         ...doc.data()
       })) as Message[];
+
       newMessages.sort((a: any, b: any) => {
         const timeA = a.timestamp?.seconds ? a.timestamp.seconds * 1000 : new Date(a.timestamp || 0).getTime();
         const timeB = b.timestamp?.seconds ? b.timestamp.seconds * 1000 : new Date(b.timestamp || 0).getTime();
         return timeA - timeB;
       });
-      setMessages(newMessages);
+
+      // Maintain only the last 75 messages
+      if (newMessages.length > MAX_MESSAGES) {
+        const excess = newMessages.length - MAX_MESSAGES;
+        const toDelete = newMessages.slice(0, excess);
+        setMessages(newMessages.slice(excess));
+
+        // Delete excess older messages from Firestore database
+        try {
+          const batch = writeBatch(db);
+          toDelete.forEach(msg => {
+            if (msg.id) {
+              batch.delete(doc(db, 'messages', msg.id));
+            }
+          });
+          batch.commit().catch(e => console.warn('Prune old messages error:', e));
+        } catch (pruneErr) {
+          console.warn('Prune batch error:', pruneErr);
+        }
+      } else {
+        setMessages(newMessages);
+      }
     }, (error) => {
       console.error('Chat onSnapshot error:', error);
     });
-
-    // Add a system message locally for joining
-    const joinMessage: Message = {
-      type: 'system',
-      content: `${user.name} joined the chat`,
-      timestamp: new Date().toISOString(),
-      college_id: user.college_id,
-      stream: user.stream,
-      year: user.year
-    };
-    
-    // We don't save system messages to DB to save writes, just show them locally or handle via presence
-    // For now, we'll just rely on the real messages
 
     return () => {
       unsubscribe();
@@ -83,10 +96,12 @@ export const Chat = () => {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || !user) return;
+    if (!input.trim() || !user || isSending) return;
 
-    const messageContent = input;
+    const messageContent = input.trim();
     setInput('');
+    setIsSending(true);
+    startLoading(35, 'Sending message...');
 
     try {
       await addDoc(collection(db, 'messages'), {
@@ -102,6 +117,9 @@ export const Chat = () => {
       });
     } catch (err) {
       console.error("Error sending message:", err);
+    } finally {
+      setIsSending(false);
+      stopLoading();
     }
   };
 
@@ -109,9 +127,9 @@ export const Chat = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto h-[calc(100dvh-10rem)] md:h-[calc(100vh-8rem)] flex flex-col"
+      className="max-w-4xl mx-auto w-full flex-1 flex flex-col overflow-hidden h-full min-h-0"
     >
       <div className="glass-panel rounded-t-2xl p-3 sm:p-4 border-b border-slate-700/50 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5 sm:gap-3">
@@ -136,9 +154,9 @@ export const Chat = () => {
         </div>
       </div>
 
-      <div className="flex-1 glass-panel p-3 sm:p-4 overflow-y-auto no-scrollbar space-y-3 sm:space-y-4">
+      <div className="flex-1 glass-panel p-3 sm:p-4 overflow-y-auto no-scrollbar space-y-3 sm:space-y-4 min-h-0">
         {messages.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-2">
+          <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-2 py-8">
             <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 opacity-20" />
             <p className="text-xs sm:text-sm">No messages yet. Start the conversation!</p>
           </div>
@@ -171,7 +189,7 @@ export const Chat = () => {
                   ? 'bg-emerald-600 text-white rounded-tr-sm' 
                   : 'glass-panel text-white border border-slate-700/50 rounded-tl-sm shadow-sm'
               }`}>
-                <p className="text-xs sm:text-sm leading-relaxed">{msg.content}</p>
+                <p className="text-xs sm:text-sm leading-relaxed break-words">{msg.content}</p>
               </div>
               <span className="text-[9px] sm:text-[10px] text-slate-400 mt-1 mx-1">
                 {msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
@@ -182,22 +200,22 @@ export const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="glass-panel rounded-b-2xl p-3 sm:p-4 border-t border-slate-700/50 shrink-0">
+      <div className="glass-panel rounded-b-2xl p-2.5 sm:p-3.5 border-t border-slate-700/50 shrink-0">
         <form onSubmit={sendMessage} className="flex items-center gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 bg-white/50 dark:bg-slate-900/50 border border-slate-700 rounded-xl px-3.5 py-2 sm:px-4 sm:py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white backdrop-blur-sm text-xs sm:text-sm"
-            disabled={!isConnected}
+            className="flex-1 bg-white/50 dark:bg-slate-900/50 border border-slate-700 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white backdrop-blur-sm text-xs sm:text-sm"
+            disabled={!isConnected || isSending}
           />
           <button
             type="submit"
-            disabled={!input.trim() || !isConnected}
-            className="bg-emerald-600 text-white p-2.5 sm:p-3 rounded-xl hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover-lift shrink-0 cursor-pointer"
+            disabled={!input.trim() || !isConnected || isSending}
+            className="bg-emerald-600 text-white p-2.5 sm:p-3 rounded-xl hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover-lift shrink-0 cursor-pointer flex items-center justify-center"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            {isSending ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Send className="w-4 h-4 sm:w-5 sm:h-5" />}
           </button>
         </form>
       </div>
