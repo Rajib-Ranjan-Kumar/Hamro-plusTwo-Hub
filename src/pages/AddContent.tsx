@@ -168,11 +168,13 @@ export const AddContent = () => {
     }
 
     if (manageDataType === 'materials') {
+      const itemClass = item.year || allSubjects.find(s => s.id === item.subject_id)?.year;
+      if (delYear && itemClass !== delYear) return false;
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
       if (delSubjectId && item.subject_id !== delSubjectId) return false;
       if (delContentType && item.type !== delContentType) return false;
       if (delTerm && item.term !== delTerm) return false;
-      if (delExamYear && item.exam_year !== delExamYear) return false;
+      if (delExamYear && item.exam_year?.toString() !== delExamYear.toString()) return false;
     } else if (manageDataType === 'subjects') {
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
     } else if (manageDataType === 'content_types' || manageDataType === 'exam_years') {
@@ -1051,63 +1053,118 @@ export const AddContent = () => {
 
               {/* Secondary Filters for Materials */}
               {manageDataType === 'materials' && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
-                  <div>
-                    <label className="text-[11px] text-slate-400 font-medium block mb-1">College</label>
-                    <select
-                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
-                      value={delCollegeId}
-                      onChange={(e) => setDelCollegeId(e.target.value)}
-                    >
-                      <option value="0">All Colleges / Global</option>
-                      {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 text-xs">
+                    {/* Class Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Class</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delYear}
+                        onChange={(e) => setDelYear(e.target.value)}
+                      >
+                        <option value="">All Classes</option>
+                        <option value="Class 11">Class 11</option>
+                        <option value="Class 12">Class 12</option>
+                      </select>
+                    </div>
+
+                    {/* College Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">College</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delCollegeId}
+                        onChange={(e) => setDelCollegeId(e.target.value)}
+                      >
+                        <option value="0">All Colleges / Global</option>
+                        {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Subject Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Subject</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delSubjectId}
+                        onChange={(e) => setDelSubjectId(e.target.value)}
+                      >
+                        <option value="">All Subjects</option>
+                        {allSubjects
+                          .filter(s => (delCollegeId === '0' || s.college_id === delCollegeId || !s.college_id) && (!delYear || s.year === delYear || !s.year))
+                          .map(s => <option key={s.id} value={s.id}>{s.name} ({s.year || 'All'})</option>)}
+                      </select>
+                    </div>
+
+                    {/* Content Type Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Content Type</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delContentType}
+                        onChange={(e) => setDelContentType(e.target.value)}
+                      >
+                        <option value="">All Types</option>
+                        <option value="pyq">PYQ</option>
+                        <option value="notes">Notes</option>
+                        <option value="syllabus">Syllabus</option>
+                        <option value="solutions">Solutions</option>
+                        <option value="model_questions">Model Questions</option>
+                      </select>
+                    </div>
+
+                    {/* Term Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Term</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delTerm}
+                        onChange={(e) => setDelTerm(e.target.value)}
+                      >
+                        <option value="">All Terms</option>
+                        <option value="1st Term">1st Term</option>
+                        <option value="2nd Term">2nd Term</option>
+                        <option value="3rd Term">3rd Term</option>
+                        <option value="Final Term">Final Term</option>
+                      </select>
+                    </div>
+
+                    {/* Exam Year Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Exam Year</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delExamYear}
+                        onChange={(e) => setDelExamYear(e.target.value)}
+                      >
+                        <option value="">All Exam Years</option>
+                        {['2026', '2025', '2024', '2023', '2022', '2021', '2020'].map(yr => (
+                          <option key={yr} value={yr}>{yr}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="text-[11px] text-slate-400 font-medium block mb-1">Subject</label>
-                    <select
-                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
-                      value={delSubjectId}
-                      onChange={(e) => setDelSubjectId(e.target.value)}
-                    >
-                      <option value="">All Subjects</option>
-                      {allSubjects
-                        .filter(s => delCollegeId === '0' || s.college_id === delCollegeId || !s.college_id)
-                        .map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] text-slate-400 font-medium block mb-1">Content Type</label>
-                    <select
-                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
-                      value={delContentType}
-                      onChange={(e) => setDelContentType(e.target.value)}
-                    >
-                      <option value="">All Types</option>
-                      <option value="pyq">PYQ</option>
-                      <option value="notes">Notes</option>
-                      <option value="syllabus">Syllabus</option>
-                      <option value="solutions">Solutions</option>
-                      <option value="model_questions">Model Questions</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] text-slate-400 font-medium block mb-1">Term</label>
-                    <select
-                      className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
-                      value={delTerm}
-                      onChange={(e) => setDelTerm(e.target.value)}
-                    >
-                      <option value="">All Terms</option>
-                      <option value="1st Term">1st Term</option>
-                      <option value="2nd Term">2nd Term</option>
-                      <option value="3rd Term">3rd Term</option>
-                      <option value="Final Term">Final Term</option>
-                    </select>
-                  </div>
+                  {/* Reset Filters Shortcut */}
+                  {(searchQuery || delYear || delCollegeId !== '0' || delSubjectId || delContentType || delTerm || delExamYear) && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setDelYear('');
+                          setDelCollegeId('0');
+                          setDelSubjectId('');
+                          setDelContentType('');
+                          setDelTerm('');
+                          setDelExamYear('');
+                        }}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>✕ Reset all filters</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
