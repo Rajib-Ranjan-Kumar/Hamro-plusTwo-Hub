@@ -987,3 +987,184 @@ export const seedDefaultCurriculumData = async () => {
     throw error;
   }
 };
+
+export interface PurgeResult {
+  materialsCount: number;
+  filesDeletedCount: number;
+  messagesCount: number;
+  notificationsCount: number;
+  contactMessagesCount: number;
+  withdrawalsCount: number;
+}
+
+export const purgeAllPreviousData = async (
+  options: {
+    wipeMaterials?: boolean;
+    wipeMessages?: boolean;
+    wipeNotifications?: boolean;
+    wipeContacts?: boolean;
+    wipeWithdrawals?: boolean;
+    wipeCurriculum?: boolean;
+    reseedCurriculum?: boolean;
+  } = {},
+  onProgress?: (msg: string, percent: number) => void
+): Promise<PurgeResult> => {
+  const wipeMaterials = options.wipeMaterials !== false;
+  const wipeMessages = options.wipeMessages !== false;
+  const wipeNotifications = options.wipeNotifications !== false;
+  const wipeContacts = options.wipeContacts !== false;
+  const wipeWithdrawals = options.wipeWithdrawals !== false;
+  const wipeCurriculum = options.wipeCurriculum === true;
+  const reseedCurriculum = options.reseedCurriculum !== false;
+
+  let materialsCount = 0;
+  let filesDeletedCount = 0;
+  let messagesCount = 0;
+  let notificationsCount = 0;
+  let contactMessagesCount = 0;
+  let withdrawalsCount = 0;
+
+  // 1. Purge Materials (contributions & academic_resources) + Cloudinary/Firebase files
+  if (wipeMaterials) {
+    onProgress?.('Fetching uploaded materials...', 10);
+    try {
+      const contribSnap = await getDocs(collection(db, 'contributions'));
+      materialsCount += contribSnap.size;
+      let count = 0;
+      for (const d of contribSnap.docs) {
+        count++;
+        onProgress?.(`Deleting material ${count}/${contribSnap.size} & cloud files...`, 10 + Math.round((count / Math.max(1, contribSnap.size)) * 30));
+        const data = d.data();
+        if (data.file_url) {
+          await deleteStorageAsset(data.file_url);
+          filesDeletedCount++;
+        }
+        if (data.solution_url) {
+          await deleteStorageAsset(data.solution_url);
+          filesDeletedCount++;
+        }
+        await deleteDoc(d.ref);
+      }
+    } catch (err) {
+      console.warn("Error wiping contributions:", err);
+    }
+
+    try {
+      const resSnap = await getDocs(collection(db, 'academic_resources'));
+      materialsCount += resSnap.size;
+      for (const d of resSnap.docs) {
+        const data = d.data();
+        if (data.cloudinary_public_id) {
+          await fetch('/api/delete-asset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId: data.cloudinary_public_id, resourceType: 'image' })
+          }).catch(() => null);
+          filesDeletedCount++;
+        }
+        await deleteDoc(d.ref);
+      }
+    } catch (err) {
+      console.warn("Error wiping academic_resources:", err);
+    }
+  }
+
+  // 2. Purge Messages
+  if (wipeMessages) {
+    onProgress?.('Purging chat messages...', 45);
+    try {
+      const msgSnap = await getDocs(collection(db, 'messages'));
+      messagesCount = msgSnap.size;
+      for (let i = 0; i < msgSnap.docs.length; i += 300) {
+        const chunk = msgSnap.docs.slice(i, i + 300);
+        const batch = writeBatch(db);
+        chunk.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+    } catch (err) {
+      console.warn("Error wiping messages:", err);
+    }
+  }
+
+  // 3. Purge Notifications
+  if (wipeNotifications) {
+    onProgress?.('Purging notifications...', 60);
+    try {
+      const notifSnap = await getDocs(collection(db, 'notifications'));
+      notificationsCount = notifSnap.size;
+      const batch = writeBatch(db);
+      notifSnap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    } catch (err) {
+      console.warn("Error wiping notifications:", err);
+    }
+  }
+
+  // 4. Purge Contact Inquiries
+  if (wipeContacts) {
+    onProgress?.('Purging contact inquiries...', 70);
+    try {
+      const contactSnap = await getDocs(collection(db, 'contact_messages'));
+      contactMessagesCount = contactSnap.size;
+      const batch = writeBatch(db);
+      contactSnap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    } catch (err) {
+      console.warn("Error wiping contact_messages:", err);
+    }
+  }
+
+  // 5. Purge Withdrawals & Subscriptions
+  if (wipeWithdrawals) {
+    onProgress?.('Purging withdrawals & subscription requests...', 80);
+    try {
+      const withSnap = await getDocs(collection(db, 'withdrawals'));
+      withdrawalsCount = withSnap.size;
+      const batch = writeBatch(db);
+      withSnap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+
+      const subSnap = await getDocs(collection(db, 'subscription_requests'));
+      const subBatch = writeBatch(db);
+      subSnap.docs.forEach(d => subBatch.delete(d.ref));
+      await subBatch.commit();
+
+      const bookmarkSnap = await getDocs(collection(db, 'bookmarks'));
+      const bmBatch = writeBatch(db);
+      bookmarkSnap.docs.forEach(d => bmBatch.delete(d.ref));
+      await bmBatch.commit();
+    } catch (err) {
+      console.warn("Error wiping withdrawals/subscriptions/bookmarks:", err);
+    }
+  }
+
+  // 6. Optional: Reset Curriculum
+  if (wipeCurriculum) {
+    onProgress?.('Resetting curriculum data...', 90);
+    try {
+      for (const col of ['subjects', 'content_types', 'exam_years']) {
+        const snap = await getDocs(collection(db, col));
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+      if (reseedCurriculum) {
+        onProgress?.('Reseeding fresh standard NEB curriculum...', 95);
+        await seedDefaultCurriculumData();
+      }
+    } catch (err) {
+      console.warn("Error resetting curriculum:", err);
+    }
+  }
+
+  onProgress?.('All data successfully purged!', 100);
+
+  return {
+    materialsCount,
+    filesDeletedCount,
+    messagesCount,
+    notificationsCount,
+    contactMessagesCount,
+    withdrawalsCount
+  };
+};

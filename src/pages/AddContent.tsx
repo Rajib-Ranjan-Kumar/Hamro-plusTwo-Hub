@@ -26,6 +26,7 @@ import {
   seedDefaultCurriculumData
 } from '../services/db';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { PurgeDataModal } from '../components/admin/PurgeDataModal';
 
 export const AddContent = () => {
   const { user } = useAuth();
@@ -37,6 +38,7 @@ export const AddContent = () => {
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, title: string, message: string, onConfirm: () => void}>({
     isOpen: false, title: '', message: '', onConfirm: () => {}
   });
+  const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   
   const [colleges, setColleges] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -435,14 +437,23 @@ export const AddContent = () => {
         <h1 className="text-2xl font-bold text-white">
           Manage Content
         </h1>
-        <button
-          onClick={handleSyncDefaults}
-          disabled={isSyncing}
-          className="px-4 py-2 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow cursor-pointer disabled:opacity-50"
-        >
-          {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-slate-800" /> : <RefreshCw className="w-4 h-4" />}
-          <span>{syncStatus || "Sync / Seed NEB Curriculum"}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleSyncDefaults}
+            disabled={isSyncing}
+            className="px-4 py-2 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow cursor-pointer disabled:opacity-50"
+          >
+            {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-slate-800" /> : <RefreshCw className="w-4 h-4" />}
+            <span>{syncStatus || "Sync / Seed NEB Curriculum"}</span>
+          </button>
+          <button
+            onClick={() => setIsPurgeModalOpen(true)}
+            className="px-4 py-2 bg-rose-600/90 hover:bg-rose-600 text-white font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow cursor-pointer"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Purge All Data</span>
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -1325,6 +1336,15 @@ export const AddContent = () => {
         message={confirmModal.message}
         onConfirm={confirmModal.onConfirm}
         onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
+      <PurgeDataModal
+        isOpen={isPurgeModalOpen}
+        onClose={() => setIsPurgeModalOpen(false)}
+        onSuccess={() => {
+          fetchDataList();
+          fetchColleges();
+          fetchSubjects(contentCollegeId);
+        }}
       />
     </motion.div>
   );

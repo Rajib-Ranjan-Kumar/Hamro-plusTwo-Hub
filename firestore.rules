@@ -226,9 +226,9 @@ service cloud.firestore {
     }
 
     match /bookmarks/{bookmarkId} {
-      allow read: if isAuthenticated() && isDocOwner();
+      allow read: if isAuthenticated() && (isDocOwner() || isAdmin());
       allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid;
-      allow update, delete: if isAuthenticated() && isDocOwner();
+      allow update, delete: if isAuthenticated() && (isDocOwner() || isAdmin());
     }
 
     match /notifications/{notificationId} {

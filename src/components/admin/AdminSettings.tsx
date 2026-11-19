@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Bell, Shield, Globe, Mail } from 'lucide-react';
+import { Save, Bell, Shield, Globe, Mail, AlertTriangle, Trash2 } from 'lucide-react';
 import { getGlobalSettings, updateGlobalSettings } from '../../services/db';
+import { PurgeDataModal } from './PurgeDataModal';
 
 export const AdminSettings = () => {
-  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'danger'>('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   
   // General Settings
   const [siteName, setSiteName] = useState('StudyNotes');
@@ -120,6 +122,17 @@ export const AdminSettings = () => {
             >
               <Bell className={`w-4 h-4 ${activeTab === 'notifications' ? 'text-emerald-500' : 'text-slate-400'}`} />
               Notifications
+            </button>
+            <button
+              onClick={() => setActiveTab('danger')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                activeTab === 'danger'
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  : 'text-red-400/80 hover:bg-red-500/10 hover:text-red-300'
+              }`}
+            >
+              <Trash2 className="w-4 h-4 text-red-400" />
+              Reset & Purge Data
             </button>
           </nav>
         </div>
@@ -321,9 +334,46 @@ export const AdminSettings = () => {
               </div>
             )}
 
+            {activeTab === 'danger' && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Danger Zone: Database & Storage Purge</h3>
+                    <p className="text-sm text-slate-400">Wipe test records, student messages, and permanently destroy Cloudinary PDFs.</p>
+                  </div>
+                </div>
+
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5 space-y-4">
+                  <div>
+                    <h4 className="text-base font-semibold text-red-300 mb-1">Permanently Wipe Dummy & Real Data</h4>
+                    <p className="text-sm text-slate-300 leading-relaxed">
+                      Use this utility to clean up all dummy materials, question papers, uploaded PDFs (Cloudinary and Firebase Storage), student messages, notifications, and contact inquiries. Your administrator account and credentials will be preserved.
+                    </p>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setIsPurgeModalOpen(true)}
+                      className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-lg flex items-center gap-2 cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" /> Open Purge Console
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
+
+      <PurgeDataModal
+        isOpen={isPurgeModalOpen}
+        onClose={() => setIsPurgeModalOpen(false)}
+      />
     </div>
   );
 };
