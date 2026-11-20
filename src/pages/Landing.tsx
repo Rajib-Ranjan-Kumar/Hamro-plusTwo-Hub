@@ -420,20 +420,38 @@ export const Landing = () => {
               { icon: FileText, title: "Previous Year Questions", desc: "Detailed past papers with step-by-step solution breakdowns for revision.", path: "/pyq" },
               { icon: BookOpen, title: "Structured Notes", desc: "Handwritten and typed notes from top teachers in Kathmandu Valley.", path: "/syllabus" },
               { icon: Upload, title: "Contribute Notes", desc: "Share your own class notes to help peers and get recognized on our platform.", path: "/contribute" },
-              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions.", path: "/leaderboard" },
+              { icon: Trophy, title: "Student Leaderboard", desc: "Earn reputation badges for verified notes uploads and correct solutions.", path: "/leaderboard", comingSoon: true },
               { icon: Users, title: "Peer Discussions", desc: "Ask doubts and get answers from fellow +2 students across Nepal.", path: "/chat" },
               { icon: CheckCircle, title: "Syllabus Compliance", desc: "100% updated according to the latest NEB board exam patterns.", path: "/syllabus" }
-            ].map((feature, i) => (
-              <ProtectedWrapper key={i} path={feature.path}>
-                <div className="p-5 sm:p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
-                  <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
-                    <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
+            ].map((feature, i) => {
+              if (feature.comingSoon) {
+                return (
+                  <div key={i} className="p-5 sm:p-6 rounded-xl bg-white/[0.03] border border-white/5 relative opacity-90 cursor-default">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center">
+                        <feature.icon className="w-4 h-4 text-slate-400" />
+                      </div>
+                      <span className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-[#F5C21B]/15 text-[#F5C21B] border border-[#F5C21B]/30 tracking-wide uppercase">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <h3 className="text-base sm:text-[16px] font-bold text-white mb-1.5 sm:mb-2">{feature.title}</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
                   </div>
-                  <h3 className="text-base sm:text-[16px] font-bold text-white mb-1.5 sm:mb-2">{feature.title}</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
-                </div>
-              </ProtectedWrapper>
-            ))}
+                );
+              }
+              return (
+                <ProtectedWrapper key={i} path={feature.path}>
+                  <div className="p-5 sm:p-6 rounded-xl bg-white/[0.03] border border-white/5 hover:border-[#F5C21B]/50 transition-all group hover:-translate-y-1">
+                    <div className="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-[#F5C21B]/10 transition-colors">
+                      <feature.icon className="w-4 h-4 text-slate-400 group-hover:text-[#F5C21B] transition-all" />
+                    </div>
+                    <h3 className="text-base sm:text-[16px] font-bold text-white mb-1.5 sm:mb-2">{feature.title}</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">{feature.desc}</p>
+                  </div>
+                </ProtectedWrapper>
+              );
+            })}
           </div>
         </div>
       </section>

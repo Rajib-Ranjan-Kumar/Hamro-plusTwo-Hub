@@ -11,7 +11,11 @@ import {
   MessageSquare,
   Crown,
   CheckCircle,
-  X
+  X,
+  LayoutDashboard,
+  Users,
+  CreditCard,
+  DollarSign
 } from 'lucide-react';
 
 const navItems = [
@@ -121,67 +125,98 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           {user?.role === 'admin' && (
             <>
               <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Admin Tools
+                Admin Control Center
               </div>
               <NavLink
-                to="/verify-subscriptions"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive 
-                      ? "bg-amber-50 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300" 
-                      : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700/50"
-                  )
-                }
-              >
-                <CheckCircle className="w-5 h-5" />
-                Verify Subscriptions
-              </NavLink>
-              <NavLink
-                to="/verify-contributions"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive 
-                      ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300" 
-                      : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700/50"
-                  )
-                }
-              >
-                <FileText className="w-5 h-5" />
-                Verify Contributions
-              </NavLink>
-              <NavLink
-                to="/add-content"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive 
-                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300" 
-                      : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700/50"
-                  )
-                }
-              >
-                <Upload className="w-5 h-5" />
-                Manage Content
-              </NavLink>
-              <NavLink
                 to="/admin"
+                end
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive 
-                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300" 
-                      : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700/50"
+                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                   )
                 }
               >
-                <Settings className="w-5 h-5" />
-                Admin Panel
+                <LayoutDashboard className="w-5 h-5 text-[#F5C21B]" />
+                Admin Dashboard
+              </NavLink>
+              <NavLink
+                to="/admin?tab=students"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    isActive 
+                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  )
+                }
+              >
+                <Users className="w-5 h-5" />
+                Student Directory
+              </NavLink>
+              <NavLink
+                to="/admin?tab=content"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    isActive 
+                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  )
+                }
+              >
+                <BookOpen className="w-5 h-5" />
+                Content Library
+              </NavLink>
+              <NavLink
+                to="/admin?tab=contributions"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    isActive 
+                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  )
+                }
+              >
+                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                Review Contributions
+              </NavLink>
+              <NavLink
+                to="/admin?tab=subscriptions"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    isActive 
+                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  )
+                }
+              >
+                <CreditCard className="w-5 h-5 text-amber-400" />
+                Manage Subscriptions
+              </NavLink>
+              <NavLink
+                to="/admin?tab=withdrawals"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    isActive 
+                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  )
+                }
+              >
+                <DollarSign className="w-5 h-5 text-purple-400" />
+                Withdrawal Payouts
               </NavLink>
             </>
           )}

@@ -14,7 +14,7 @@ export const SEO = ({
   description = 'Access quality study materials, past year questions (PYQs), and contribute to help your peers succeed in their +2 journey.', 
   keywords = 'NEB, +2, class 11, class 12, notes, pyq, nepal, study materials, science, management',
   image = 'https://images.unsplash.com/photo-1543731068-7e0f5beff43a?q=80&w=2070&auto=format&fit=crop',
-  url = 'https://hamroplus2hub.com'
+  url = 'https://hamroplus2.com.np'
 }: SEOProps) => {
   const fullTitle = title === 'Hamro +2 Hub - The Ultimate Platform for +2 Students in Nepal' ? title : `${title} | Hamro +2 Hub`;
 

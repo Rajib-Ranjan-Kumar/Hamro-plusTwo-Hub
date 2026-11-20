@@ -103,13 +103,13 @@ export default function App() {
                 <Route path="contribute" element={<ProtectedRoute><Contribute /></ProtectedRoute>} />
                 <Route path="syllabus" element={<ProtectedRoute><Syllabus /></ProtectedRoute>} />
                 <Route path="admin/*" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
-                <Route path="add-content" element={<ProtectedRoute requireAdmin><AddContent /></ProtectedRoute>} />
+                <Route path="add-content" element={<Navigate to="/admin?tab=content" replace />} />
                 <Route path="pyq" element={<ProtectedRoute><PYQ /></ProtectedRoute>} />
                 <Route path="chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
                 <Route path="get-premium" element={<ProtectedRoute><GetPremium /></ProtectedRoute>} />
                 <Route path="premium" element={<Navigate to="/get-premium" replace />} />
-                <Route path="verify-subscriptions" element={<ProtectedRoute requireAdmin><VerifySubscriptions /></ProtectedRoute>} />
-                <Route path="verify-contributions" element={<ProtectedRoute requireAdmin><VerifyContributions /></ProtectedRoute>} />
+                <Route path="verify-subscriptions" element={<Navigate to="/admin?tab=subscriptions" replace />} />
+                <Route path="verify-contributions" element={<Navigate to="/admin?tab=contributions" replace />} />
                 <Route path="leaderboard" element={<div className="p-8 text-center text-slate-500">Leaderboard coming soon...</div>} />
                 <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               </Route>

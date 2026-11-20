@@ -3,23 +3,14 @@ import { collection, getDocs, query, where, addDoc, updateDoc, doc, getDoc, dele
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { auth } from '../firebase';
 
-// Helper function to generate SHA-1 signature on client if backend signature endpoint is unreachable
-const getClientUploadSignature = async (timestamp: number, secret: string): Promise<string> => {
-  const message = `timestamp=${timestamp}${secret}`;
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-};
-
 export const uploadFile = async (file: File, path: string): Promise<string> => {
   try {
-    let cloudName = 'zob9phdy';
-    let apiKey = '194297374744823';
+    let cloudName = '';
+    let apiKey = '';
     let timestamp = Math.round(new Date().getTime() / 1000);
     let signature = '';
 
-    // 1. Try to get signature from backend
+    // 1. Obtain signature and credentials from backend endpoint
     try {
       const sigRes = await fetch('/api/upload-signature');
       const contentType = sigRes.headers.get('content-type') || '';
@@ -28,18 +19,16 @@ export const uploadFile = async (file: File, path: string): Promise<string> => {
         if (sigData.signature) {
           timestamp = sigData.timestamp;
           signature = sigData.signature;
-          cloudName = sigData.cloudName || cloudName;
-          apiKey = sigData.apiKey || apiKey;
+          cloudName = sigData.cloudName;
+          apiKey = sigData.apiKey;
         }
       }
     } catch (sigErr) {
-      console.warn("Backend signature unavailable, using direct client signature fallback:", sigErr);
+      console.warn("Backend signature endpoint unreachable:", sigErr);
     }
 
-    // Fallback: Generate signature directly on client if backend signature unavailable
-    if (!signature) {
-      const secret = 'fGLjz4G4eVKmSX7oZ5wHPvTDdPQ';
-      signature = await getClientUploadSignature(timestamp, secret);
+    if (!signature || !cloudName || !apiKey) {
+      throw new Error('Unable to obtain secure upload signature from server. Please verify server configuration.');
     }
 
     // 2. Upload directly to Cloudinary
@@ -691,9 +680,14 @@ export const deleteStorageAsset = async (fileUrl?: string): Promise<boolean> => 
     const extracted = extractCloudinaryPublicId(fileUrl);
     if (extracted) {
       try {
+        const token = await auth.currentUser?.getIdToken();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
         const res = await fetch('/api/delete-asset', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ publicId: extracted.publicId, resourceType: extracted.resourceType })
         });
         return res.ok;
@@ -1045,12 +1039,17 @@ export const purgeAllPreviousData = async (
     try {
       const resSnap = await getDocs(collection(db, 'academic_resources'));
       materialsCount += resSnap.size;
+      const token = await auth.currentUser?.getIdToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       for (const d of resSnap.docs) {
         const data = d.data();
         if (data.cloudinary_public_id) {
           await fetch('/api/delete-asset', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ publicId: data.cloudinary_public_id, resourceType: 'image' })
           }).catch(() => null);
           filesDeletedCount++;

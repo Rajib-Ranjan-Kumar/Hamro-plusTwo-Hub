@@ -7,7 +7,7 @@ export default function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
   );
 
   if (req.method === 'OPTIONS') {
@@ -15,11 +15,18 @@ export default function handler(req: any, res: any) {
     return;
   }
 
-  try {
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'zob9phdy';
-    const apiKey = process.env.CLOUDINARY_API_KEY || '194297374744823';
-    const apiSecret = process.env.CLOUDINARY_API_SECRET || 'fGLjz4G4eVKmSX7oZ5wHPvTDdPQ';
+  // Read credentials exclusively from environment variables (NO Fallback Secrets)
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
+  if (!cloudName || !apiKey || !apiSecret) {
+    return res.status(500).json({
+      error: 'Cloudinary storage credentials are not properly configured on the server.'
+    });
+  }
+
+  try {
     cloudinary.config({
       cloud_name: cloudName,
       api_key: apiKey,
@@ -33,13 +40,13 @@ export default function handler(req: any, res: any) {
       timestamp: timestamp,
     };
 
-    if (folder) {
+    if (folder && typeof folder === 'string') {
       paramsToSign.folder = folder;
     }
 
     const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
 
-    res.status(200).json({
+    return res.status(200).json({
       timestamp,
       signature,
       cloudName,
@@ -47,7 +54,7 @@ export default function handler(req: any, res: any) {
       folder: folder || null,
     });
   } catch (error: any) {
-    console.error('Error generating Cloudinary signature:', error);
-    res.status(500).json({ error: error.message || 'Failed to generate upload signature' });
+    console.error('Error generating Cloudinary signature:', error?.message || 'Unknown error');
+    return res.status(500).json({ error: 'Failed to generate upload signature.' });
   }
 }

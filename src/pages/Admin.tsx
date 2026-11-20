@@ -1,93 +1,180 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  GraduationCap, 
-  CreditCard, 
-  DollarSign, 
-  AlertTriangle, 
-  Settings as SettingsIcon 
-} from 'lucide-react';
+import { Navigate, useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
+import { db } from '../firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
-// Import subcomponents
+// Admin Subcomponents
+import { AdminSidebar, AdminTab } from '../components/admin/AdminSidebar';
+import { AdminHeader } from '../components/admin/AdminHeader';
 import { DashboardOverview } from '../components/admin/DashboardOverview';
-import { UserManagement } from '../components/admin/UserManagement';
+import { StudentManagement } from '../components/admin/StudentManagement';
+import { ContentManagement } from '../components/admin/ContentManagement';
+import { ContributionManagement } from '../components/admin/ContributionManagement';
+import { SubscriptionManagement } from '../components/admin/SubscriptionManagement';
 import { WithdrawalManagement } from '../components/admin/WithdrawalManagement';
 import { ReportedContent } from '../components/admin/ReportedContent';
+import { AuditLogsView } from '../components/admin/AuditLogsView';
+import { AdminNotificationsView } from '../components/admin/AdminNotificationsView';
 import { AdminSettings } from '../components/admin/AdminSettings';
-
-type AdminTab = 'overview' | 'users' | 'withdrawals' | 'reported' | 'settings';
 
 export const Admin = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // Active Tab synchronized with URL search params
+  const tabParam = (searchParams.get('tab') as AdminTab) || 'overview';
+  const [activeTab, setActiveTab] = useState<AdminTab>(tabParam);
+
+  // Layout State
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Operational Pending Counters for Badges
+  const [pendingCounts, setPendingCounts] = useState({
+    contributions: 0,
+    subscriptions: 0,
+    withdrawals: 0,
+    reported: 0
+  });
+
+  // Verify Admin Authorization
   if (user?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'withdrawals', label: 'Withdrawals', icon: DollarSign },
-    { id: 'reported', label: 'Reported', icon: AlertTriangle },
-    { id: 'settings', label: 'Settings', icon: SettingsIcon },
-  ];
+  // Synchronize Tab with URL
+  useEffect(() => {
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (newTab: AdminTab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  };
+
+  // Live Listeners for Pending Badges
+  useEffect(() => {
+    const unsubContrib = onSnapshot(
+      query(collection(db, 'contributions'), where('status', '==', 'pending')),
+      snap => setPendingCounts(prev => ({ ...prev, contributions: snap.size }))
+    );
+
+    const unsubSubs = onSnapshot(
+      query(collection(db, 'subscription_requests'), where('status', '==', 'pending')),
+      snap => setPendingCounts(prev => ({ ...prev, subscriptions: snap.size }))
+    );
+
+    const unsubWithdrawals = onSnapshot(
+      query(collection(db, 'withdrawals'), where('status', '==', 'pending')),
+      snap => setPendingCounts(prev => ({ ...prev, withdrawals: snap.size }))
+    );
+
+    return () => {
+      unsubContrib();
+      unsubSubs();
+      unsubWithdrawals();
+    };
+  }, []);
+
+  const totalNotifications = pendingCounts.contributions + pendingCounts.subscriptions + pendingCounts.withdrawals;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 max-w-7xl mx-auto"
-    >
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">
-          Admin Control Panel
-        </h1>
-      </div>
+    <div className="min-h-screen bg-[#080A0E] text-slate-100 flex overflow-x-hidden font-sans">
+      {/* SaaS Collapsible Sidebar */}
+      <AdminSidebar
+        activeTab={activeTab}
+        onSelectTab={handleTabChange}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
+        mobileOpen={mobileDrawerOpen}
+        onCloseMobile={() => setMobileDrawerOpen(false)}
+        pendingCounts={pendingCounts}
+      />
 
-      <div className="flex flex-col xl:flex-row gap-6">
-        {/* Navigation for Admin (Horizontal pills on mobile/tablet, vertical sidebar on desktop) */}
-        <div className="w-full xl:w-64 shrink-0">
-          <div className="glass-panel rounded-2xl p-2.5 sm:p-4 sticky top-16 md:top-6 z-20">
-            <nav className="flex flex-row overflow-x-auto no-scrollbar gap-2 pb-1 xl:flex-col xl:pb-0">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as AdminTab)}
-                    className={`shrink-0 flex items-center gap-2 sm:gap-3 px-3.5 py-2 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 shadow-sm'
-                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
+      {/* Main Content Column */}
+      <div className="flex-1 flex flex-col min-w-0 bg-[#080A0E]">
+        {/* Top Header Bar */}
+        <AdminHeader
+          activeTab={activeTab}
+          onSelectTab={handleTabChange}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
+          onOpenMobile={() => setMobileDrawerOpen(true)}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          pendingNotificationsCount={totalNotifications}
+        />
 
-        {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
-          <div className="glass-panel rounded-2xl p-4 sm:p-6 min-h-[500px]">
-            {activeTab === 'overview' && <DashboardOverview />}
-            {activeTab === 'users' && <UserManagement />}
-            {activeTab === 'withdrawals' && <WithdrawalManagement />}
-            {activeTab === 'reported' && <ReportedContent />}
-            {activeTab === 'settings' && <AdminSettings />}
-          </div>
-        </div>
+        {/* Dynamic Main Workspace */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.15 }}
+            >
+              {activeTab === 'overview' && (
+                <DashboardOverview onNavigateTab={handleTabChange} />
+              )}
+
+              {activeTab === 'analytics' && (
+                <DashboardOverview onNavigateTab={handleTabChange} />
+              )}
+
+              {activeTab === 'students' && (
+                <StudentManagement />
+              )}
+
+              {activeTab === 'content' && (
+                <ContentManagement />
+              )}
+
+              {activeTab === 'colleges' && (
+                <ContentManagement />
+              )}
+
+              {activeTab === 'subjects' && (
+                <ContentManagement />
+              )}
+
+              {activeTab === 'contributions' && (
+                <ContributionManagement />
+              )}
+
+              {activeTab === 'reported' && (
+                <ReportedContent />
+              )}
+
+              {activeTab === 'subscriptions' && (
+                <SubscriptionManagement />
+              )}
+
+              {activeTab === 'withdrawals' && (
+                <WithdrawalManagement />
+              )}
+
+              {activeTab === 'notifications' && (
+                <AdminNotificationsView onNavigateTab={handleTabChange} />
+              )}
+
+              {activeTab === 'audit-logs' && (
+                <AuditLogsView />
+              )}
+
+              {activeTab === 'settings' && (
+                <AdminSettings />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </div>
-    </motion.div>
+    </div>
   );
 };

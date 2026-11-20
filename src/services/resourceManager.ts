@@ -125,22 +125,6 @@ export const slugify = (str?: string | null): string => {
     .replace(/^_+|_+$/g, '') || 'general';
 };
 
-/**
- * Generates an SHA-1 signature locally if serverless signature endpoint is unreachable
- */
-const getClientUploadSignature = async (timestamp: number, secret: string, folder?: string): Promise<string> => {
-  let message = '';
-  if (folder) {
-    message = `folder=${folder}&timestamp=${timestamp}${secret}`;
-  } else {
-    message = `timestamp=${timestamp}${secret}`;
-  }
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-};
-
 // ===============================================================
 // 1. Dynamic Cloudinary Folder Path Generator
 // ===============================================================
@@ -212,8 +196,8 @@ export const uploadPdfToCloudinary = async (
   const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const uniqueFileName = `${cleanBaseName}_${uniqueSuffix}`;
 
-  let cloudName = 'zob9phdy';
-  let apiKey = '194297374744823';
+  let cloudName = '';
+  let apiKey = '';
   let timestamp = Math.round(new Date().getTime() / 1000);
   let signature = '';
 
@@ -228,19 +212,17 @@ export const uploadPdfToCloudinary = async (
         if (sigData.signature) {
           timestamp = sigData.timestamp;
           signature = sigData.signature;
-          cloudName = sigData.cloudName || cloudName;
-          apiKey = sigData.apiKey || apiKey;
+          cloudName = sigData.cloudName;
+          apiKey = sigData.apiKey;
         }
       }
     }
   } catch (err) {
-    console.warn('Backend signature endpoint unreachable, using client fallback:', err);
+    console.warn('Backend signature endpoint unreachable:', err);
   }
 
-  // Fallback client signature calculation if backend endpoint unavailable
-  if (!signature) {
-    const secret = 'fGLjz4G4eVKmSX7oZ5wHPvTDdPQ';
-    signature = await getClientUploadSignature(timestamp, secret, folderPath);
+  if (!signature || !cloudName || !apiKey) {
+    throw new Error('Unable to obtain secure upload signature from server. Please verify server configuration.');
   }
 
   // 4. Upload to Cloudinary API
@@ -583,9 +565,14 @@ export const deleteResource = async (resourceId: string): Promise<void> => {
   // 1. Delete asset from Cloudinary
   if (publicId) {
     try {
+      const token = await auth.currentUser?.getIdToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       await fetch('/api/delete-asset', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ publicId, resourceType: 'image' }),
       });
     } catch (err) {
