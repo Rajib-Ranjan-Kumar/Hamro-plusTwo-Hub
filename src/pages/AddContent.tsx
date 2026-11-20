@@ -259,8 +259,13 @@ export const AddContent = () => {
   const fetchSubjects = async (collegeId: string) => {
     const data = await getSubjects(collegeId);
     setSubjects(data);
-    if (data.length > 0 && !data.find((s: any) => s.id.toString() === subjectId)) {
-      setSubjectId(data[0].id.toString());
+    const matching = data.filter((s: any) => 
+      (!contentYear || s.year === contentYear) && (!contentStream || s.stream === contentStream)
+    );
+    if (matching.length > 0 && !matching.find((s: any) => s.id.toString() === subjectId)) {
+      setSubjectId(matching[0].id.toString());
+    } else if (matching.length === 0) {
+      setSubjectId('');
     }
   };
 

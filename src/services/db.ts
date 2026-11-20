@@ -212,32 +212,17 @@ export const getColleges = async () => {
 
 export const getSubjects = async (collegeId?: string) => {
   try {
-    let q = collection(db, 'subjects') as any;
-    if (collegeId === 'all') {
-      // No filter, fetch all
-    } else if (collegeId && collegeId !== '0') {
-      const collegeIds = Array.from(new Set([collegeId, null]));
-      q = query(q, where('college_id', 'in', collegeIds));
-    } else {
-      q = query(q, where('college_id', '==', null));
+    const snap = await getDocs(collection(db, 'subjects'));
+    const all = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
+    if (collegeId && collegeId !== 'all' && collegeId !== '0') {
+      return all.filter(s => s.college_id === collegeId || !s.college_id);
+    } else if (collegeId === '0') {
+      return all.filter(s => !s.college_id);
     }
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    return all;
   } catch (error) {
-    console.warn("getSubjects direct query error, attempting collection fallback:", error);
-    try {
-      const snap = await getDocs(collection(db, 'subjects'));
-      const all = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
-      if (collegeId && collegeId !== 'all' && collegeId !== '0') {
-        return all.filter(s => s.college_id === collegeId || !s.college_id);
-      } else if (collegeId === '0') {
-        return all.filter(s => !s.college_id);
-      }
-      return all;
-    } catch (e) {
-      console.error("Failed to fetch subjects:", e);
-      return [];
-    }
+    console.error("Failed to fetch subjects:", error);
+    return [];
   }
 };
 
@@ -251,26 +236,21 @@ const DEFAULT_CONTENT_TYPES = [
 
 export const getContentTypes = async (collegeId?: string, year?: string) => {
   try {
-    let q = collection(db, 'content_types') as any;
-    if (collegeId === 'all') {
-      // No filter
-    } else if (collegeId && collegeId !== '0') {
-      const collegeIds = Array.from(new Set([collegeId, null]));
-      q = query(q, where('college_id', 'in', collegeIds));
-    } else {
-      q = query(q, where('college_id', '==', null));
+    const snapshot = await getDocs(collection(db, 'content_types'));
+    const all = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    let filtered = all;
+    if (collegeId && collegeId !== 'all' && collegeId !== '0') {
+      filtered = filtered.filter(t => t.college_id === collegeId || !t.college_id);
+    } else if (collegeId === '0') {
+      filtered = filtered.filter(t => !t.college_id);
     }
     if (year && year !== 'all') {
-      q = query(q, where('year', '==', year));
+      filtered = filtered.filter(t => !t.year || t.year === year);
     }
-    const snapshot = await getDocs(q);
-    const results = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-    if (results.length > 0) return results;
-    
-    // If no custom content types found for this class/college, provide standard defaults
+    if (filtered.length > 0) return filtered;
     return DEFAULT_CONTENT_TYPES.map(t => ({ ...t, year: year || 'Class 11' }));
   } catch (error) {
-    console.warn("getContentTypes direct query error, using standard defaults:", error);
+    console.warn("getContentTypes error, using standard defaults:", error);
     return DEFAULT_CONTENT_TYPES.map(t => ({ ...t, year: year || 'Class 11' }));
   }
 };
@@ -287,26 +267,21 @@ const DEFAULT_EXAM_YEARS = [
 
 export const getExamYears = async (collegeId?: string, year?: string) => {
   try {
-    let q = collection(db, 'exam_years') as any;
-    if (collegeId === 'all') {
-      // No filter
-    } else if (collegeId && collegeId !== '0') {
-      const collegeIds = Array.from(new Set([collegeId, null]));
-      q = query(q, where('college_id', 'in', collegeIds));
-    } else {
-      q = query(q, where('college_id', '==', null));
+    const snapshot = await getDocs(collection(db, 'exam_years'));
+    const all = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    let filtered = all;
+    if (collegeId && collegeId !== 'all' && collegeId !== '0') {
+      filtered = filtered.filter(y => y.college_id === collegeId || !y.college_id);
+    } else if (collegeId === '0') {
+      filtered = filtered.filter(y => !y.college_id);
     }
     if (year && year !== 'all') {
-      q = query(q, where('year', '==', year));
+      filtered = filtered.filter(y => !y.year || y.year === year);
     }
-    const snapshot = await getDocs(q);
-    const results = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-    if (results.length > 0) return results;
-
-    // Fallback: Return standard default exam years
+    if (filtered.length > 0) return filtered;
     return DEFAULT_EXAM_YEARS.map(y => ({ ...y, year: year || 'Class 11' }));
   } catch (error) {
-    console.warn("getExamYears direct query error, using standard defaults:", error);
+    console.warn("getExamYears error, using standard defaults:", error);
     return DEFAULT_EXAM_YEARS.map(y => ({ ...y, year: year || 'Class 11' }));
   }
 };
