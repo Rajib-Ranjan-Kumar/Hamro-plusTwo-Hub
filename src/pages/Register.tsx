@@ -8,6 +8,7 @@ import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 import { useAuth } from '../context/AuthContext';
 import { useRateLimit } from '../hooks/useRateLimit';
 import { motion } from 'motion/react';
+import { Logo } from '../components/Logo';
 
 export const Register = () => {
   const [name, setName] = useState('');
@@ -165,11 +166,8 @@ export const Register = () => {
       <div className="absolute inset-0 bg-black/45 z-0 pointer-events-none" />
 
       {/* Top right Brand Badge */}
-      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 flex items-center gap-2">
-        <div className="bg-[#F4B400] text-black text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded">
-          +2
-        </div>
-        <span className="text-base sm:text-lg font-bold tracking-tight text-white">Hamro +2</span>
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10">
+        <Logo size="md" to="/" textClassName="text-base sm:text-lg font-bold tracking-tight text-white" />
       </div>
 
       {/* Centered Glass Register Form Card */}

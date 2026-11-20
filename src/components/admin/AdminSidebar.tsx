@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { Logo } from '../Logo';
 
 export type AdminTab = 
   | 'overview' 
@@ -158,16 +159,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     <div className="flex flex-col h-full bg-[#080A0E] border-r border-white/10 select-none">
       {/* Brand Header */}
       <div className="h-16 px-4 flex items-center justify-between border-b border-white/10 shrink-0">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#F4B400] to-[#F5C21B] flex items-center justify-center shrink-0 shadow-lg shadow-[#F4B400]/20">
-            <Sparkles className="w-5 h-5 text-black" />
-          </div>
-          {(!collapsed || mobileOpen) && (
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold tracking-tight text-white truncate">Hamro +2 Hub</span>
-              <span className="text-[10px] font-semibold text-[#F5C21B] uppercase tracking-wider">Admin Center</span>
-            </div>
-          )}
+        <div className="flex items-center overflow-hidden">
+          <Logo 
+            size="lg"
+            showText={!collapsed || mobileOpen}
+            subtitle="Admin Center"
+            textClassName="text-white text-sm font-bold tracking-tight truncate"
+          />
         </div>
 
         {/* Mobile Close Button */}

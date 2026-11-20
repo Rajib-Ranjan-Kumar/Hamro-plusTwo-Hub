@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { Logo } from './Logo';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
@@ -53,12 +54,9 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       )}>
         <div className="p-5 sm:p-6 border-b border-slate-700/60 flex items-center justify-between">
           <div>
-            <NavLink to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2 select-none group">
-              <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)] group-hover:scale-105 transition-transform">
-                +2
-              </div>
-              <h1 className="text-xl font-bold text-white tracking-wide">Hamro +2 Hub</h1>
-            </NavLink>
+            <div onClick={() => setIsOpen(false)}>
+              <Logo size="md" to="/" textClassName="text-xl font-bold text-white tracking-wide" />
+            </div>
             <div className="flex items-center gap-2 mt-2">
               <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">{user?.name}</p>
               {user?.is_premium && <Crown className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" />}

@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
 import { Menu, X } from 'lucide-react';
 import { CompleteProfileModal } from './CompleteProfileModal';
+import { Logo } from './Logo';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from './SEO';
 
@@ -31,12 +32,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 sm:h-16 bg-slate-900/90 backdrop-blur-xl border-b border-slate-700/60 flex items-center justify-between px-4 z-50">
-        <Link to="/" className="flex items-center gap-2 select-none group">
-          <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)] group-hover:scale-105 transition-transform">
-            +2
-          </div>
-          <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">Hamro +2 Hub</h1>
-        </Link>
+        <Logo size="sm" to="/" textClassName="text-base sm:text-lg font-bold text-white tracking-wide" />
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle navigation menu"

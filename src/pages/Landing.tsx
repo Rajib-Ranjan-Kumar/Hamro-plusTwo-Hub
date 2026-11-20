@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, FileText, Upload, Trophy, CheckCircle, Users, Play, ChevronDown, Rocket, User, Loader2, AlertCircle, X, Mail, MapPin, Phone, Github, Twitter, Youtube, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SEO } from '../components/SEO';
+import { Logo } from '../components/Logo';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
@@ -100,12 +101,7 @@ export const Landing = () => {
         }}
       >
         {/* Left: Logo Section */}
-        <div className="flex items-center gap-2 shrink-0 select-none">
-          <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] sm:h-[34px] sm:w-[34px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
-            +2
-          </div>
-          <span className="text-[16px] sm:text-[18px] font-bold text-white tracking-wide shrink-0">Hamro +2 Hub</span>
-        </div>
+        <Logo size="md" to="/" textClassName="text-[16px] sm:text-[18px] font-bold text-white tracking-wide shrink-0" />
 
         {/* Center: Navigation Links (Desktop/Laptop only, hidden on tablet/mobile) */}
         <nav className="hidden lg:flex items-center gap-[34px] absolute left-1/2 -translate-x-1/2">
@@ -199,12 +195,7 @@ export const Landing = () => {
               <div>
                 {/* Drawer Header with Close Button */}
                 <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-                  <div className="flex items-center gap-2 select-none">
-                    <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px]">
-                      +2
-                    </div>
-                    <span className="text-base font-bold text-white tracking-wide">Hamro +2 Hub</span>
-                  </div>
+                  <Logo size="sm" to="/" textClassName="text-base font-bold text-white tracking-wide" />
                   <button
                     onClick={() => setIsMenuOpen(false)}
                     aria-label="Close menu"
@@ -562,12 +553,7 @@ export const Landing = () => {
       <footer className="bg-[#0D0D0F] border-t border-white/5 py-8 sm:py-10 text-slate-400 text-[13px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[70px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="bg-[#F5C21B] text-black text-[10px] font-black px-2 py-0.5 rounded">
-                +2
-              </div>
-              <span className="text-base font-bold text-white">Hamro +2 Hub</span>
-            </div>
+            <Logo size="sm" to="/" textClassName="text-base font-bold text-white" />
             <p className="text-xs sm:text-[11px] text-slate-500 leading-relaxed">
               Nepal's collaborative platform for high school students. Quality resources, syllabus references, and term guides.
             </p>

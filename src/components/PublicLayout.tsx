@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Footer } from './Footer';
+import { Logo } from './Logo';
 import { SEO } from './SEO';
 import { Sparkles, ArrowRight } from 'lucide-react';
 
@@ -20,12 +21,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
 
       {/* Public Navigation Header */}
       <header className="sticky top-0 left-0 right-0 h-16 bg-slate-900/85 backdrop-blur-xl border-b border-slate-700/60 z-50 px-4 sm:px-8 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5 select-none group">
-          <div className="bg-[#F4B400] text-black text-xs font-black h-8 w-8 flex items-center justify-center rounded-lg shadow-[0_0_12px_rgba(244,180,0,0.35)] group-hover:scale-105 transition-transform">
-            +2
-          </div>
-          <span className="text-base sm:text-lg font-bold text-white tracking-wide">Hamro +2 Hub</span>
-        </Link>
+        <Logo size="md" to="/" textClassName="text-base sm:text-lg font-bold text-white tracking-wide" />
 
         {/* Navigation links */}
         <nav className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium">
