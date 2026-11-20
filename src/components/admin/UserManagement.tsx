@@ -9,6 +9,8 @@ export const UserManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [streamFilter, setStreamFilter] = useState('all');
+  const [yearFilter, setYearFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   
@@ -41,7 +43,9 @@ export const UserManagement = () => {
     const matchesSearch = (user.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (user.email || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
+    const matchesStream = streamFilter === 'all' || user.stream === streamFilter;
+    const matchesYear = yearFilter === 'all' || user.year === yearFilter;
+    return matchesSearch && matchesRole && matchesStream && matchesYear;
   });
 
   // Pagination Logic
@@ -52,7 +56,7 @@ export const UserManagement = () => {
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, roleFilter]);
+  }, [searchQuery, roleFilter, streamFilter, yearFilter]);
 
   const handleDeleteClick = (id: string) => {
     setUserToDelete(id);
@@ -87,8 +91,8 @@ export const UserManagement = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-xl font-bold text-white">User Management</h2>
         
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
+        <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-56">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text" 
@@ -99,16 +103,41 @@ export const UserManagement = () => {
             />
           </div>
           
-          <div className="relative w-full sm:w-40">
+          <div className="relative w-full sm:w-32">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <select 
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white appearance-none"
+              className="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white appearance-none cursor-pointer"
             >
               <option value="all">All Roles</option>
               <option value="admin">Admin</option>
               <option value="student">Student</option>
+            </select>
+          </div>
+
+          <div className="relative w-full sm:w-36">
+            <select 
+              value={streamFilter}
+              onChange={(e) => setStreamFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white cursor-pointer"
+            >
+              <option value="all">All Streams</option>
+              <option value="Science">Science</option>
+              <option value="Management">Management</option>
+              <option value="Humanities">Humanities</option>
+            </select>
+          </div>
+
+          <div className="relative w-full sm:w-32">
+            <select 
+              value={yearFilter}
+              onChange={(e) => setYearFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white cursor-pointer"
+            >
+              <option value="all">All Classes</option>
+              <option value="Class 11">Class 11</option>
+              <option value="Class 12">Class 12</option>
             </select>
           </div>
         </div>

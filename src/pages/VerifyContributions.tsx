@@ -37,6 +37,8 @@ export const VerifyContributions = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [filterStream, setFilterStream] = useState('');
+  const [filterYear, setFilterYear] = useState('');
   const [colleges, setColleges] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   
@@ -103,15 +105,24 @@ export const VerifyContributions = () => {
   const getCollegeName = (id: string) => colleges.find(c => c.id === id)?.name || 'General';
   const getSubjectName = (id: string) => subjects.find(s => s.id === id)?.name || 'Unknown';
 
-  const filteredRequests = requests.filter(r => 
-    r.description?.toLowerCase().includes(search.toLowerCase()) || 
-    r.user_name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filterItem = (r: any) => {
+    const q = search.toLowerCase().trim();
+    const matchesSearch = !q || 
+      (r.description && r.description.toLowerCase().includes(q)) || 
+      (r.user_name && r.user_name.toLowerCase().includes(q)) ||
+      (getSubjectName(r.subject_id).toLowerCase().includes(q));
+    
+    const itemStream = r.stream || subjects.find(s => s.id === r.subject_id)?.stream;
+    const matchesStream = !filterStream || itemStream === filterStream;
 
-  const filteredHistory = history.filter(r => 
-    r.description?.toLowerCase().includes(search.toLowerCase()) || 
-    r.user_name?.toLowerCase().includes(search.toLowerCase())
-  );
+    const itemYear = r.year || subjects.find(s => s.id === r.subject_id)?.year;
+    const matchesYear = !filterYear || itemYear === filterYear;
+
+    return matchesSearch && matchesStream && matchesYear;
+  };
+
+  const filteredRequests = requests.filter(filterItem);
+  const filteredHistory = history.filter(filterItem);
 
   return (
     <motion.div 
@@ -124,15 +135,38 @@ export const VerifyContributions = () => {
           <h1 className="text-2xl font-bold text-white">Contribution Management</h1>
           <p className="text-slate-500 text-sm">Verify materials submitted by users before they go live.</p>
         </div>
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search contributions..." 
-            className="pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none w-full md:w-64"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search contributions..." 
+              className="pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:w-56"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <select
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-white cursor-pointer"
+            value={filterStream}
+            onChange={(e) => setFilterStream(e.target.value)}
+          >
+            <option value="">All Streams</option>
+            <option value="Science">Science</option>
+            <option value="Management">Management</option>
+            <option value="Humanities">Humanities</option>
+          </select>
+
+          <select
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-white cursor-pointer"
+            value={filterYear}
+            onChange={(e) => setFilterYear(e.target.value)}
+          >
+            <option value="">All Classes</option>
+            <option value="Class 11">Class 11</option>
+            <option value="Class 12">Class 12</option>
+          </select>
         </div>
       </div>
 
@@ -163,6 +197,16 @@ export const VerifyContributions = () => {
                         )}>
                           {item.type}
                         </span>
+                        {(item.stream || subjects.find(s => s.id === item.subject_id)?.stream) && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-800">
+                            {item.stream || subjects.find(s => s.id === item.subject_id)?.stream}
+                          </span>
+                        )}
+                        {(item.year || subjects.find(s => s.id === item.subject_id)?.year) && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                            {item.year || subjects.find(s => s.id === item.subject_id)?.year}
+                          </span>
+                        )}
                         <h3 className="text-lg font-bold text-white">{item.description}</h3>
                       </div>
                       <p className="text-sm text-slate-500">{item.description}</p>

@@ -24,6 +24,7 @@ export const Contribute = () => {
   const [formData, setFormData] = useState({
     college_id: user?.college_id?.toString() || '',
     year: user?.year || 'Class 11',
+    stream: user?.stream || 'Science',
     subject_id: '',
     type: 'pyq',
     term: '',
@@ -55,14 +56,17 @@ export const Contribute = () => {
   useEffect(() => {
     getSubjects(formData.college_id).then(data => {
       setSubjects(data);
-      if (data.length > 0 && !data.find((s: any) => s.id.toString() === formData.subject_id)) {
-        setFormData(prev => ({ ...prev, subject_id: data[0].id.toString() }));
+      const matching = data.filter((s: any) => 
+        s.year === formData.year && (!formData.stream || s.stream === formData.stream)
+      );
+      if (matching.length > 0 && !matching.find((s: any) => s.id.toString() === formData.subject_id)) {
+        setFormData(prev => ({ ...prev, subject_id: matching[0].id.toString() }));
       }
     });
 
     getContentTypes(formData.college_id, formData.year).then(data => setContentTypes(data));
     getExamYears(formData.college_id, formData.year).then(data => setExamYears(data));
-  }, [formData.college_id, formData.year]);
+  }, [formData.college_id, formData.year, formData.stream]);
 
   const fetchContributions = async () => {
     if (user) {
@@ -106,8 +110,11 @@ export const Contribute = () => {
         throw new Error("Please select a file to upload.");
       }
 
+      const selectedSubject = subjects.find(s => s.id.toString() === formData.subject_id.toString());
       await addContribution({
         ...formData,
+        stream: selectedSubject?.stream || formData.stream || user?.stream || 'Science',
+        year: selectedSubject?.year || formData.year,
         file_url,
         user_id: user?.id,
         college_id: formData.college_id === '0' ? null : formData.college_id,
@@ -292,6 +299,20 @@ export const Contribute = () => {
                     </div>
 
                     <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-1">Stream</label>
+                      <select 
+                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white cursor-pointer"
+                        value={formData.stream}
+                        onChange={(e) => setFormData({...formData, stream: e.target.value})}
+                      >
+                        <option value="">All Streams</option>
+                        <option value="Science">Science</option>
+                        <option value="Management">Management</option>
+                        <option value="Humanities">Humanities</option>
+                      </select>
+                    </div>
+
+                    <div>
                       <label className="block text-sm font-medium text-slate-300 mb-1">Subject</label>
                       <select 
                         required
@@ -300,9 +321,13 @@ export const Contribute = () => {
                         onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
                       >
                         <option value="">Select Subject</option>
-                        {subjects.filter(s => s.year === formData.year).map(s => (
-                          <option key={s.id} value={s.id}>{s.name} ({s.stream})</option>
-                        ))}
+                        {subjects
+                          .filter(s => s.year === formData.year && (!formData.stream || s.stream === formData.stream))
+                          .map(s => (
+                            <option key={s.id} value={s.id}>
+                              {s.name} {!formData.stream && s.stream ? `(${s.stream})` : ''}
+                            </option>
+                          ))}
                       </select>
                     </div>
 

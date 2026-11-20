@@ -61,10 +61,13 @@ export const AddContent = () => {
   const [delTerm, setDelTerm] = useState('');
   const [delExamYear, setDelExamYear] = useState('');
   const [delYear, setDelYear] = useState('');
+  const [delStream, setDelStream] = useState('');
   const [delItemId, setDelItemId] = useState('');
 
   // Add Content State
   const [contentCollegeId, setContentCollegeId] = useState('0');
+  const [contentYear, setContentYear] = useState('Class 11');
+  const [contentStream, setContentStream] = useState('Science');
   const [subjectId, setSubjectId] = useState('');
   const [type, setType] = useState('pyq');
   const [term, setTerm] = useState('');
@@ -128,6 +131,19 @@ export const AddContent = () => {
   }, [user, contentCollegeId, subjectId, subjects]);
 
   useEffect(() => {
+    if (subjects.length > 0) {
+      const matching = subjects.filter((s: any) => 
+        (!contentYear || s.year === contentYear) && (!contentStream || s.stream === contentStream)
+      );
+      if (matching.length > 0 && !matching.find((s: any) => s.id.toString() === subjectId)) {
+        setSubjectId(matching[0].id.toString());
+      } else if (matching.length === 0) {
+        setSubjectId('');
+      }
+    }
+  }, [contentYear, contentStream, subjects]);
+
+  useEffect(() => {
     if (user?.role === 'admin' && activeTab === 'manage_data') {
       fetchDataList();
       getSubjects('all').then(setAllSubjects);
@@ -172,12 +188,16 @@ export const AddContent = () => {
     if (manageDataType === 'materials') {
       const itemClass = item.year || allSubjects.find(s => s.id === item.subject_id)?.year;
       if (delYear && itemClass !== delYear) return false;
+      const itemStream = item.stream || allSubjects.find(s => s.id === item.subject_id)?.stream;
+      if (delStream && itemStream !== delStream) return false;
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
       if (delSubjectId && item.subject_id !== delSubjectId) return false;
       if (delContentType && item.type !== delContentType) return false;
       if (delTerm && item.term !== delTerm) return false;
       if (delExamYear && item.exam_year?.toString() !== delExamYear.toString()) return false;
     } else if (manageDataType === 'subjects') {
+      if (delStream && item.stream !== delStream) return false;
+      if (delYear && item.year !== delYear) return false;
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
     } else if (manageDataType === 'content_types' || manageDataType === 'exam_years') {
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
@@ -280,10 +300,13 @@ export const AddContent = () => {
       setUploadStep('Publishing content to platform...');
       setProgress(85, 'Publishing content to platform...');
 
+      const selectedSubject = subjects.find(s => s.id.toString() === subjectId.toString());
       await addContribution({
         user_id: user?.id,
         college_id: contentCollegeId === '0' ? null : contentCollegeId,
         subject_id: subjectId,
+        stream: selectedSubject?.stream || contentStream || 'Science',
+        year: selectedSubject?.year || contentYear || 'Class 11',
         type,
         term,
         exam_year: examYear,
@@ -558,6 +581,34 @@ export const AddContent = () => {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Class</label>
+                  <select 
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    value={contentYear}
+                    onChange={(e) => setContentYear(e.target.value)}
+                  >
+                    <option value="">All Classes</option>
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Stream</label>
+                  <select 
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    value={contentStream}
+                    onChange={(e) => setContentStream(e.target.value)}
+                  >
+                    <option value="">All Streams</option>
+                    <option value="Science">Science</option>
+                    <option value="Management">Management</option>
+                    <option value="Humanities">Humanities</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">Subject</label>
                   <select 
                     required
@@ -565,7 +616,14 @@ export const AddContent = () => {
                     value={subjectId}
                     onChange={(e) => setSubjectId(e.target.value)}
                   >
-                    {subjects.map(s => <option key={s.id} value={s.id}>{s.name} ({s.year})</option>)}
+                    <option value="">Select Subject</option>
+                    {subjects
+                      .filter(s => (!contentYear || s.year === contentYear) && (!contentStream || s.stream === contentStream))
+                      .map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} ({s.year || 'All'}{s.stream ? ` - ${s.stream}` : ''})
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>
@@ -1065,7 +1123,7 @@ export const AddContent = () => {
               {/* Secondary Filters for Materials */}
               {manageDataType === 'materials' && (
                 <div className="space-y-2">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-3 text-xs">
                     {/* Class Filter */}
                     <div>
                       <label className="text-[11px] text-slate-400 font-medium block mb-1">Class</label>
@@ -1077,6 +1135,21 @@ export const AddContent = () => {
                         <option value="">All Classes</option>
                         <option value="Class 11">Class 11</option>
                         <option value="Class 12">Class 12</option>
+                      </select>
+                    </div>
+
+                    {/* Stream Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Stream</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delStream}
+                        onChange={(e) => setDelStream(e.target.value)}
+                      >
+                        <option value="">All Streams</option>
+                        <option value="Science">Science</option>
+                        <option value="Management">Management</option>
+                        <option value="Humanities">Humanities</option>
                       </select>
                     </div>
 
@@ -1103,8 +1176,8 @@ export const AddContent = () => {
                       >
                         <option value="">All Subjects</option>
                         {allSubjects
-                          .filter(s => (delCollegeId === '0' || s.college_id === delCollegeId || !s.college_id) && (!delYear || s.year === delYear || !s.year))
-                          .map(s => <option key={s.id} value={s.id}>{s.name} ({s.year || 'All'})</option>)}
+                          .filter(s => (delCollegeId === '0' || s.college_id === delCollegeId || !s.college_id) && (!delYear || s.year === delYear || !s.year) && (!delStream || s.stream === delStream))
+                          .map(s => <option key={s.id} value={s.id}>{s.name} ({s.year || 'All'}{s.stream ? ` - ${s.stream}` : ''})</option>)}
                       </select>
                     </div>
 
@@ -1158,12 +1231,13 @@ export const AddContent = () => {
                   </div>
 
                   {/* Reset Filters Shortcut */}
-                  {(searchQuery || delYear || delCollegeId !== '0' || delSubjectId || delContentType || delTerm || delExamYear) && (
+                  {(searchQuery || delYear || delStream || delCollegeId !== '0' || delSubjectId || delContentType || delTerm || delExamYear) && (
                     <div className="flex justify-end pt-1">
                       <button
                         onClick={() => {
                           setSearchQuery('');
                           setDelYear('');
+                          setDelStream('');
                           setDelCollegeId('0');
                           setDelSubjectId('');
                           setDelContentType('');
@@ -1173,6 +1247,71 @@ export const AddContent = () => {
                         className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         <span>✕ Reset all filters</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Secondary Filters for Subjects */}
+              {manageDataType === 'subjects' && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-xs">
+                    {/* Class Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Class</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delYear}
+                        onChange={(e) => setDelYear(e.target.value)}
+                      >
+                        <option value="">All Classes</option>
+                        <option value="Class 11">Class 11</option>
+                        <option value="Class 12">Class 12</option>
+                      </select>
+                    </div>
+
+                    {/* Stream Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Stream</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delStream}
+                        onChange={(e) => setDelStream(e.target.value)}
+                      >
+                        <option value="">All Streams</option>
+                        <option value="Science">Science</option>
+                        <option value="Management">Management</option>
+                        <option value="Humanities">Humanities</option>
+                      </select>
+                    </div>
+
+                    {/* College Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">College</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delCollegeId}
+                        onChange={(e) => setDelCollegeId(e.target.value)}
+                      >
+                        <option value="0">All Colleges / Global</option>
+                        {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  {(searchQuery || delYear || delStream || delCollegeId !== '0') && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setDelYear('');
+                          setDelStream('');
+                          setDelCollegeId('0');
+                        }}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>✕ Reset filters</span>
                       </button>
                     </div>
                   )}

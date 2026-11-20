@@ -10,6 +10,7 @@ export const Syllabus = () => {
   const navigate = useNavigate();
 
   const [year, setYear] = useState(user?.year || 'Class 11');
+  const [stream, setStream] = useState(user?.stream || 'Science');
   const [subjects, setSubjects] = useState<any[]>([]);
   const [activeSubject, setActiveSubject] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('syllabus');
@@ -18,30 +19,30 @@ export const Syllabus = () => {
 
   const isLocked = !hasPremiumAccess && ['syllabus', 'notes'].includes(activeTab);
 
-  // Fetch subjects based on selected year
+  // Fetch subjects based on selected stream and year
   useEffect(() => {
-    if (user) {
-      const fetchCollegeId = user.college_id;
-      getSubjects(fetchCollegeId).then(data => {
-        const filtered = data.filter((s: any) => s.stream === user.stream && s.year === user.year);
-        setSubjects(filtered);
-        if (filtered.length > 0) setActiveSubject(filtered[0]);
-        else setActiveSubject(null);
-      });
+    const fetchCollegeId = user?.college_id;
+    getSubjects(fetchCollegeId).then(data => {
+      const filtered = data.filter((s: any) => (!stream || s.stream === stream) && (!year || s.year === year));
+      setSubjects(filtered);
+      if (filtered.length > 0) setActiveSubject(filtered[0]);
+      else setActiveSubject(null);
+    });
 
-      getContentTypes(fetchCollegeId, user.year).then(data => setContentTypes(data));
+    if (fetchCollegeId) {
+      getContentTypes(fetchCollegeId, year).then(data => setContentTypes(data));
     }
-  }, [user]);
+  }, [user?.college_id, stream, year]);
 
   // Fetch content based on active subject and tab
   useEffect(() => {
     if (activeSubject) {
       const fetchCollegeId = user?.college_id;
-      getContent(activeTab, activeSubject.id, undefined, undefined, undefined, fetchCollegeId).then(data => setContent(data));
+      getContent(activeTab, activeSubject.id, year, undefined, undefined, fetchCollegeId).then(data => setContent(data));
     } else {
       setContent([]);
     }
-  }, [activeSubject, activeTab, user?.college_id]);
+  }, [activeSubject, activeTab, user?.college_id, year]);
 
   const openViewer = (url: string, title: string, allowDownload: boolean = false) => {
     window.open(`/viewer?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}${allowDownload ? '&download=true' : ''}`, '_blank');
@@ -59,33 +60,53 @@ export const Syllabus = () => {
             Syllabus & Notes
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            {user?.stream} Stream
+            Official NEB Curriculum & Chapter-wise Notes for {stream} Stream ({year})
           </p>
         </div>
       </div>
 
-      {/* Step 1: Class Selection */}
-      <div className={`flex glass-panel p-1 rounded-xl w-full max-w-md opacity-50 pointer-events-none`}>
-        <button
-          onClick={() => setYear('Class 11')}
-          className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all ${
-            user?.year === 'Class 11'
-              ? 'bg-white/80 dark:bg-slate-700/80 text-emerald-600 dark:text-emerald-400 shadow-sm'
-              : 'text-slate-400 hover:text-white dark:hover:text-white'
-          }`}
-        >
-          Class 11
-        </button>
-        <button
-          onClick={() => setYear('Class 12')}
-          className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all ${
-            user?.year === 'Class 12'
-              ? 'bg-white/80 dark:bg-slate-700/80 text-emerald-600 dark:text-emerald-400 shadow-sm'
-              : 'text-slate-400 hover:text-white dark:hover:text-white'
-          }`}
-        >
-          Class 12
-        </button>
+      {/* Class & Stream Selectors */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Class Selection */}
+        <div className="flex glass-panel p-1 rounded-xl w-full sm:w-auto min-w-[200px]">
+          <button
+            onClick={() => setYear('Class 11')}
+            className={`flex-1 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+              year === 'Class 11'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Class 11
+          </button>
+          <button
+            onClick={() => setYear('Class 12')}
+            className={`flex-1 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+              year === 'Class 12'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Class 12
+          </button>
+        </div>
+
+        {/* Stream Selection */}
+        <div className="flex glass-panel p-1 rounded-xl w-full sm:w-auto">
+          {['Science', 'Management', 'Humanities'].map(str => (
+            <button
+              key={str}
+              onClick={() => setStream(str)}
+              className={`py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+                stream === str
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {str}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
@@ -96,7 +117,7 @@ export const Syllabus = () => {
           </h2>
           <div className="flex flex-row overflow-x-auto no-scrollbar gap-2 pb-2 xl:flex-col xl:space-y-2 xl:pb-0">
             {subjects.length === 0 ? (
-              <p className="text-sm text-slate-500">No subjects found for this year.</p>
+              <p className="text-sm text-slate-500">No subjects found for {stream} ({year}).</p>
             ) : (
               subjects.map(subject => (
                 <button
