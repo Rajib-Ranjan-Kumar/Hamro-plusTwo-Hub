@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { collection, addDoc, getDocs, query, limit, where } from 'firebase/firestore';
@@ -9,7 +10,8 @@ import { getFriendlyErrorMessage } from '../utils/friendlyErrors';
 import { motion } from 'motion/react';
 
 export const GetPremium = () => {
-  const { user } = useAuth();
+  const { user, premiumOnlyMode } = useAuth();
+  const navigate = useNavigate();
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -114,6 +116,32 @@ export const GetPremium = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (!premiumOnlyMode) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-2xl mx-auto text-center py-12 space-y-6 glass-panel rounded-3xl p-8 sm:p-12 border border-emerald-500/30"
+      >
+        <div className="inline-flex p-4 bg-emerald-500/10 rounded-full border border-emerald-500/30">
+          <CheckCircle className="w-12 h-12 text-emerald-400" />
+        </div>
+        <h1 className="text-3xl font-bold text-white">All Materials Are Free!</h1>
+        <p className="text-slate-300 max-w-md mx-auto leading-relaxed">
+          Open Access mode is currently active. All Previous Year Questions, complete chapter notes, syllabus documents, and AI Chat are 100% free for all students without requiring a paid subscription.
+        </p>
+        <div className="pt-2">
+          <button
+            onClick={() => navigate('/pyq')}
+            className="px-6 py-3 bg-[#F4B400] hover:bg-[#F5C21B] text-slate-950 font-bold rounded-xl transition-all shadow-md cursor-pointer"
+          >
+            Explore Free Resources
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   if (user?.is_premium) {
     return (

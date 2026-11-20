@@ -10,7 +10,7 @@ import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 
 export const Landing = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, premiumOnlyMode } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -115,7 +115,7 @@ export const Landing = () => {
             { name: 'Notes', path: '/syllabus' },
             { name: 'Syllabus', path: '/syllabus' },
             { name: 'Chat', path: '/chat' },
-            { name: 'Membership', path: '/get-premium' },
+            ...(premiumOnlyMode ? [{ name: 'Membership', path: '/get-premium' }] : []),
             { name: 'About', path: '#about', isAnchor: true }
           ].map((item) => {
             const linkContent = (
@@ -254,7 +254,7 @@ export const Landing = () => {
                     { name: 'Notes', path: '/syllabus' },
                     { name: 'Syllabus', path: '/syllabus' },
                     { name: 'Chat', path: '/chat' },
-                    { name: 'Membership', path: '/get-premium' },
+                    ...(premiumOnlyMode ? [{ name: 'Membership', path: '/get-premium' }] : []),
                     { name: 'About', path: '#about', isAnchor: true }
                   ].map((item) => {
                     const linkContent = (

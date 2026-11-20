@@ -231,7 +231,7 @@ export const AdminSettings = () => {
                         <p className="text-sm text-slate-400">
                           {premiumOnlyMode 
                             ? 'Strict Mode: Subscription enforcement is active. Only active subscribers and admins can view premium materials.'
-                            : 'Bypass Mode: All premium materials (PYQs, Syllabus, Notes, Chat) are accessible to all users for free.'}
+                            : 'Bypass Mode: All premium materials (PYQs, Syllabus, Notes, Chat) are accessible to all users for free. "Get Premium" options and membership links are hidden from users.'}
                         </p>
                       </div>
 

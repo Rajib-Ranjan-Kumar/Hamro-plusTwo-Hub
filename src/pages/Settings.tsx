@@ -9,7 +9,7 @@ import { motion } from 'motion/react';
 import { format } from 'date-fns';
 
 export const Settings = () => {
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, premiumOnlyMode } = useAuth();
   const [colleges, setColleges] = useState<any[]>([]);
   const [name, setName] = useState(user?.name || '');
   const [collegeId, setCollegeId] = useState(user?.college_id || '');
@@ -275,13 +275,17 @@ export const Settings = () => {
             </div>
             <div className="flex items-center gap-2">
               <p className="text-lg font-semibold text-white">
-                {user?.is_premium ? 'Premium Plan' : 'Free Plan'}
+                {!premiumOnlyMode ? 'Open Access' : user?.is_premium ? 'Premium Plan' : 'Free Plan'}
               </p>
-              {user?.is_premium && (
+              {!premiumOnlyMode ? (
+                <span className="px-2 py-0.5 text-xs font-medium bg-emerald-900/30 text-emerald-400 rounded-full border border-emerald-800">
+                  All Materials Free
+                </span>
+              ) : user?.is_premium ? (
                 <span className="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full border border-amber-200 dark:border-amber-800">
                   Active
                 </span>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

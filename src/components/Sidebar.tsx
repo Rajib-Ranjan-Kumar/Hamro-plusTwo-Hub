@@ -32,7 +32,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
-  const { user } = useAuth();
+  const { user, premiumOnlyMode, hasPremiumAccess } = useAuth();
 
   return (
     <>
@@ -106,7 +106,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             );
           })}
 
-          {user?.role === 'student' && !user?.is_premium && (
+          {premiumOnlyMode && user?.role === 'student' && !hasPremiumAccess && (
             <NavLink
               to="/get-premium"
               onClick={() => setIsOpen(false)}
