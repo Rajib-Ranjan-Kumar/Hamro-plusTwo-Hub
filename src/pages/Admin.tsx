@@ -11,6 +11,8 @@ import { AdminHeader } from '../components/admin/AdminHeader';
 import { DashboardOverview } from '../components/admin/DashboardOverview';
 import { StudentManagement } from '../components/admin/StudentManagement';
 import { ContentManagement } from '../components/admin/ContentManagement';
+import { AcademicStructureManager } from '../components/admin/AcademicStructureManager';
+import { EducationalContentManager } from '../components/admin/EducationalContentManager';
 import { ContributionManagement } from '../components/admin/ContributionManagement';
 import { SubscriptionManagement } from '../components/admin/SubscriptionManagement';
 import { WithdrawalManagement } from '../components/admin/WithdrawalManagement';
@@ -132,16 +134,20 @@ export const Admin = () => {
                 <StudentManagement />
               )}
 
+              {activeTab === 'academic-structure' && (
+                <AcademicStructureManager initialTab="colleges" />
+              )}
+
               {activeTab === 'content' && (
-                <ContentManagement />
+                <EducationalContentManager />
               )}
 
               {activeTab === 'colleges' && (
-                <ContentManagement />
+                <AcademicStructureManager initialTab="colleges" />
               )}
 
               {activeTab === 'subjects' && (
-                <ContentManagement />
+                <AcademicStructureManager initialTab="subjects" />
               )}
 
               {activeTab === 'contributions' && (

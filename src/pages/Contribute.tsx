@@ -50,6 +50,12 @@ export const Contribute = () => {
     if (user) {
       fetchContributions();
       fetchWithdrawals();
+      setFormData(prev => ({
+        ...prev,
+        college_id: prev.college_id || user.college_id?.toString() || '',
+        year: prev.year || user.year || 'Class 11',
+        stream: prev.stream || user.stream || 'Science'
+      }));
     }
   }, [user]);
 
@@ -299,13 +305,18 @@ export const Contribute = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">Stream</label>
+                      <label className="block text-sm font-medium text-slate-300 mb-1">
+                        Stream <span className="text-emerald-400">*</span>
+                      </label>
                       <select 
+                        required
                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white cursor-pointer"
                         value={formData.stream}
-                        onChange={(e) => setFormData({...formData, stream: e.target.value})}
+                        onChange={(e) => {
+                          const newStream = e.target.value;
+                          setFormData(prev => ({ ...prev, stream: newStream, subject_id: '' }));
+                        }}
                       >
-                        <option value="">All Streams</option>
                         <option value="Science">Science</option>
                         <option value="Management">Management</option>
                         <option value="Humanities">Humanities</option>

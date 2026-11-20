@@ -31,6 +31,7 @@ const TAB_TITLES: Record<AdminTab, { title: string; category: string }> = {
   'overview': { title: 'Executive Overview', category: 'Main' },
   'analytics': { title: 'Platform Analytics', category: 'Main' },
   'students': { title: 'Student Management', category: 'Academic' },
+  'academic-structure': { title: 'Academic Hierarchy Structure', category: 'Academic' },
   'content': { title: 'Educational Content Hub', category: 'Academic' },
   'colleges': { title: 'Colleges & Institutions', category: 'Academic' },
   'subjects': { title: 'Curriculum & Subjects', category: 'Academic' },

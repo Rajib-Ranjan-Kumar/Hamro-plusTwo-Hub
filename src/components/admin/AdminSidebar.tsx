@@ -20,7 +20,8 @@ import {
   Menu,
   X,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  FolderTree
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
@@ -29,6 +30,7 @@ export type AdminTab =
   | 'overview' 
   | 'analytics' 
   | 'students' 
+  | 'academic-structure'
   | 'content' 
   | 'colleges' 
   | 'subjects' 
@@ -100,10 +102,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       id: 'academic',
       label: 'ACADEMIC MANAGEMENT',
       items: [
-        { id: 'students', label: 'Students', icon: Users },
+        { id: 'academic-structure', label: 'Academic Hierarchy', icon: FolderTree },
         { id: 'content', label: 'Content Library', icon: BookOpen },
-        { id: 'colleges', label: 'Colleges', icon: GraduationCap },
-        { id: 'subjects', label: 'Subjects', icon: Layers },
+        { id: 'students', label: 'Students', icon: Users },
       ]
     },
     {
