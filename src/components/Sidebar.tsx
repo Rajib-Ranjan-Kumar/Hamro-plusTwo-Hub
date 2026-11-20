@@ -6,10 +6,7 @@ import { motion } from 'motion/react';
 import { 
   BookOpen, 
   FileText, 
-  Video, 
   Upload, 
-  TrendingUp, 
-  Trophy, 
   Settings, 
   MessageSquare,
   Crown,
@@ -18,12 +15,10 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { name: 'Home', path: '/', icon: TrendingUp },
   { name: 'PYQs', path: '/pyq', icon: FileText, premium: true },
   { name: 'Syllabus & Notes', path: '/syllabus', icon: BookOpen, premium: true },
   { name: 'Chat', path: '/chat', icon: MessageSquare },
   { name: 'Contribute & Earn', path: '/contribute', icon: Upload },
-  { name: 'Leaderboard', path: '/leaderboard', icon: Trophy },
   { name: 'Settings', path: '/settings', icon: Settings },
 ];
 
@@ -54,12 +49,12 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       )}>
         <div className="p-5 sm:p-6 border-b border-slate-700/60 flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 select-none">
-              <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)]">
+            <NavLink to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2 select-none group">
+              <div className="bg-[#F4B400] text-black text-[10px] font-black h-[28px] w-[28px] flex items-center justify-center rounded-[6px] shadow-[0_0_8px_rgba(244,180,0,0.3)] group-hover:scale-105 transition-transform">
                 +2
               </div>
               <h1 className="text-xl font-bold text-white tracking-wide">Hamro +2 Hub</h1>
-            </div>
+            </NavLink>
             <div className="flex items-center gap-2 mt-2">
               <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">{user?.name}</p>
               {user?.is_premium && <Crown className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" />}
