@@ -62,6 +62,7 @@ export const AddContent = () => {
   const [delExamYear, setDelExamYear] = useState('');
   const [delYear, setDelYear] = useState('');
   const [delStream, setDelStream] = useState('');
+  const [delLocation, setDelLocation] = useState('');
   const [delItemId, setDelItemId] = useState('');
 
   // Add Content State
@@ -175,7 +176,9 @@ export const AddContent = () => {
         (item.description && item.description.toLowerCase().includes(q)) ||
         (item.title && item.title.toLowerCase().includes(q)) ||
         (item.name && item.name.toLowerCase().includes(q)) ||
+        (item.location && item.location.toLowerCase().includes(q)) ||
         (item.year_value && item.year_value.toString().toLowerCase().includes(q)) ||
+        (item.value && item.value.toString().toLowerCase().includes(q)) ||
         (item.year && item.year.toLowerCase().includes(q)) ||
         (item.term && item.term.toLowerCase().includes(q)) ||
         (item.type && item.type.toLowerCase().includes(q)) ||
@@ -199,6 +202,8 @@ export const AddContent = () => {
       if (delStream && item.stream !== delStream) return false;
       if (delYear && item.year !== delYear) return false;
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
+    } else if (manageDataType === 'colleges') {
+      if (delLocation && item.location !== delLocation) return false;
     } else if (manageDataType === 'content_types' || manageDataType === 'exam_years') {
       if (delCollegeId !== '0' && item.college_id !== delCollegeId) return false;
       if (delYear && item.year !== delYear) return false;
@@ -445,6 +450,8 @@ export const AddContent = () => {
       setIsSyncing(false);
     }
   };
+
+  const collegeLocations = Array.from(new Set(colleges.map((c: any) => c.location?.trim()).filter(Boolean)));
 
   if (user?.role !== 'admin') {
     return <Navigate to="/" replace />;
@@ -1095,6 +1102,14 @@ export const AddContent = () => {
                     setManageDataType(type);
                     setSearchQuery('');
                     setDelItemId('');
+                    setDelYear('');
+                    setDelStream('');
+                    setDelCollegeId('0');
+                    setDelSubjectId('');
+                    setDelContentType('');
+                    setDelTerm('');
+                    setDelExamYear('');
+                    setDelLocation('');
                   }}
                   className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer ${
                     manageDataType === type
@@ -1113,7 +1128,17 @@ export const AddContent = () => {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="text"
-                  placeholder="Search by title, subject, college, term, year..."
+                  placeholder={
+                    manageDataType === 'materials'
+                      ? "Search materials by title, subject, college, term, year, stream..."
+                      : manageDataType === 'subjects'
+                      ? "Search subjects by name, stream, or class..."
+                      : manageDataType === 'colleges'
+                      ? "Search colleges by name or location..."
+                      : manageDataType === 'content_types'
+                      ? "Search content types by name or class..."
+                      : "Search exam years (e.g. 2080, 2024)..."
+                  }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500"
@@ -1317,6 +1342,139 @@ export const AddContent = () => {
                   )}
                 </div>
               )}
+
+              {/* Secondary Filters for Colleges */}
+              {manageDataType === 'colleges' && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Filter by Location</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delLocation}
+                        onChange={(e) => setDelLocation(e.target.value)}
+                      >
+                        <option value="">All Locations</option>
+                        {collegeLocations.map((loc: any) => (
+                          <option key={loc} value={loc}>{loc}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {(searchQuery || delLocation) && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setDelLocation('');
+                        }}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>✕ Reset filters</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Secondary Filters for Content Types */}
+              {manageDataType === 'content_types' && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">
+                    {/* Class Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Class</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delYear}
+                        onChange={(e) => setDelYear(e.target.value)}
+                      >
+                        <option value="">All Classes</option>
+                        <option value="Class 11">Class 11</option>
+                        <option value="Class 12">Class 12</option>
+                      </select>
+                    </div>
+
+                    {/* College Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">College</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delCollegeId}
+                        onChange={(e) => setDelCollegeId(e.target.value)}
+                      >
+                        <option value="0">All Colleges / Global</option>
+                        {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  {(searchQuery || delYear || delCollegeId !== '0') && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setDelYear('');
+                          setDelCollegeId('0');
+                        }}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>✕ Reset filters</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Secondary Filters for Exam Years */}
+              {manageDataType === 'exam_years' && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">
+                    {/* Class Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">Class</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delYear}
+                        onChange={(e) => setDelYear(e.target.value)}
+                      >
+                        <option value="">All Classes</option>
+                        <option value="Class 11">Class 11</option>
+                        <option value="Class 12">Class 12</option>
+                      </select>
+                    </div>
+
+                    {/* College Filter */}
+                    <div>
+                      <label className="text-[11px] text-slate-400 font-medium block mb-1">College</label>
+                      <select
+                        className="w-full px-2.5 py-1.5 bg-slate-950/70 border border-slate-700 rounded-lg text-white"
+                        value={delCollegeId}
+                        onChange={(e) => setDelCollegeId(e.target.value)}
+                      >
+                        <option value="0">All Colleges / Global</option>
+                        {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  {(searchQuery || delYear || delCollegeId !== '0') && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setDelYear('');
+                          setDelCollegeId('0');
+                        }}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>✕ Reset filters</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* List View */}
@@ -1447,9 +1605,15 @@ export const AddContent = () => {
                           {item.name || item.year_value || item.value || 'Unnamed Item'}
                         </p>
                         <p className="text-xs text-slate-400 mt-0.5 truncate">
-                          {item.stream ? `${item.stream} • ` : ''}
-                          {item.year ? `${item.year} • ` : ''}
-                          {collegeName}
+                          {manageDataType === 'colleges' ? (
+                            <span>{item.location || 'Location Not Specified'}</span>
+                          ) : (
+                            <>
+                              {item.stream ? `${item.stream} • ` : ''}
+                              {item.year ? `${item.year} • ` : ''}
+                              {collegeName}
+                            </>
+                          )}
                         </p>
                       </div>
 
