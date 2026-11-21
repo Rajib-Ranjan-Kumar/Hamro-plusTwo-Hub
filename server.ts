@@ -132,6 +132,7 @@ async function startServer() {
       });
 
       const folder = (req.query?.folder as string) || (req.body?.folder as string);
+      const publicId = (req.query?.public_id as string) || (req.body?.public_id as string);
       const timestamp = Math.round(new Date().getTime() / 1000);
 
       const paramsToSign: Record<string, any> = {
@@ -142,6 +143,10 @@ async function startServer() {
         paramsToSign.folder = folder;
       }
 
+      if (publicId && typeof publicId === 'string') {
+        paramsToSign.public_id = publicId;
+      }
+
       const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
 
       res.json({
@@ -150,6 +155,7 @@ async function startServer() {
         cloudName,
         apiKey,
         folder: folder || null,
+        publicId: publicId || null,
       });
     } catch (error: any) {
       console.error("Error generating Cloudinary signature:", error?.message || "Unknown error");

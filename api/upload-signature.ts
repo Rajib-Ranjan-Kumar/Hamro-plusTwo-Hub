@@ -34,6 +34,7 @@ export default function handler(req: any, res: any) {
     });
 
     const folder = req.query?.folder || req.body?.folder;
+    const publicId = req.query?.public_id || req.body?.public_id;
     const timestamp = Math.round(new Date().getTime() / 1000);
 
     const paramsToSign: Record<string, any> = {
@@ -44,6 +45,10 @@ export default function handler(req: any, res: any) {
       paramsToSign.folder = folder;
     }
 
+    if (publicId && typeof publicId === 'string') {
+      paramsToSign.public_id = publicId;
+    }
+
     const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
 
     return res.status(200).json({
@@ -52,6 +57,7 @@ export default function handler(req: any, res: any) {
       cloudName,
       apiKey,
       folder: folder || null,
+      publicId: publicId || null,
     });
   } catch (error: any) {
     console.error('Error generating Cloudinary signature:', error?.message || 'Unknown error');

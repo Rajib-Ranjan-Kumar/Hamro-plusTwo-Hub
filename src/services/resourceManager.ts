@@ -233,7 +233,6 @@ export const uploadPdfToCloudinary = async (
     formData.append('timestamp', timestamp.toString());
     formData.append('signature', signature);
     formData.append('folder', folderPath);
-    formData.append('public_id', uniqueFileName);
 
     const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
       method: 'POST',
@@ -245,7 +244,7 @@ export const uploadPdfToCloudinary = async (
       return {
         secure_url: data.secure_url,
         public_id: data.public_id,
-        fileName: `${uniqueFileName}.pdf`,
+        fileName: file.name,
         folder: folderPath,
         bytes: data.bytes,
         format: data.format || 'pdf',
@@ -266,7 +265,7 @@ export const uploadPdfToCloudinary = async (
       return {
         secure_url: downloadUrl,
         public_id: `${folderPath}/${uniqueFileName}.pdf`,
-        fileName: `${uniqueFileName}.pdf`,
+        fileName: file.name,
         folder: folderPath,
       };
     } catch (fbError: any) {
