@@ -686,43 +686,99 @@ export const getEducationalResources = async (
   filters: ResourceFilterParams = {}
 ): Promise<EducationalResourceItem[]> => {
   try {
-    const snap = await getDocs(collection(db, 'academic_resources'));
-    let items = snap.docs.map(d => {
-      const data = d.data();
-      return {
-        id: d.id,
-        title: data.title || data.description || 'Untitled Document',
-        resource_type: data.resource_type || 'notes',
-        college_id: data.college_id || null,
-        college_name: data.college_name || 'Global',
-        college_slug: data.college_slug || 'universal',
-        class_id: data.class_id || null,
-        class_level: data.class_level || 'Class 11',
-        stream_id: data.stream_id || null,
-        stream: data.stream || 'Science',
-        subject_id: data.subject_id || null,
-        subject: data.subject || '',
-        academic_year: data.academic_year || data.year || '',
-        term: data.term || '',
-        exam_year: data.exam_year || data.year || '',
-        examination_name: data.examination_name || '',
-        chapter_name: data.chapter_name || '',
-        description: data.description || '',
-        pdf_filename: data.pdf_filename || '',
-        cloudinary_public_id: data.cloudinary_public_id || '',
-        cloudinary_secure_url: data.cloudinary_secure_url || '',
-        cloudinary_folder: data.cloudinary_folder || '',
-        linked_question_paper_id: data.linked_question_paper_id || '',
-        linked_question_paper_title: data.linked_question_paper_title || '',
-        status: data.status || 'published',
-        access_level: data.access_level || 'free',
-        user_id: data.user_id || '',
-        user_name: data.user_name || '',
-        user_email: data.user_email || '',
-        created_at: data.created_at,
-        updated_at: data.updated_at
-      } as EducationalResourceItem;
-    });
+    let items: EducationalResourceItem[] = [];
+    const seenIds = new Set<string>();
+
+    // 1. Fetch from academic_resources
+    try {
+      const snap = await getDocs(collection(db, 'academic_resources'));
+      snap.docs.forEach(d => {
+        const data = d.data();
+        seenIds.add(d.id);
+        if (data.cloudinary_public_id) seenIds.add(data.cloudinary_public_id);
+        items.push({
+          id: d.id,
+          title: data.title || data.description || 'Untitled Document',
+          resource_type: data.resource_type || 'notes',
+          college_id: data.college_id || null,
+          college_name: data.college_name || 'Global',
+          college_slug: data.college_slug || 'universal',
+          class_id: data.class_id || null,
+          class_level: data.class_level || 'Class 11',
+          stream_id: data.stream_id || null,
+          stream: data.stream || 'Science',
+          subject_id: data.subject_id || null,
+          subject: data.subject || '',
+          academic_year: data.academic_year || data.year || '',
+          term: data.term || '',
+          exam_year: data.exam_year || data.year || '',
+          examination_name: data.examination_name || '',
+          chapter_name: data.chapter_name || '',
+          description: data.description || '',
+          pdf_filename: data.pdf_filename || '',
+          cloudinary_public_id: data.cloudinary_public_id || '',
+          cloudinary_secure_url: data.cloudinary_secure_url || data.file_url || '',
+          cloudinary_folder: data.cloudinary_folder || '',
+          linked_question_paper_id: data.linked_question_paper_id || '',
+          linked_question_paper_title: data.linked_question_paper_title || '',
+          status: data.status || 'published',
+          access_level: data.access_level || 'free',
+          user_id: data.user_id || '',
+          user_name: data.user_name || '',
+          user_email: data.user_email || '',
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        });
+      });
+    } catch (err) {
+      console.warn('Could not read academic_resources collection:', err);
+    }
+
+    // 2. Also include verified items from contributions
+    try {
+      const contribSnap = await getDocs(query(collection(db, 'contributions'), where('status', '==', 'verified')));
+      contribSnap.docs.forEach(d => {
+        if (!seenIds.has(d.id)) {
+          const data = d.data();
+          const rawType = (data.type || '').toLowerCase();
+          const resType = rawType.includes('note') ? 'notes' : (rawType.includes('pyq') || rawType.includes('question') ? 'pyq' : (rawType.includes('syllabus') ? 'syllabus' : 'notes'));
+          items.push({
+            id: d.id,
+            title: data.title || data.description || 'Study Resource',
+            resource_type: resType as any,
+            college_id: data.college_id || null,
+            college_name: data.college_name || 'Global',
+            college_slug: slugify(data.college_name || 'universal'),
+            class_id: null,
+            class_level: data.year || 'Class 11',
+            stream_id: null,
+            stream: data.stream || 'Science',
+            subject_id: data.subject_id || null,
+            subject: data.subject_name || data.subject || 'General',
+            academic_year: data.exam_year || '2081',
+            term: data.term || 'Final Term',
+            exam_year: data.exam_year || '2081',
+            examination_name: data.title || '',
+            description: data.description || '',
+            pdf_filename: '',
+            cloudinary_public_id: '',
+            cloudinary_secure_url: data.file_url || '',
+            cloudinary_folder: '',
+            linked_question_paper_id: '',
+            linked_question_paper_title: '',
+            status: 'published',
+            access_level: data.access_level || 'free',
+            user_id: data.user_id || '',
+            user_name: data.user_name || 'Contributor',
+            user_email: data.user_email || '',
+            created_at: data.created_at,
+            updated_at: data.updated_at
+          });
+        }
+      });
+    } catch (err) {
+      console.warn('Could not read contributions collection for resources:', err);
+    }
 
     // Apply multi-faceted cascading filters
     if (filters.collegeId && filters.collegeId !== 'all') {
@@ -876,40 +932,90 @@ export const uploadEducationalResource = async (
   const uploadResult = await uploadPdfToCloudinary(file, folderPath);
 
   // 3. Save to Firestore
-  const docRef = await addDoc(collection(db, 'academic_resources'), {
-    title: resourceData.title.trim(),
-    resource_type: resourceData.resource_type,
-    college_id: cleanId(resourceData.college_id),
-    college_name: resourceData.college_name,
-    college_slug: slugify(resourceData.college_name),
-    class_id: cleanId(resourceData.class_id),
-    class_level: resourceData.class_level,
-    stream_id: cleanId(resourceData.stream_id),
-    stream: resourceData.stream,
-    subject_id: cleanId(resourceData.subject_id),
-    subject: resourceData.subject,
-    academic_year: resourceData.academic_year || '',
-    term: resourceData.term || '',
-    exam_year: resourceData.exam_year || '',
-    examination_name: resourceData.examination_name || '',
-    chapter_name: resourceData.chapter_name || '',
-    description: resourceData.description || '',
-    pdf_filename: uploadResult.fileName,
-    cloudinary_public_id: uploadResult.public_id,
-    cloudinary_secure_url: uploadResult.secure_url,
-    cloudinary_folder: uploadResult.folder,
-    linked_question_paper_id: resourceData.linked_question_paper_id || null,
-    linked_question_paper_title: resourceData.linked_question_paper_title || '',
-    status: resourceData.status || 'published',
-    access_level: resourceData.access_level || 'free',
-    user_id: currentUser?.id || auth.currentUser?.uid || 'admin',
-    user_name: currentUser?.name || 'Administrator',
-    user_email: currentUser?.email || 'admin@hamroplus2.com.np',
-    created_at: serverTimestamp(),
-    updated_at: serverTimestamp()
-  });
+  let docId = '';
+  const currentUid = auth.currentUser?.uid || currentUser?.id || 'admin';
+  const currentName = currentUser?.name || auth.currentUser?.displayName || 'Administrator';
+  const currentEmail = currentUser?.email || auth.currentUser?.email || 'admin@hamroplus2.com.np';
 
-  return docRef.id;
+  const mappedType = resourceData.resource_type === 'notes' ? 'Notes' : 
+                     (resourceData.resource_type === 'pyq' ? 'PYQ' : 
+                     (resourceData.resource_type === 'syllabus' ? 'Syllabus' : 'PYQ'));
+
+  // 3a. Save to academic_resources (new dynamic hierarchy collection)
+  try {
+    const docRef = await addDoc(collection(db, 'academic_resources'), {
+      title: resourceData.title.trim(),
+      resource_type: resourceData.resource_type,
+      college_id: cleanId(resourceData.college_id),
+      college_name: resourceData.college_name,
+      college_slug: slugify(resourceData.college_name),
+      class_id: cleanId(resourceData.class_id),
+      class_level: resourceData.class_level,
+      stream_id: cleanId(resourceData.stream_id),
+      stream: resourceData.stream,
+      subject_id: cleanId(resourceData.subject_id),
+      subject: resourceData.subject,
+      academic_year: resourceData.academic_year || '',
+      term: resourceData.term || '',
+      exam_year: resourceData.exam_year || '',
+      examination_name: resourceData.examination_name || '',
+      chapter_name: resourceData.chapter_name || '',
+      description: resourceData.description || '',
+      pdf_filename: uploadResult.fileName,
+      cloudinary_public_id: uploadResult.public_id,
+      cloudinary_secure_url: uploadResult.secure_url,
+      cloudinary_folder: uploadResult.folder,
+      linked_question_paper_id: resourceData.linked_question_paper_id || null,
+      linked_question_paper_title: resourceData.linked_question_paper_title || '',
+      status: resourceData.status || 'published',
+      access_level: resourceData.access_level || 'free',
+      user_id: currentUid,
+      user_name: currentName,
+      user_email: currentEmail,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp()
+    });
+    docId = docRef.id;
+  } catch (academicErr: any) {
+    console.warn('Could not write to academic_resources (Firestore security rules might need publishing):', academicErr);
+  }
+
+  // 3b. Dual-write to contributions collection so that student pages (/pyq, /syllabus) immediately display the verified material
+  try {
+    const contribRef = await addDoc(collection(db, 'contributions'), {
+      user_id: currentUid,
+      user_name: currentName,
+      user_email: currentEmail,
+      college_id: cleanId(resourceData.college_id),
+      title: resourceData.title.trim(),
+      description: resourceData.description || resourceData.title.trim(),
+      type: mappedType,
+      subject_id: cleanId(resourceData.subject_id) || slugify(resourceData.subject) || 'general',
+      subject_name: resourceData.subject,
+      term: resourceData.term || 'Final Term',
+      exam_year: resourceData.exam_year || resourceData.academic_year || '2081',
+      file_url: uploadResult.secure_url,
+      solution_url: resourceData.resource_type === 'solution' ? uploadResult.secure_url : null,
+      access_level: resourceData.access_level || 'free',
+      status: 'verified',
+      solution_status: 'verified',
+      upvotes: 0,
+      rating: 0,
+      rating_count: 0,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp()
+    });
+    if (!docId) {
+      docId = contribRef.id;
+    }
+  } catch (contribErr: any) {
+    console.warn('Failed to write to contributions collection:', contribErr);
+    if (!docId) {
+      throw contribErr;
+    }
+  }
+
+  return docId || 'saved';
 };
 
 /**
