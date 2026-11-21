@@ -579,7 +579,20 @@ export const deleteResource = async (resourceId: string): Promise<void> => {
     }
   }
 
-  // 2. Delete document from Firestore
+  // 2. Clean up any mirror / dual-written copy in 'contributions'
+  if (publicId) {
+    try {
+      const contribQuery = query(collection(db, 'contributions'), where('cloudinary_public_id', '==', publicId));
+      const contribSnaps = await getDocs(contribQuery);
+      for (const d of contribSnaps.docs) {
+        await deleteDoc(doc(db, 'contributions', d.id));
+      }
+    } catch (err) {
+      console.warn('Could not clean up mirror contribution records:', err);
+    }
+  }
+
+  // 3. Delete document from Firestore
   await deleteDoc(docRef);
 };
 
