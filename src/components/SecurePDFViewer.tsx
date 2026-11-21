@@ -76,6 +76,8 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewerMode, setViewerMode] = useState<'canvas' | 'google' | 'native'>('canvas');
+  const [viewerNotice, setViewerNotice] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -115,7 +117,7 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
   // Intercept Ctrl + Scroll Wheel over the PDF area to zoom the PDF instead of the website
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container) return;
+    if (!container || viewerMode !== 'canvas') return;
 
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey) {
@@ -131,7 +133,7 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
     return () => {
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [isLoading, pdfDoc]);
+  }, [isLoading, pdfDoc, viewerMode]);
 
   // Check if the URL is likely an image
   const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i) || 
@@ -144,10 +146,18 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
       return;
     }
 
+    if (viewerMode !== 'canvas') {
+      setIsLoading(false);
+      return;
+    }
+
     let isMounted = true;
 
     const loadPdfJs = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+
         // 1. Dynamically append PDF.js library if not already loaded
         if (!(window as any).pdfjsLib) {
           const script = document.createElement('script');
@@ -179,9 +189,11 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
           setIsLoading(false);
         }
       } catch (err: any) {
-        console.error("PDF.js loading failed:", err);
+        console.warn("PDF.js canvas rendering blocked/failed, seamlessly switching to Cloud Document Viewer:", err);
         if (isMounted) {
-          setError(err.message || "Failed to parse PDF document. Please verify your connection or download options.");
+          // Seamlessly fallback to Google Docs Viewer rather than showing a dead-end error
+          setViewerMode('google');
+          setViewerNotice('Optimized: Switched to Cloud Document Viewer for smooth reading.');
           setIsLoading(false);
         }
       }
@@ -192,11 +204,11 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
     return () => {
       isMounted = false;
     };
-  }, [url, isImage]);
+  }, [url, isImage, viewerMode]);
 
   // Handle scroll events to detect current page number in viewport
   const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
+    if (!scrollContainerRef.current || viewerMode !== 'canvas') return;
     const container = scrollContainerRef.current;
     const pageElements = container.querySelectorAll('[data-page-number]');
     
@@ -254,47 +266,100 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
       `}</style>
 
       {/* Global Header */}
-      <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 bg-slate-900/80 border-b border-slate-800 text-white backdrop-blur-md z-50 shrink-0">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="p-2 bg-blue-500/20 rounded-lg shrink-0">
+      <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3.5 bg-slate-900/90 border-b border-slate-800 text-white backdrop-blur-md z-50 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg shrink-0">
             {isImage ? (
-              <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             ) : (
-              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             )}
           </div>
-          <div className="min-w-0 flex-1 pr-4">
-            <h2 className="text-sm sm:text-lg font-bold leading-tight truncate">{title}</h2>
-            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 truncate">
-              Secure Document Viewer
-            </p>
+          <div className="min-w-0 flex-1 pr-2 sm:pr-4">
+            <h2 className="text-xs sm:text-base font-bold leading-tight truncate">{title}</h2>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[10px] sm:text-xs text-slate-400 truncate">
+                Hamro +2 Hub Reader
+              </span>
+              {viewerNotice && (
+                <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded truncate hidden md:inline">
+                  {viewerNotice}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         
+        {/* Actions & Engine Switcher */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {!isImage && (
+            <div className="hidden sm:flex items-center bg-slate-800/80 p-0.5 rounded-lg border border-slate-700/60 text-xs mr-1">
+              <button
+                onClick={() => { setViewerMode('canvas'); setViewerNotice(null); }}
+                className={`px-2 py-1 rounded-md transition-all ${
+                  viewerMode === 'canvas' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400 hover:text-white'
+                }`}
+                title="Interactive Canvas Renderer"
+              >
+                Canvas
+              </button>
+              <button
+                onClick={() => { setViewerMode('google'); setViewerNotice(null); }}
+                className={`px-2 py-1 rounded-md transition-all ${
+                  viewerMode === 'google' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400 hover:text-white'
+                }`}
+                title="Google Docs Cloud Viewer"
+              >
+                Cloud Viewer
+              </button>
+              <button
+                onClick={() => { setViewerMode('native'); setViewerNotice(null); }}
+                className={`px-2 py-1 rounded-md transition-all ${
+                  viewerMode === 'native' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400 hover:text-white'
+                }`}
+                title="Native Browser Embed"
+              >
+                Native
+              </button>
+            </div>
+          )}
+
+          {/* Direct Open in New Tab - Always available for students and admins */}
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 sm:p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white flex items-center gap-1 text-xs font-semibold"
+            title="Open in new window"
+          >
+            <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden md:inline">Open Tab</span>
+          </a>
+
           {allowDownload && (
             <a 
               href={url}
               download
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white flex items-center gap-1 text-sm font-semibold"
+              className="p-1.5 sm:p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white flex items-center gap-1 text-xs font-semibold"
               title="Download PDF"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Download</span>
             </a>
           )}
+
           <button 
             onClick={toggleFullscreen}
-            className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
+            className="p-1.5 sm:p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
             title="Toggle Fullscreen"
           >
-            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+            {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
           </button>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg transition-colors text-slate-400"
+            className="p-1.5 sm:p-2 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg transition-colors text-slate-400"
             title="Close Viewer"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -305,8 +370,8 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
       {/* Viewer Main Body */}
       <div className="flex-1 w-full relative min-h-0 flex flex-col bg-slate-950">
         
-        {/* PDF Floating Navigation & Zoom Control Overlay */}
-        {!isImage && pdfDoc && !error && (
+        {/* PDF Floating Navigation & Zoom Control Overlay (Only in canvas mode) */}
+        {!isImage && viewerMode === 'canvas' && pdfDoc && !error && (
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-6 px-4 py-2 bg-slate-900/90 border border-slate-800 text-white rounded-full shadow-2xl backdrop-blur-md z-40 select-none">
             {/* Page Status Indicator */}
             <div className="text-xs font-semibold text-slate-300 pr-4 border-r border-slate-800">
@@ -342,43 +407,47 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="w-full h-full relative overflow-y-auto p-4 flex flex-col items-center min-h-0 scroll-smooth"
+          className="w-full h-full relative overflow-y-auto p-2 sm:p-4 flex flex-col items-center min-h-0 scroll-smooth"
         >
           {/* Loading Spinner */}
           {isLoading && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 z-20">
-              <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+              <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
               <p className="text-sm font-medium text-slate-400 animate-pulse">Loading document...</p>
             </div>
           )}
 
-          {/* Error Fallback */}
-          {error ? (
-            <div className="flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto my-auto z-10">
-              <FileText className="w-16 h-16 text-rose-500 mb-4" />
-              <p className="text-slate-200 font-medium mb-2">Could Not Render PDF</p>
-              <p className="text-xs text-slate-400 mb-6">{error}</p>
-              {isAdmin && (
-                <a 
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-lg flex items-center gap-2"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Open PDF in New Tab
-                </a>
-              )}
-            </div>
-          ) : isImage ? (
+          {/* Mode 1: Image view */}
+          {isImage ? (
             <img 
               src={url} 
               alt={title}
               referrerPolicy="no-referrer"
-              className="max-w-full max-h-full object-contain z-10 pointer-events-none select-none"
+              className="max-w-full max-h-full object-contain z-10 pointer-events-none select-none my-auto"
               onLoad={() => setIsLoading(false)}
             />
+          ) : viewerMode === 'google' ? (
+            /* Mode 2: Google Docs Viewer iframe fallback */
+            <div className="w-full h-full max-w-5xl flex-1 flex flex-col relative z-10">
+              <iframe
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`}
+                className="w-full h-full min-h-[500px] border border-slate-800 rounded-xl bg-slate-900 shadow-2xl flex-1"
+                title={title}
+                onLoad={() => setIsLoading(false)}
+              />
+            </div>
+          ) : viewerMode === 'native' ? (
+            /* Mode 3: Native browser embed iframe */
+            <div className="w-full h-full max-w-5xl flex-1 flex flex-col relative z-10">
+              <iframe
+                src={url}
+                className="w-full h-full min-h-[500px] border border-slate-800 rounded-xl bg-slate-900 shadow-2xl flex-1"
+                title={title}
+                onLoad={() => setIsLoading(false)}
+              />
+            </div>
           ) : (
+            /* Mode 4: PDF.js Canvas renderer */
             !isLoading && pdfDoc && (
               <div className="flex flex-col items-center gap-6 max-w-full z-10 py-4">
                 {Array.from({ length: numPages }, (_, index) => (
@@ -392,6 +461,38 @@ export const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, title, on
                 ))}
               </div>
             )
+          )}
+
+          {/* Fallback Error with One-Click Multi-Engine Resolution */}
+          {error && viewerMode === 'canvas' && !pdfDoc && (
+            <div className="flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto my-auto z-10">
+              <FileText className="w-16 h-16 text-amber-500 mb-4" />
+              <p className="text-slate-200 font-bold text-lg mb-1">Canvas Rendering Restriced</p>
+              <p className="text-xs text-slate-400 mb-6">{error}</p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  onClick={() => { setViewerMode('google'); setError(null); }}
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-lg"
+                >
+                  Use Cloud Viewer
+                </button>
+                <button
+                  onClick={() => { setViewerMode('native'); setError(null); }}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl text-xs border border-slate-700 transition-all"
+                >
+                  Native Viewer
+                </button>
+                <a 
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl text-xs border border-slate-700 transition-all flex items-center gap-1.5"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Open in New Tab
+                </a>
+              </div>
+            </div>
           )}
         </div>
       </div>

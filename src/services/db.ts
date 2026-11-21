@@ -374,78 +374,217 @@ export const addExamYear = async (data: any) => {
 
 export const getContent = async (type: string, subjectId?: string, year?: string, term?: string, examYear?: string, collegeId?: string, includePending: boolean = false) => {
   try {
-    let q = collection(db, 'contributions') as any;
-    q = query(q, where('type', '==', type));
-    
-    // Only show verified content unless explicitly requested (e.g., for admin)
-    if (!includePending) {
-      q = query(q, where('status', '==', 'verified'));
-    }
-    
-    if (subjectId) q = query(q, where('subject_id', '==', subjectId));
-    if (term) q = query(q, where('term', '==', term));
-    if (examYear) q = query(q, where('exam_year', '==', examYear));
-    
-    if (collegeId === 'all') {
-      // Admin sees all
-    } else if (collegeId && collegeId !== '0') {
-      const collegeIds = Array.from(new Set([collegeId, null]));
-      q = query(q, where('college_id', 'in', collegeIds));
-    } else if (collegeId !== undefined) {
-      q = query(q, where('college_id', '==', null));
-    }
-    
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-  } catch (error) {
-    console.warn("Direct query failed (likely missing composite index), activating resilient in-memory filter fallback:", error);
-    try {
-      let fallbackQ = query(collection(db, 'contributions'), where('type', '==', type));
-      if (!includePending) {
-        fallbackQ = query(fallbackQ, where('status', '==', 'verified'));
-      }
-      const snapshot = await getDocs(fallbackQ);
-      let results = snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    const normType = (type || '').toLowerCase();
+    const isPyq = normType === 'pyq' || normType === 'question_paper' || normType === 'solution' || normType === 'solutions';
+    const isNotes = normType === 'notes' || normType === 'note';
+    const isSyllabus = normType === 'syllabus';
 
-      if (subjectId) {
-        results = results.filter(item => item.subject_id === subjectId);
-      }
-      if (term) {
-        results = results.filter(item => item.term === term);
-      }
-      if (examYear) {
-        results = results.filter(item => item.exam_year === examYear);
-      }
-      if (collegeId && collegeId !== 'all' && collegeId !== '0') {
-        results = results.filter(item => item.college_id === collegeId || item.college_id === null || !item.college_id);
-      } else if (collegeId === '0') {
-        results = results.filter(item => !item.college_id);
-      }
-      return results;
-    } catch (fallbackError) {
-      console.error("Fallback getContent error:", fallbackError);
-      return [];
+    const items: any[] = [];
+    const seenUrls = new Set<string>();
+    const seenIds = new Set<string>();
+
+    // 1. Fetch from 'academic_resources' (new dynamic academic hierarchy)
+    try {
+      const snap = await getDocs(collection(db, 'academic_resources'));
+      snap.docs.forEach(d => {
+        const data = d.data();
+        const rType = (data.resource_type || '').toLowerCase();
+        
+        let matchesType = false;
+        if (isPyq && (rType === 'pyq' || rType === 'question_paper' || rType === 'solution' || rType === 'solutions')) matchesType = true;
+        if (isNotes && (rType === 'notes' || rType === 'note')) matchesType = true;
+        if (isSyllabus && rType === 'syllabus') matchesType = true;
+        if (!matchesType && rType === normType) matchesType = true;
+
+        if (!matchesType) return;
+
+        if (!includePending && data.status && data.status !== 'published' && data.status !== 'verified') {
+          return;
+        }
+
+        const fileUrl = data.cloudinary_secure_url || data.file_url || '';
+        if (fileUrl) seenUrls.add(fileUrl);
+        seenIds.add(d.id);
+
+        items.push({
+          id: d.id,
+          title: data.title || data.description || 'Study Resource',
+          description: data.description || data.title || '',
+          type: data.resource_type || type,
+          file_url: fileUrl,
+          solution_url: data.resource_type === 'solution' ? fileUrl : (data.solution_url || null),
+          subject_id: data.subject_id || '',
+          subject_name: data.subject || data.subject_name || '',
+          subject: data.subject || data.subject_name || '',
+          college_id: data.college_id || null,
+          college_name: data.college_name || '',
+          class_level: data.class_level || data.year || '',
+          year: data.class_level || data.year || '',
+          stream: data.stream || '',
+          term: data.term || '',
+          exam_year: data.exam_year || data.academic_year || '',
+          academic_year: data.academic_year || data.exam_year || '',
+          upvotes: data.upvotes || 0,
+          downvotes: data.downvotes || 0,
+          rating: data.rating || 0,
+          rating_count: data.rating_count || 0,
+          solution_status: data.solution_status || 'verified',
+          status: data.status || 'verified',
+          access_level: data.access_level || 'free',
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        });
+      });
+    } catch (err) {
+      console.warn("Could not query academic_resources in getContent:", err);
     }
+
+    // 2. Fetch from 'contributions' (traditional & dual-written contributions)
+    try {
+      const snap = await getDocs(collection(db, 'contributions'));
+      snap.docs.forEach(d => {
+        if (seenIds.has(d.id)) return;
+        const data = d.data();
+        const rType = (data.type || data.resource_type || '').toLowerCase();
+
+        let matchesType = false;
+        if (isPyq && (rType === 'pyq' || rType === 'question_paper' || rType === 'solution' || rType === 'solutions')) matchesType = true;
+        if (isNotes && (rType === 'notes' || rType === 'note')) matchesType = true;
+        if (isSyllabus && rType === 'syllabus') matchesType = true;
+        if (!matchesType && rType === normType) matchesType = true;
+
+        if (!matchesType) return;
+
+        if (!includePending && data.status && data.status !== 'verified' && data.status !== 'published') {
+          return;
+        }
+
+        const fileUrl = data.file_url || data.cloudinary_secure_url || '';
+        if (fileUrl && seenUrls.has(fileUrl)) return;
+        if (fileUrl) seenUrls.add(fileUrl);
+
+        items.push({
+          id: d.id,
+          title: data.title || data.description || 'Study Resource',
+          description: data.description || data.title || '',
+          type: data.type || type,
+          file_url: fileUrl,
+          solution_url: data.solution_url || null,
+          subject_id: data.subject_id || '',
+          subject_name: data.subject_name || data.subject || '',
+          subject: data.subject || data.subject_name || '',
+          college_id: data.college_id || null,
+          college_name: data.college_name || '',
+          class_level: data.class_level || data.year || '',
+          year: data.year || data.class_level || '',
+          stream: data.stream || '',
+          term: data.term || '',
+          exam_year: data.exam_year || data.academic_year || '',
+          academic_year: data.academic_year || data.exam_year || '',
+          upvotes: data.upvotes || 0,
+          downvotes: data.downvotes || 0,
+          rating: data.rating || 0,
+          rating_count: data.rating_count || 0,
+          solution_status: data.solution_status || 'verified',
+          status: data.status || 'verified',
+          access_level: data.access_level || 'free',
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        });
+      });
+    } catch (err) {
+      console.warn("Could not query contributions in getContent:", err);
+    }
+
+    // 3. Resilient in-memory filtering across all dimensions
+    let filtered = items;
+
+    // Filter by subject
+    if (subjectId && subjectId !== 'all') {
+      const sIdLower = subjectId.toLowerCase().trim();
+      filtered = filtered.filter(item => {
+        const itemSubId = (item.subject_id || '').toLowerCase().trim();
+        const itemSubName = (item.subject_name || item.subject || '').toLowerCase().trim();
+        return itemSubId === sIdLower || 
+               itemSubName === sIdLower || 
+               itemSubId.includes(sIdLower) || 
+               sIdLower.includes(itemSubId) ||
+               itemSubName.includes(sIdLower) ||
+               sIdLower.includes(itemSubName);
+      });
+    }
+
+    // Filter by term
+    if (term && term !== 'all' && term.trim()) {
+      const termLower = term.toLowerCase().trim();
+      filtered = filtered.filter(item => {
+        if (!item.term) return true;
+        return item.term.toLowerCase().trim() === termLower;
+      });
+    }
+
+    // Filter by exam year
+    if (examYear && examYear !== 'all' && examYear.trim()) {
+      const eyStr = examYear.toString().trim();
+      filtered = filtered.filter(item => {
+        if (!item.exam_year && !item.academic_year) return true;
+        return item.exam_year?.toString() === eyStr || item.academic_year?.toString() === eyStr;
+      });
+    }
+
+    // Filter by college
+    if (collegeId === 'all') {
+      // Admin sees everything
+    } else if (collegeId && collegeId !== '0') {
+      // Returns chosen college materials AND universal/general materials
+      filtered = filtered.filter(item => {
+        return item.college_id === collegeId || 
+               !item.college_id || 
+               item.college_id === '0' ||
+               (item.college_name && item.college_name.toLowerCase().includes(collegeId.toLowerCase()));
+      });
+    } else if (collegeId === '0' || collegeId === '') {
+      // General materials without a specific college restriction
+      filtered = filtered.filter(item => !item.college_id || item.college_id === '0');
+    }
+
+    // Sort newest first
+    filtered.sort((a, b) => {
+      const tA = a.created_at?.toDate ? a.created_at.toDate().getTime() : 0;
+      const tB = b.created_at?.toDate ? b.created_at.toDate().getTime() : 0;
+      return tB - tA;
+    });
+
+    return filtered;
+  } catch (error) {
+    console.error("getContent error:", error);
+    return [];
   }
 };
 
 export const upvoteContent = async (id: string, userId: string) => {
-  const ref = doc(db, 'contributions', id);
-  const docSnap = await getDoc(ref);
+  let ref = doc(db, 'contributions', id);
+  let docSnap = await getDoc(ref);
+  let collectionName = 'contributions';
+
+  if (!docSnap.exists()) {
+    ref = doc(db, 'academic_resources', id);
+    docSnap = await getDoc(ref);
+    collectionName = 'academic_resources';
+  }
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     const upvotedBy = data.upvoted_by || [];
     const downvotedBy = data.downvoted_by || [];
     
     if (upvotedBy.includes(userId)) {
-      // Already upvoted, remove upvote
       await updateDoc(ref, { 
         upvotes: Math.max(0, (data.upvotes || 0) - 1),
         upvoted_by: upvotedBy.filter((uid: string) => uid !== userId)
       });
       return { action: 'removed_upvote' };
     } else {
-      // Add upvote, remove downvote if exists
       const newDownvotes = downvotedBy.includes(userId) ? Math.max(0, (data.downvotes || 0) - 1) : (data.downvotes || 0);
       await updateDoc(ref, { 
         upvotes: (data.upvotes || 0) + 1,
@@ -460,22 +599,26 @@ export const upvoteContent = async (id: string, userId: string) => {
 };
 
 export const downvoteContent = async (id: string, userId: string) => {
-  const ref = doc(db, 'contributions', id);
-  const docSnap = await getDoc(ref);
+  let ref = doc(db, 'contributions', id);
+  let docSnap = await getDoc(ref);
+
+  if (!docSnap.exists()) {
+    ref = doc(db, 'academic_resources', id);
+    docSnap = await getDoc(ref);
+  }
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     const upvotedBy = data.upvoted_by || [];
     const downvotedBy = data.downvoted_by || [];
     
     if (downvotedBy.includes(userId)) {
-      // Already downvoted, remove downvote
       await updateDoc(ref, { 
         downvotes: Math.max(0, (data.downvotes || 0) - 1),
         downvoted_by: downvotedBy.filter((uid: string) => uid !== userId)
       });
       return { action: 'removed_downvote' };
     } else {
-      // Add downvote, remove upvote if exists
       const newUpvotes = upvotedBy.includes(userId) ? Math.max(0, (data.upvotes || 0) - 1) : (data.upvotes || 0);
       await updateDoc(ref, { 
         downvotes: (data.downvotes || 0) + 1,
@@ -490,8 +633,14 @@ export const downvoteContent = async (id: string, userId: string) => {
 };
 
 export const rateContent = async (id: string, rating: number) => {
-  const ref = doc(db, 'contributions', id);
-  const docSnap = await getDoc(ref);
+  let ref = doc(db, 'contributions', id);
+  let docSnap = await getDoc(ref);
+
+  if (!docSnap.exists()) {
+    ref = doc(db, 'academic_resources', id);
+    docSnap = await getDoc(ref);
+  }
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     const currentRating = data.rating || 0;
@@ -502,7 +651,13 @@ export const rateContent = async (id: string, rating: number) => {
 };
 
 export const reportContent = async (id: string, reason: string, reporterName: string = 'Unknown') => {
-  const ref = doc(db, 'contributions', id);
+  let ref = doc(db, 'contributions', id);
+  let docSnap = await getDoc(ref);
+
+  if (!docSnap.exists()) {
+    ref = doc(db, 'academic_resources', id);
+  }
+
   await updateDoc(ref, { 
     reported: true, 
     report_reason: reason,
@@ -512,7 +667,13 @@ export const reportContent = async (id: string, reason: string, reporterName: st
 };
 
 export const updateSolutionStatus = async (id: string, status: string) => {
-  const ref = doc(db, 'contributions', id);
+  let ref = doc(db, 'contributions', id);
+  let docSnap = await getDoc(ref);
+
+  if (!docSnap.exists()) {
+    ref = doc(db, 'academic_resources', id);
+  }
+
   await updateDoc(ref, { solution_status: status });
 };
 

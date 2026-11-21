@@ -11,7 +11,7 @@ export const ViewerPage = () => {
   useEffect(() => {
     document.title = title;
     return () => {
-      document.title = 'BCA Notes Nepal';
+      document.title = 'Hamro +2 Hub - Document Viewer';
     };
   }, [title]);
 

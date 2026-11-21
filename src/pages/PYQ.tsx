@@ -98,11 +98,7 @@ export const PYQ = () => {
 
   // Fetch content list
   useEffect(() => {
-    if (filterSubject) {
-      getContent('pyq', filterSubject, filterYear, filterTerm, filterExamYear, filterCollege).then(data => setContent(data));
-    } else {
-      setContent([]);
-    }
+    getContent('pyq', filterSubject || undefined, filterYear, filterTerm, filterExamYear, filterCollege).then(data => setContent(data));
   }, [filterSubject, filterYear, filterTerm, filterExamYear, filterCollege]);
 
   const handleUpvote = async (id: string) => {
@@ -266,11 +262,8 @@ export const PYQ = () => {
               value={filterSubject}
               onChange={(e) => setFilterSubject(e.target.value)}
             >
-              {subjects.length === 0 ? (
-                <option value="">No Subjects</option>
-              ) : (
-                subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
-              )}
+              <option value="">All Subjects</option>
+              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           {/* 5. Term */}

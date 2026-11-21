@@ -36,12 +36,8 @@ export const Syllabus = () => {
 
   // Fetch content based on active subject and tab
   useEffect(() => {
-    if (activeSubject) {
-      const fetchCollegeId = user?.college_id;
-      getContent(activeTab, activeSubject.id, year, undefined, undefined, fetchCollegeId).then(data => setContent(data));
-    } else {
-      setContent([]);
-    }
+    const fetchCollegeId = user?.college_id;
+    getContent(activeTab, activeSubject?.id || activeSubject?.name || undefined, year, undefined, undefined, fetchCollegeId).then(data => setContent(data));
   }, [activeSubject, activeTab, user?.college_id, year]);
 
   const openViewer = (url: string, title: string, allowDownload: boolean = false) => {
