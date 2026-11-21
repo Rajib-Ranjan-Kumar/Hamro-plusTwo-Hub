@@ -51,6 +51,15 @@ export const AdminSettings = () => {
     }
   };
 
+  const handleTogglePremiumMode = async (newVal: boolean) => {
+    setPremiumOnlyMode(newVal);
+    try {
+      await updateGlobalSettings({ premium_only_mode: newVal });
+    } catch (err) {
+      console.error("Failed to update premium bypass setting:", err);
+    }
+  };
+
   const handleSaveGeneral = async () => {
     try {
       setSaving(true);
@@ -217,21 +226,21 @@ export const AdminSettings = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white text-base">Premium Content Access</span>
+                          <span className="font-semibold text-white text-base">Subscription Paywall & Content Access</span>
                           {premiumOnlyMode ? (
                             <span className="px-2.5 py-0.5 text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full">
-                              ENFORCED (ON)
+                              PAYWALL ENFORCED (STRICT)
                             </span>
                           ) : (
                             <span className="px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">
-                              GLOBAL BYPASS (OFF)
+                              GLOBAL FREE BYPASS (ACTIVE)
                             </span>
                           )}
                         </div>
                         <p className="text-sm text-slate-400">
                           {premiumOnlyMode 
-                            ? 'Strict Mode: Subscription enforcement is active. Only active subscribers and admins can view premium materials.'
-                            : 'Bypass Mode: All premium materials (PYQs, Syllabus, Notes, Chat) are accessible to all users for free. "Get Premium" options and membership links are hidden from users.'}
+                            ? 'Strict Mode: Subscription paywall is strictly enforced. Free users must upgrade to view premium materials. "Get Premium" and pricing options are visible.'
+                            : 'Free Bypass Mode: All study materials (PYQs, Syllabus, Notes, Chat) are 100% free for all students. "Get Premium" options and upgrade banners are automatically hidden.'}
                         </p>
                       </div>
 
@@ -241,9 +250,9 @@ export const AdminSettings = () => {
                           className="sr-only peer" 
                           checked={premiumOnlyMode}
                           disabled={saving || loading}
-                          onChange={(e) => setPremiumOnlyMode(e.target.checked)}
+                          onChange={(e) => handleTogglePremiumMode(e.target.checked)}
                         />
-                        <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
+                        <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-amber-600"></div>
                       </label>
                     </div>
                   </div>

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 
 const navItems = [
+  { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'PYQs', path: '/pyq', icon: FileText, premium: true },
   { name: 'Syllabus & Notes', path: '/syllabus', icon: BookOpen, premium: true },
   { name: 'Chat', path: '/chat', icon: MessageSquare },
@@ -84,6 +85,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
               <NavLink
                 key={item.name}
                 to={item.path}
+                end={item.path === '/'}
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
