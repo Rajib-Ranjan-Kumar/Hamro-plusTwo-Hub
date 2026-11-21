@@ -53,9 +53,9 @@ export const About: React.FC = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-700/60 relative overflow-hidden group"
+          className="bg-slate-900/85 p-6 sm:p-8 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl hover:border-amber-500/40 transition-all relative overflow-hidden group"
         >
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-5">
             <Target className="w-6 h-6" />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Our Mission</h2>
@@ -70,9 +70,9 @@ export const About: React.FC = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-700/60 relative overflow-hidden group"
+          className="bg-slate-900/85 p-6 sm:p-8 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl hover:border-amber-500/40 transition-all relative overflow-hidden group"
         >
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-5">
             <Award className="w-6 h-6" />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Our Vision</h2>
@@ -134,7 +134,7 @@ export const About: React.FC = () => {
           ].map((pillar, idx) => (
             <div 
               key={idx}
-              className="glass-panel p-5 sm:p-6 rounded-2xl border border-slate-700/50 hover:border-slate-600 transition-all flex flex-col justify-between"
+              className="bg-slate-900/85 p-5 sm:p-6 rounded-2xl border border-slate-700/60 hover:border-amber-500/40 shadow-sm backdrop-blur-md transition-all flex flex-col justify-between"
             >
               <div>
                 <div className={`w-10 h-10 rounded-xl border flex items-center justify-center mb-4 ${pillar.color}`}>
@@ -149,14 +149,14 @@ export const About: React.FC = () => {
       </div>
 
       {/* Community Impact Numbers */}
-      <div className="glass-panel p-6 sm:p-10 rounded-2xl border border-slate-700/60 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/90">
+      <div className="rounded-3xl bg-slate-900/90 border border-slate-700/60 shadow-xl backdrop-blur-xl p-6 sm:p-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="space-y-1">
             <p className="text-3xl sm:text-4xl font-black text-[#F4B400]">2+</p>
             <p className="text-xs sm:text-sm text-slate-400 font-medium">Streams (Science & Mgmt)</p>
           </div>
           <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-black text-emerald-400">1000+</p>
+            <p className="text-3xl sm:text-4xl font-black text-amber-400">1000+</p>
             <p className="text-xs sm:text-sm text-slate-400 font-medium">Question Papers & Solutions</p>
           </div>
           <div className="space-y-1">
@@ -171,13 +171,13 @@ export const About: React.FC = () => {
       </div>
 
       {/* How Students Can Get Involved */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-700/60 space-y-6">
+      <div className="rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-white">How You Can Benefit</h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">Get the most out of Hamro +2 Hub in 3 simple steps.</p>
           </div>
-          <span className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-full w-fit">
+          <span className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-1.5 rounded-full w-fit">
             <Heart className="w-3.5 h-3.5 fill-current" /> Made by Students, for Students
           </span>
         </div>
@@ -194,7 +194,7 @@ export const About: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <div className="w-8 h-8 rounded-full bg-slate-800 text-emerald-400 font-bold text-sm flex items-center justify-center border border-slate-700">
+            <div className="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold text-sm flex items-center justify-center border border-slate-700">
               2
             </div>
             <h3 className="font-bold text-white text-base">Study Structured Notes</h3>
@@ -216,7 +216,7 @@ export const About: React.FC = () => {
       </div>
 
       {/* CTA Banner */}
-      <div className="p-8 sm:p-10 rounded-2xl bg-gradient-to-r from-amber-500/20 via-slate-900 to-emerald-500/20 border border-amber-400/30 text-center space-y-4">
+      <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-amber-500/15 via-slate-900/95 to-amber-500/10 border border-amber-500/30 shadow-2xl backdrop-blur-xl text-center space-y-4">
         <h2 className="text-2xl sm:text-3xl font-black text-white">Ready to ace your +2 exams?</h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
           Start exploring past papers, download verified notes, or join thousands of students preparing smarter today.

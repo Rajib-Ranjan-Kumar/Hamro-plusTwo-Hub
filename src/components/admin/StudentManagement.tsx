@@ -212,7 +212,7 @@ export const StudentManagement = () => {
   return (
     <div className="space-y-5">
       {/* Search & Filters Header */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#111827] border border-white/10 space-y-3.5 shadow-sm">
+      <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 space-y-4 shadow-xl backdrop-blur-xl">
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -286,7 +286,7 @@ export const StudentManagement = () => {
       </div>
 
       {/* Modern SaaS Table */}
-      <div className="rounded-2xl bg-[#111827] border border-white/10 overflow-hidden shadow-sm">
+      <div className="rounded-3xl bg-slate-900/85 border border-slate-700/60 overflow-hidden shadow-xl backdrop-blur-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>

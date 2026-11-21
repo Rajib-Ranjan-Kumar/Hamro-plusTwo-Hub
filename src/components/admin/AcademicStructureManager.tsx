@@ -940,8 +940,8 @@ export const AcademicStructureManager: React.FC<AcademicStructureManagerProps> =
 
       {/* Add / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-[#111827] border border-white/10 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="bg-slate-900/95 border border-slate-700/80 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl backdrop-blur-xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Plus className="w-5 h-5 text-[#F4B400]" />
@@ -1157,8 +1157,8 @@ export const AcademicStructureManager: React.FC<AcademicStructureManagerProps> =
 
       {/* Safe Delete & Dependency Warning Modal */}
       {isDeleteModalOpen && deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-[#111827] border border-rose-500/30 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="bg-slate-900/95 border border-rose-500/40 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl backdrop-blur-xl space-y-5">
             <div className="flex items-center gap-3 text-rose-400">
               <div className="p-2.5 bg-rose-950/60 rounded-xl border border-rose-800/50">
                 <AlertTriangle className="w-6 h-6" />

@@ -79,17 +79,17 @@ export const Contact = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Contact Information (Managed only by Admin) */}
         <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-          <div className="bg-slate-800/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-slate-700 shadow-sm">
-            <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6">Get in Touch</h3>
+          <div className="bg-slate-900/85 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-700/60 shadow-xl">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-4 sm:mb-6">Get in Touch</h3>
             
             <div className="space-y-4 sm:space-y-6">
               {/* Email */}
               <div className="flex items-start gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-amber-400/10 text-[#F5C21B] border border-amber-400/20 rounded-xl shrink-0">
+                <div className="p-2.5 sm:p-3 bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 rounded-2xl shrink-0 shadow-sm">
                   <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-white">Official Support Email</p>
+                  <p className="text-xs sm:text-sm font-semibold text-white">Official Support Email</p>
                   <a 
                     href={`mailto:${supportEmail}`} 
                     className="text-xs sm:text-sm text-slate-300 hover:text-[#F5C21B] transition-colors break-all font-mono"
@@ -101,14 +101,14 @@ export const Contact = () => {
 
               {/* Phone */}
               <div className="flex items-start gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl shrink-0">
+                <div className="p-2.5 sm:p-3 bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-2xl shrink-0 shadow-sm">
                   <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-white">Phone / Helpline</p>
+                  <p className="text-xs sm:text-sm font-semibold text-white">Phone / Helpline</p>
                   <a 
                     href={`tel:${supportPhone}`} 
-                    className="text-xs sm:text-sm text-slate-300 hover:text-emerald-400 transition-colors font-mono"
+                    className="text-xs sm:text-sm text-slate-300 hover:text-amber-400 transition-colors font-mono"
                   >
                     {supportPhone}
                   </a>
@@ -117,22 +117,22 @@ export const Contact = () => {
 
               {/* Location */}
               <div className="flex items-start gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl shrink-0">
+                <div className="p-2.5 sm:p-3 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-2xl shrink-0 shadow-sm">
                   <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-white">Location</p>
+                  <p className="text-xs sm:text-sm font-semibold text-white">Location</p>
                   <p className="text-xs sm:text-sm text-slate-300">{contactLocation}</p>
                 </div>
               </div>
 
               {/* Hours */}
               <div className="flex items-start gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl shrink-0">
+                <div className="p-2.5 sm:p-3 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-2xl shrink-0 shadow-sm">
                   <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-white">Support Hours</p>
+                  <p className="text-xs sm:text-sm font-semibold text-white">Support Hours</p>
                   <p className="text-xs sm:text-sm text-slate-300">{contactHours}</p>
                 </div>
               </div>
@@ -142,14 +142,14 @@ export const Contact = () => {
 
         {/* Contact Form */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-800/90 backdrop-blur-md p-4 sm:p-6 md:p-8 rounded-2xl border border-slate-700 shadow-sm">
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Send us a Message</h3>
+          <div className="bg-slate-900/85 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-3xl border border-slate-700/60 shadow-xl">
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Send us a Message</h3>
             
             {status.message && (
               <div className={`p-3.5 sm:p-4 rounded-xl mb-6 text-xs sm:text-sm ${
                 status.type === 'success' 
-                  ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
-                  : 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
+                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30' 
+                  : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
               }`}>
                 {status.message}
               </div>
@@ -167,7 +167,7 @@ export const Contact = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-[#F5C21B] text-white transition-colors text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all text-sm"
                     placeholder="e.g. Aarav Sharma"
                   />
                 </div>
@@ -181,7 +181,7 @@ export const Contact = () => {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-[#F5C21B] text-white transition-colors text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all text-sm"
                     placeholder="aarav@example.com"
                   />
                 </div>
@@ -197,7 +197,7 @@ export const Contact = () => {
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-[#F5C21B] text-white transition-colors text-sm"
+                  className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all text-sm"
                   placeholder="e.g. Question Paper Contribution Inquiry"
                 />
               </div>
@@ -212,7 +212,7 @@ export const Contact = () => {
                   rows={5}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-[#F5C21B] text-white transition-colors text-sm resize-none"
+                  className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all text-sm resize-none"
                   placeholder="How can we help you?"
                 />
               </div>
@@ -221,7 +221,7 @@ export const Contact = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                   <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>

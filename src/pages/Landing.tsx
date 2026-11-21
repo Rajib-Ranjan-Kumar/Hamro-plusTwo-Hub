@@ -611,7 +611,7 @@ export const Landing = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative w-full max-w-md bg-slate-800/98 border border-slate-700/80 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col justify-center"
+              className="relative w-full max-w-md bg-slate-900/95 border border-slate-700/80 backdrop-blur-xl rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col justify-center"
             >
               {/* Close Button */}
               <button 
@@ -641,11 +641,11 @@ export const Landing = () => {
               <button
                 onClick={handleGoogleLogin}
                 disabled={isLoggingIn}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-bold rounded-full transition-all border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] cursor-pointer"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isLoggingIn ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin text-slate-800" />
+                    <Loader2 className="w-5 h-5 animate-spin text-slate-950" />
                     <span>Signing in...</span>
                   </>
                 ) : (

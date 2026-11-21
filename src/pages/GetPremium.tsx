@@ -148,14 +148,14 @@ export const GetPremium = () => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-2xl mx-auto text-center py-12 space-y-6 glass-panel rounded-3xl p-12"
+        className="max-w-2xl mx-auto text-center py-12 space-y-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 p-8 sm:p-12 shadow-xl backdrop-blur-xl"
       >
-        <div className="inline-flex p-4 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-          <Crown className="w-12 h-12 text-amber-500 fill-amber-500" />
+        <div className="inline-flex p-4 bg-amber-500/15 border border-amber-500/30 rounded-2xl">
+          <Crown className="w-12 h-12 text-[#F5C21B] fill-[#F5C21B]" />
         </div>
-        <h1 className="text-3xl font-bold text-white">You are a Premium Member!</h1>
-        <p className="text-slate-400">
-          Enjoy unlimited access to PYQs, Syllabus, and Notes.
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">You are a Premium Member!</h1>
+        <p className="text-slate-400 text-sm max-w-md mx-auto">
+          Enjoy unlimited, high-speed access to all Past Year Question Papers, complete chapter notes, and curriculum guides.
         </p>
       </motion.div>
     );
@@ -166,15 +166,14 @@ export const GetPremium = () => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-2xl mx-auto text-center py-12 space-y-6 glass-panel rounded-3xl p-12"
+        className="max-w-2xl mx-auto text-center py-12 space-y-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 p-8 sm:p-12 shadow-xl backdrop-blur-xl"
       >
-        <div className="inline-flex p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-          <Clock className="w-12 h-12 text-blue-500" />
+        <div className="inline-flex p-4 bg-blue-500/15 border border-blue-500/30 rounded-2xl">
+          <Clock className="w-12 h-12 text-blue-400" />
         </div>
-        <h1 className="text-3xl font-bold text-white">Request Pending</h1>
-        <p className="text-slate-400">
-          Your premium subscription request is currently being reviewed by an administrator. 
-          Please check back later.
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Request Under Review</h1>
+        <p className="text-slate-400 text-sm max-w-md mx-auto">
+          Your payment receipt has been submitted and is currently being verified by an administrator. Please check back shortly!
         </p>
       </motion.div>
     );
@@ -184,78 +183,96 @@ export const GetPremium = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-8 pb-12"
+      className="max-w-5xl mx-auto space-y-6 sm:space-y-8 pb-12"
     >
-      <div className="text-center space-y-3 sm:space-y-4 px-2">
-        <div className="inline-flex p-2.5 sm:p-3 bg-amber-100 dark:bg-amber-900/30 rounded-2xl">
-          <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500" />
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-slate-700/60 shadow-xl backdrop-blur-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+              Full Academic Pass
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Upgrade to Premium
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-lg">
+            Unlock complete solutions, terminal exam question papers, verified high-yield revision summaries, and 24/7 AI tutor assistance.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white">Upgrade to Premium</h1>
-        <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
-          Get exclusive access to all Past Year Questions (PYQs), detailed Syllabus, and comprehensive Notes.
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Payment Info Section */}
-        <div className="glass-panel rounded-2xl p-4 sm:p-6 space-y-6">
-          <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-emerald-400" />
-            Payment Details
-          </h2>
+        <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-lg backdrop-blur-md space-y-6">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-800">
+            <div className="p-2 rounded-xl bg-amber-500/10 text-[#F5C21B]">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">Payment Options</h2>
+              <p className="text-xs text-slate-400">Scan QR or direct bank transfer</p>
+            </div>
+          </div>
           
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#F5C21B]" />
             </div>
           ) : paymentInfo ? (
             <div className="space-y-6">
               {paymentInfo.esewa_qr_url && (
                 <div className="text-center space-y-2">
-                  <p className="text-xs sm:text-sm font-medium text-slate-400">Scan QR to Pay via eSewa</p>
-                  <div className="bg-white/50 dark:bg-slate-900/50 p-3 sm:p-4 rounded-xl inline-block border border-slate-700/50 backdrop-blur-sm max-w-full">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Scan QR with eSewa</p>
+                  <div className="bg-slate-950/80 p-3 sm:p-4 rounded-2xl inline-block border border-slate-800 shadow-md">
                     <img 
                       src={paymentInfo.esewa_qr_url} 
                       alt="eSewa QR" 
-                      className="w-40 h-40 sm:w-48 sm:h-48 object-contain mx-auto"
+                      className="w-40 h-40 sm:w-44 sm:h-44 object-contain mx-auto rounded-lg"
                       referrerPolicy="no-referrer"
                     />
                   </div>
                 </div>
               )}
               
-              <div className="space-y-3 bg-emerald-50 dark:bg-emerald-900/20 p-3.5 sm:p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
-                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Bank Transfer Details</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs sm:text-sm">
+              <div className="space-y-3 bg-slate-950/70 p-4 rounded-2xl border border-slate-800 text-xs sm:text-sm">
+                <p className="text-xs font-bold text-[#F5C21B] uppercase tracking-wider">Bank Transfer Details</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
                   <span className="text-slate-400">Bank Name:</span>
-                  <span className="font-medium text-white break-words">{paymentInfo.bank_name || 'N/A'}</span>
+                  <span className="font-semibold text-white break-words">{paymentInfo.bank_name || 'N/A'}</span>
                   <span className="text-slate-400">Account Holder:</span>
-                  <span className="font-medium text-white break-words">{paymentInfo.account_holder || 'N/A'}</span>
+                  <span className="font-semibold text-white break-words">{paymentInfo.account_holder || 'N/A'}</span>
                   <span className="text-slate-400">Account Number:</span>
-                  <span className="font-medium text-white font-mono break-all">{paymentInfo.account_number || 'N/A'}</span>
+                  <span className="font-semibold text-white font-mono break-all">{paymentInfo.account_number || 'N/A'}</span>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-              <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-2" />
-              <p className="text-slate-500 text-sm">Admin hasn't set up payment info yet.</p>
+            <div className="text-center py-12 bg-slate-950/60 rounded-2xl border border-dashed border-slate-800">
+              <AlertCircle className="w-10 h-10 text-slate-500 mx-auto mb-2" />
+              <p className="text-slate-400 text-xs">Payment options are currently being updated.</p>
             </div>
           )}
         </div>
 
         {/* Upload Section */}
-        <div className="glass-panel rounded-2xl p-4 sm:p-6 space-y-6">
-          <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-            <Upload className="w-5 h-5 text-emerald-400" />
-            Upload Proof
-          </h2>
+        <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-lg backdrop-blur-md space-y-6">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-800">
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <Upload className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">Upload Receipt Proof</h2>
+              <p className="text-xs text-slate-400">Submit screenshot to activate subscription</p>
+            </div>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {status && (
               <div className={cn(
-                "p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm flex items-start gap-3",
-                status.type === 'success' ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                "p-3.5 rounded-xl text-xs sm:text-sm flex items-start gap-3",
+                status.type === 'success' ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
               )}>
                 {status.type === 'success' ? <CheckCircle className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
                 <span>{status.message}</span>
@@ -264,24 +281,24 @@ export const GetPremium = () => {
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Plan</label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Plan</label>
                   <select
                     value={planSelected}
                     onChange={(e) => setPlanSelected(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all cursor-pointer"
                   >
                     <option value="Basic">Basic</option>
                     <option value="Premium">Premium</option>
                     <option value="Pro">Pro</option>
                   </select>
                 </div>
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Payment Method</label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Method</label>
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all cursor-pointer"
                   >
                     <option value="eSewa">eSewa</option>
                     <option value="Bank Transfer">Bank Transfer</option>
@@ -291,25 +308,25 @@ export const GetPremium = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Amount Paid</label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Amount Paid</label>
                   <input
                     type="number"
                     required
                     value={amountPaid}
                     onChange={(e) => setAmountPaid(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all placeholder-slate-500"
                     placeholder="e.g. 500"
                   />
                 </div>
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-slate-300">Transaction ID</label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Transaction ID</label>
                   <input
                     type="text"
                     required
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all placeholder-slate-500"
                     placeholder="e.g. 123456789"
                   />
                 </div>
@@ -317,26 +334,26 @@ export const GetPremium = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs sm:text-sm font-medium text-slate-300">Transaction Screenshot</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Payment Screenshot</label>
               <div 
                 className={cn(
-                  "relative border-2 border-dashed rounded-xl transition-all flex flex-col items-center justify-center p-5 sm:p-8 text-center cursor-pointer",
-                  previewUrl ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/10" : "border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50"
+                  "relative border-2 border-dashed rounded-2xl transition-all flex flex-col items-center justify-center p-5 sm:p-6 text-center cursor-pointer bg-slate-950/50",
+                  previewUrl ? "border-emerald-500/50 bg-emerald-500/10" : "border-slate-700 hover:border-amber-500/60 hover:bg-slate-950/80"
                 )}
                 onClick={() => document.getElementById('screenshot-upload')?.click()}
               >
                 {previewUrl ? (
-                  <div className="space-y-4">
-                    <img src={previewUrl} alt="Preview" referrerPolicy="no-referrer" className="max-h-48 rounded-lg shadow-md mx-auto" />
-                    <p className="text-xs text-emerald-600 font-medium">Click to change image</p>
+                  <div className="space-y-2">
+                    <img src={previewUrl} alt="Preview" referrerPolicy="no-referrer" className="max-h-40 rounded-xl shadow-md mx-auto" />
+                    <p className="text-xs text-emerald-400 font-semibold">Click to change screenshot</p>
                   </div>
                 ) : (
                   <>
-                    <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-full mb-4">
-                      <Upload className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/20 text-[#F5C21B] rounded-2xl mb-2">
+                      <Upload className="w-5 h-5" />
                     </div>
-                    <p className="text-sm font-medium text-white">Click to upload screenshot</p>
-                    <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 5MB</p>
+                    <p className="text-xs font-bold text-white">Click or tap to upload receipt</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">PNG, JPG up to 5MB</p>
                   </>
                 )}
                 <input 
@@ -352,12 +369,12 @@ export const GetPremium = () => {
             <button
               type="submit"
               disabled={isSubmitting || !file}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white font-bold rounded-full transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 hover-lift"
+              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Submitting...
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-950" />
+                  Submitting Verification...
                 </>
               ) : (
                 <>

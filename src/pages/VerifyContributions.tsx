@@ -185,7 +185,7 @@ export const VerifyContributions = () => {
           ) : filteredRequests.length > 0 ? (
             <div className="grid gap-6">
               {filteredRequests.map((item) => (
-                <div key={item.id} className="glass-panel rounded-2xl p-6 border border-slate-700 space-y-4">
+                <div key={item.id} className="bg-slate-900/85 rounded-3xl p-6 border border-slate-700/60 shadow-xl backdrop-blur-xl space-y-4 hover:border-amber-500/40 transition-all">
                   <div className="flex flex-col md:flex-row justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -346,7 +346,7 @@ export const VerifyContributions = () => {
             <History className="w-5 h-5 text-emerald-500" />
             Recent History
           </h2>
-          <div className="glass-panel rounded-2xl overflow-hidden">
+          <div className="bg-slate-900/85 rounded-3xl overflow-hidden border border-slate-700/60 shadow-xl backdrop-blur-xl">
             <div className="divide-y divide-slate-100 dark:divide-slate-700">
               {filteredHistory.slice(0, 10).map((item) => (
                 <div key={item.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">

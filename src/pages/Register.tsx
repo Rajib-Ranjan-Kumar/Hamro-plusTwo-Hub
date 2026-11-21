@@ -175,29 +175,34 @@ export const Register = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 max-w-md w-full bg-slate-800/95 border border-slate-700/80 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col justify-center my-8"
+        className="relative z-10 max-w-md w-full bg-slate-900/90 border border-slate-700/60 backdrop-blur-xl rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col justify-center my-8 overflow-hidden"
       >
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="text-center mb-6 sm:mb-8 relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 mb-3">
+            <span>Student Registration</span>
+          </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight">Create an Account</h2>
-          <p className="text-slate-400 text-xs sm:text-sm">Join thousands of +2 students in Nepal.</p>
+          <p className="text-slate-400 text-xs sm:text-sm">Join thousands of +2 students across Nepal.</p>
         </div>
 
         {isLocked && (
-          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3 text-rose-400 animate-in fade-in">
+          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-start gap-3 text-rose-400 animate-in fade-in">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             <p className="text-sm">Too many failed attempts. Please try again later.</p>
           </div>
         )}
 
         {error && !isLocked && (
-          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3 text-rose-400 animate-in fade-in">
+          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-start gap-3 text-rose-400 animate-in fade-in">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             <p className="text-sm">{error}</p>
           </div>
         )}
 
         {message && (
-          <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start gap-3 text-emerald-400 animate-in fade-in">
+          <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-start gap-3 text-emerald-400 animate-in fade-in">
             <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
             <p className="text-sm">{message}</p>
           </div>
@@ -206,7 +211,7 @@ export const Register = () => {
         <button
           onClick={handleGoogleRegister}
           disabled={isSubmitting || isLocked}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full transition-all border border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover-lift"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-950/70 hover:bg-slate-800/80 text-white font-bold rounded-2xl transition-all border border-slate-700/80 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-md cursor-pointer"
         >
           {isSubmitting ? (
             <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
@@ -218,14 +223,14 @@ export const Register = () => {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              <span>Sign up with Google</span>
+              <span>Continue with Google</span>
             </>
           )}
         </button>
 
         <p className="mt-8 text-center text-sm text-slate-400">
           Already have an account?{' '}
-          <Link to="/login" className="text-[#F4B400] hover:text-[#FFC107] font-bold transition-colors">
+          <Link to="/login" className="text-[#F5C21B] hover:text-amber-300 font-bold transition-colors">
             Sign in
           </Link>
         </p>

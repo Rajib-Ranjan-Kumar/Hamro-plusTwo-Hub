@@ -345,7 +345,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
             <div
               key={idx}
               onClick={() => onNavigateTab && onNavigateTab(card.tab)}
-              className="p-5 rounded-2xl bg-[#111827] border border-white/10 hover:border-white/20 transition-all cursor-pointer group shadow-sm hover:shadow-md"
+              className="p-5 rounded-3xl bg-slate-900/85 border border-slate-700/60 hover:border-amber-500/40 transition-all cursor-pointer group shadow-xl backdrop-blur-xl"
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300">{card.title}</span>
@@ -365,7 +365,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
       {/* Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart 1: Student Registration Growth */}
-        <div className="p-5 rounded-2xl bg-[#111827] border border-white/10 shadow-sm space-y-4">
+        <div className="p-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-white">Student Registration Trend</h3>
@@ -409,7 +409,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
         </div>
 
         {/* Chart 2: Resource Upload Breakdown */}
-        <div className="p-5 rounded-2xl bg-[#111827] border border-white/10 shadow-sm space-y-4">
+        <div className="p-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-white">Educational Resources by Type</h3>
@@ -438,7 +438,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
         </div>
 
         {/* Chart 3: Contribution Moderation Pipeline */}
-        <div className="p-5 rounded-2xl bg-[#111827] border border-white/10 shadow-sm space-y-4">
+        <div className="p-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl space-y-4">
           <div>
             <h3 className="text-sm font-bold text-white">Contribution Moderation Pipeline</h3>
             <p className="text-[11px] text-slate-400">Current status of peer-submitted academic papers</p>
@@ -464,7 +464,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
         </div>
 
         {/* Chart 4: Subscriptions & Pro Access */}
-        <div className="p-5 rounded-2xl bg-[#111827] border border-white/10 shadow-sm space-y-4">
+        <div className="p-6 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-white">Subscription Plan Distribution</h3>

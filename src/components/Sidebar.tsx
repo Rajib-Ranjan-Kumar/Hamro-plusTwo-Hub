@@ -89,16 +89,16 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group hover-lift",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
                     isActive 
-                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300" 
-                      : "text-slate-600 hover:bg-slate-50/50 dark:text-slate-400 dark:hover:bg-slate-700/30"
+                      ? "bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <item.icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                    <item.icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-[#F5C21B]' : 'text-slate-400 group-hover:text-white'}`} />
                     {item.name}
                   </>
                 )}
@@ -112,19 +112,19 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
               onClick={() => setIsOpen(false)}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors mt-4 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800",
-                  isActive && "ring-2 ring-amber-500 ring-offset-2"
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all mt-4 bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25",
+                  isActive && "ring-2 ring-amber-500 ring-offset-2 ring-offset-slate-900"
                 )
               }
             >
-              <Crown className="w-5 h-5" />
+              <Crown className="w-5 h-5 text-amber-400" />
               Get Premium
             </NavLink>
           )}
 
           {user?.role === 'admin' && (
             <>
-              <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <div className="pt-4 pb-2 px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 Admin Control Center
               </div>
               <NavLink
@@ -133,10 +133,10 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                     isActive 
-                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      ? "bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >
@@ -148,10 +148,10 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                     isActive 
-                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      ? "bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >
@@ -163,10 +163,10 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                     isActive 
-                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      ? "bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >
@@ -178,10 +178,10 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                     isActive 
-                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      ? "bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >
@@ -193,10 +193,10 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                     isActive 
-                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      ? "bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >
@@ -208,10 +208,10 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                     isActive 
-                      ? "bg-[#F4B400]/15 text-[#F5C21B] font-semibold" 
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      ? "bg-amber-500/15 text-[#F5C21B] border border-amber-500/30 font-semibold shadow-sm" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent"
                   )
                 }
               >

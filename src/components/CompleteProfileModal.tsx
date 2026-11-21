@@ -58,26 +58,26 @@ export const CompleteProfileModal = () => {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-slate-700">
-          <h2 className="text-xl font-bold text-white">Complete Your Profile</h2>
-          <p className="text-sm text-slate-400 mt-1">Please select your college, stream, and year to continue.</p>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className="bg-slate-900/95 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-700/80 backdrop-blur-xl">
+        <div className="p-6 sm:p-8 border-b border-slate-700/60">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Complete Your Profile</h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">Please select your college, stream, and class to tailor your academic experience.</p>
         </div>
         
-        <div className="p-6">
+        <div className="p-6 sm:p-8">
           <form onSubmit={handleSave} className="space-y-5">
             {status && (
-              <div className="p-3 rounded-lg text-sm bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+              <div className="p-3.5 rounded-xl text-xs sm:text-sm bg-rose-500/10 text-rose-400 border border-rose-500/20">
                 {status}
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">College</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">College</label>
               <select 
                 required
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none transition-all cursor-pointer text-sm"
                 value={collegeId}
                 onChange={(e) => setCollegeId(e.target.value)}
               >
@@ -89,10 +89,10 @@ export const CompleteProfileModal = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Stream</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Stream</label>
               <select 
                 required
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none transition-all cursor-pointer text-sm"
                 value={stream}
                 onChange={(e) => setStream(e.target.value)}
               >
@@ -104,10 +104,10 @@ export const CompleteProfileModal = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Class</label>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Class</label>
               <select 
                 required
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                className="w-full px-4 py-2.5 bg-slate-950/70 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none transition-all cursor-pointer text-sm"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
               >
@@ -120,7 +120,7 @@ export const CompleteProfileModal = () => {
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium rounded-xl transition-colors flex items-center justify-center"
+              className="w-full py-3 mt-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center text-sm"
             >
               {isSubmitting ? 'Saving...' : 'Save & Continue'}
             </button>

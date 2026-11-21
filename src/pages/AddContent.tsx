@@ -492,73 +492,73 @@ export const AddContent = () => {
       </div>
 
       {/* Tabs */}
-      <div className="glass-panel rounded-2xl p-1 flex flex-wrap gap-1">
+      <div className="bg-slate-900/90 border border-slate-700/60 rounded-2xl p-1.5 flex flex-wrap gap-1.5 shadow-sm backdrop-blur-md">
         <button
           onClick={() => setActiveTab('add_content')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'add_content'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-amber-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <FileText className="w-4 h-4" /> Add Material
         </button>
         <button
           onClick={() => setActiveTab('add_college')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'add_college'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-amber-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <Building2 className="w-4 h-4" /> Add College
         </button>
         <button
           onClick={() => setActiveTab('add_subject')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'add_subject'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-amber-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <BookOpen className="w-4 h-4" /> Add Subject
         </button>
         <button
           onClick={() => setActiveTab('add_type')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'add_type'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-amber-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <Tag className="w-4 h-4" /> Add Content Type
         </button>
         <button
           onClick={() => setActiveTab('add_exam_year')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'add_exam_year'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-amber-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <Calendar className="w-4 h-4" /> Add Exam Year
         </button>
         <button
           onClick={() => setActiveTab('add_exam_timer')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'add_exam_timer'
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-amber-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <Clock className="w-4 h-4" /> Exam Timer
         </button>
         <button
           onClick={() => setActiveTab('manage_data')}
-          className={`px-4 py-2 text-sm font-medium rounded-xl transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'manage_data'
-              ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300'
-              : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+              ? 'bg-rose-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <Trash2 className="w-4 h-4" /> Manage / Delete
@@ -566,7 +566,7 @@ export const AddContent = () => {
       </div>
 
       {activeTab === 'add_content' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
             <h2 className="text-xl font-bold text-white">Add Official Material</h2>
             <p className="text-sm text-slate-400 mt-1">Publish verified PYQs, notes, or syllabus directly to the platform.</p>
@@ -779,7 +779,7 @@ export const AddContent = () => {
       )}
 
       {activeTab === 'add_college' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Add New College</h2>
             <p className="text-sm text-slate-400 mt-1">Add a new college to the platform database.</p>
@@ -826,7 +826,7 @@ export const AddContent = () => {
       )}
 
       {activeTab === 'add_subject' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Add New Subject</h2>
             <p className="text-sm text-slate-400 mt-1">Add a new subject for a specific college and year.</p>
@@ -897,7 +897,7 @@ export const AddContent = () => {
       )}
 
       {activeTab === 'add_type' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Add Content Type</h2>
             <p className="text-sm text-slate-400 mt-1">Add a new content type (e.g., Lab Manual, Assignment).</p>
@@ -958,7 +958,7 @@ export const AddContent = () => {
       )}
 
       {activeTab === 'add_exam_year' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Add Exam Year</h2>
             <p className="text-sm text-slate-400 mt-1">Add a specific exam year (e.g., 2019, 2018).</p>
@@ -1018,7 +1018,7 @@ export const AddContent = () => {
         </div>
       )}
       {activeTab === 'add_exam_timer' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Exam Timer</h2>
             <p className="text-sm text-slate-400 mt-1">Set the upcoming exam date and term for a specific college.</p>
@@ -1081,7 +1081,7 @@ export const AddContent = () => {
         </div>
       )}
       {activeTab === 'manage_data' && (
-        <div className="glass-panel rounded-2xl overflow-hidden">
+        <div className="bg-slate-900/85 border border-slate-700/60 rounded-3xl overflow-hidden shadow-xl backdrop-blur-xl">
           <div className="p-6 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-white flex items-center gap-2">

@@ -125,53 +125,53 @@ export const AdminSettings = () => {
           <nav className="space-y-1">
             <button
               onClick={() => setActiveTab('general')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'general'
-                  ? 'bg-slate-100 text-white dark:bg-slate-800 dark:text-white'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-white'
+                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
+                  : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
               }`}
             >
-              <Globe className={`w-4 h-4 ${activeTab === 'general' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              <Globe className={`w-4 h-4 ${activeTab === 'general' ? 'text-amber-400' : 'text-slate-400'}`} />
               General Settings
             </button>
             <button
               onClick={() => setActiveTab('contact')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'contact'
-                  ? 'bg-slate-100 text-white dark:bg-slate-800 dark:text-white'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-white'
+                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
+                  : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
               }`}
             >
-              <Mail className={`w-4 h-4 ${activeTab === 'contact' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              <Mail className={`w-4 h-4 ${activeTab === 'contact' ? 'text-amber-400' : 'text-slate-400'}`} />
               Contact Us Details
             </button>
             <button
               onClick={() => setActiveTab('security')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'security'
-                  ? 'bg-slate-100 text-white dark:bg-slate-800 dark:text-white'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-white'
+                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
+                  : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
               }`}
             >
-              <Shield className={`w-4 h-4 ${activeTab === 'security' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              <Shield className={`w-4 h-4 ${activeTab === 'security' ? 'text-amber-400' : 'text-slate-400'}`} />
               Security
             </button>
             <button
               onClick={() => setActiveTab('notifications')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'notifications'
-                  ? 'bg-slate-100 text-white dark:bg-slate-800 dark:text-white'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-white'
+                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
+                  : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
               }`}
             >
-              <Bell className={`w-4 h-4 ${activeTab === 'notifications' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              <Bell className={`w-4 h-4 ${activeTab === 'notifications' ? 'text-amber-400' : 'text-slate-400'}`} />
               Notifications
             </button>
             <button
               onClick={() => setActiveTab('danger')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'danger'
-                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30 shadow-sm'
                   : 'text-red-400/80 hover:bg-red-500/10 hover:text-red-300'
               }`}
             >
@@ -183,7 +183,7 @@ export const AdminSettings = () => {
 
         {/* Settings Content */}
         <div className="flex-1 min-w-0">
-          <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-sm p-6">
+          <div className="bg-slate-900/85 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl p-6 sm:p-8">
             
             {activeTab === 'general' && (
               <div className="space-y-6">
@@ -262,7 +262,7 @@ export const AdminSettings = () => {
                   <button 
                     onClick={handleSaveGeneral}
                     disabled={saving || loading}
-                    className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors shadow-sm cursor-pointer"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
                   >
                     <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -385,7 +385,7 @@ export const AdminSettings = () => {
                 </div>
 
                 <div className="pt-4 border-t border-slate-700 flex justify-end">
-                  <button className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">
+                  <button className="flex items-center gap-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md cursor-pointer">
                     <Save className="w-4 h-4" /> Update Password
                   </button>
                 </div>
@@ -453,7 +453,7 @@ export const AdminSettings = () => {
                   <button 
                     onClick={handleSaveNotifications}
                     disabled={saving || loading}
-                    className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
                   >
                     <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Preferences'}
                   </button>

@@ -72,20 +72,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (firebaseUser) {
           const idToken = await firebaseUser.getIdToken();
           setToken(idToken);
-          
+
           const userRef = doc(db, 'users', firebaseUser.uid);
           const userDoc = await getDoc(userRef);
-          
+
           let currentSessionId = localStorage.getItem(`session_${firebaseUser.uid}`);
-          
+
           // Check URL for session_id (used when opening new tabs from iframe to bypass storage partitioning)
           const urlParams = new URLSearchParams(window.location.search);
           const urlSessionId = urlParams.get('session_id');
-          
+
           if (urlSessionId) {
             currentSessionId = urlSessionId;
             localStorage.setItem(`session_${firebaseUser.uid}`, currentSessionId);
-            
+
             // Clean up URL
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.delete('session_id');
@@ -96,16 +96,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (isExplicitSignIn) {
             sessionStorage.removeItem('hamro_signing_in');
           }
-          
+
           if (userDoc.exists()) {
             const userData = userDoc.data() as User;
-            
+
             // Elevate role to 'admin' if email is the hardcoded admin email
             if (firebaseUser.email === 'jaiswalrajib98192@gmail.com' && userData.role !== 'admin') {
               userData.role = 'admin';
               await setDoc(userRef, { role: 'admin' }, { merge: true });
             }
-            
+
             // If explicit sign in OR no session ID in local storage, establish new session
             if (isExplicitSignIn || !currentSessionId) {
               currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
@@ -123,13 +123,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setIsLoading(false);
               return;
             }
-            
+
             setUser({ id: firebaseUser.uid, ...userData, session_id: currentSessionId } as User);
           } else {
             // Create default user doc if it doesn't exist
             currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2);
             localStorage.setItem(`session_${firebaseUser.uid}`, currentSessionId);
-            
+
             const newUser = {
               name: firebaseUser.displayName || 'User',
               email: firebaseUser.email || '',
@@ -152,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             unsubscribeSnapshotRef.current();
             unsubscribeSnapshotRef.current = null;
           }
-          
+
           unsubscribeSnapshotRef.current = onSnapshot(userRef, (snapshot) => {
             // Ignore optimistic local uncommitted writes
             if (snapshot.metadata.hasPendingWrites) return;
@@ -161,7 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               const data = snapshot.data();
               const latestSessionId = data.session_id;
               const mySessionId = localStorage.getItem(`session_${firebaseUser.uid}`);
-              
+
               if (latestSessionId && mySessionId && latestSessionId !== mySessionId) {
                 console.log('Logged out: Another device signed in.');
                 logout();

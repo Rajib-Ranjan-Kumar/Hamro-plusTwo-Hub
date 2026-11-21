@@ -471,7 +471,7 @@ export const VerifySubscriptions = () => {
                   </div>
                 </div>
 
-                <div className="glass-panel rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                <div className="bg-slate-900/85 rounded-3xl overflow-hidden border border-slate-700/60 shadow-xl backdrop-blur-xl">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-400 border-b border-slate-200 dark:border-slate-800">
@@ -547,39 +547,39 @@ export const VerifySubscriptions = () => {
             {activeTab === 'analytics' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="bg-slate-900/85 p-6 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl hover:border-amber-500/40 transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                      <div className="p-2.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-xl">
                         <CheckCircle className="w-5 h-5" />
                       </div>
-                      <h3 className="text-sm font-medium text-slate-500">Active Subs</h3>
+                      <h3 className="text-sm font-semibold text-slate-400">Active Subs</h3>
                     </div>
                     <p className="text-3xl font-bold text-white">{stats.approved}</p>
                   </div>
-                  <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="bg-slate-900/85 p-6 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl hover:border-amber-500/40 transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-lg">
+                      <div className="p-2.5 bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-xl">
                         <Clock className="w-5 h-5" />
                       </div>
-                      <h3 className="text-sm font-medium text-slate-500">Pending</h3>
+                      <h3 className="text-sm font-semibold text-slate-400">Pending</h3>
                     </div>
                     <p className="text-3xl font-bold text-white">{stats.pending}</p>
                   </div>
-                  <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="bg-slate-900/85 p-6 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl hover:border-amber-500/40 transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
+                      <div className="p-2.5 bg-blue-500/15 text-blue-400 border border-blue-500/30 rounded-xl">
                         <CreditCard className="w-5 h-5" />
                       </div>
-                      <h3 className="text-sm font-medium text-slate-500">Total Revenue</h3>
+                      <h3 className="text-sm font-semibold text-slate-400">Total Revenue</h3>
                     </div>
                     <p className="text-3xl font-bold text-white">₹{stats.revenue}</p>
                   </div>
-                  <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="bg-slate-900/85 p-6 rounded-3xl border border-slate-700/60 shadow-xl backdrop-blur-xl hover:border-amber-500/40 transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg">
+                      <div className="p-2.5 bg-rose-500/15 text-rose-400 border border-rose-500/30 rounded-xl">
                         <XCircle className="w-5 h-5" />
                       </div>
-                      <h3 className="text-sm font-medium text-slate-500">Rejected</h3>
+                      <h3 className="text-sm font-semibold text-slate-400">Rejected</h3>
                     </div>
                     <p className="text-3xl font-bold text-white">{stats.rejected}</p>
                   </div>

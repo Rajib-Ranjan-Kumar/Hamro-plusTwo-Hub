@@ -69,12 +69,12 @@ export const Syllabus = () => {
       {/* Class & Stream Selectors */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Class Selection */}
-        <div className="flex glass-panel p-1 rounded-xl w-full sm:w-auto min-w-[200px]">
+        <div className="flex bg-slate-900/85 border border-slate-700/60 p-1.5 rounded-2xl w-full sm:w-auto min-w-[200px] shadow-sm backdrop-blur-md">
           <button
             onClick={() => setYear('Class 11')}
-            className={`flex-1 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 py-2 px-4 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
               year === 'Class 11'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-amber-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -82,9 +82,9 @@ export const Syllabus = () => {
           </button>
           <button
             onClick={() => setYear('Class 12')}
-            className={`flex-1 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 py-2 px-4 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
               year === 'Class 12'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-amber-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -93,14 +93,14 @@ export const Syllabus = () => {
         </div>
 
         {/* Stream Selection */}
-        <div className="flex glass-panel p-1 rounded-xl w-full sm:w-auto">
+        <div className="flex bg-slate-900/85 border border-slate-700/60 p-1.5 rounded-2xl w-full sm:w-auto shadow-sm backdrop-blur-md">
           {['Science', 'Management', 'Humanities'].map(str => (
             <button
               key={str}
               onClick={() => setStream(str)}
-              className={`py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+              className={`py-2 px-4 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
                 stream === str
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-amber-500 text-slate-950 shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -124,14 +124,14 @@ export const Syllabus = () => {
                 <button
                   key={subject.id}
                   onClick={() => setActiveSubject(subject)}
-                  className={`shrink-0 text-left px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-2 cursor-pointer ${
+                  className={`shrink-0 text-left px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-between gap-2 cursor-pointer ${
                     activeSubject?.id === subject.id
-                      ? 'bg-emerald-600 text-white shadow-md ring-2 ring-emerald-600 ring-offset-2 dark:ring-offset-slate-900'
-                      : 'glass-panel text-slate-300 hover:bg-slate-700/50'
+                      ? 'bg-amber-500 text-slate-950 shadow-md'
+                      : 'bg-slate-950/70 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
                   }`}
                 >
                   <span className="truncate pr-1">{subject.name}</span>
-                  {activeSubject?.id === subject.id && <CheckCircle2 className="w-4 h-4 shrink-0" />}
+                  {activeSubject?.id === subject.id && <CheckCircle2 className="w-4 h-4 shrink-0 text-slate-950" />}
                 </button>
               ))
             )}
@@ -144,23 +144,23 @@ export const Syllabus = () => {
             {activeSubject ? (
             <>
               {/* Tabs */}
-              <div className="glass-panel rounded-2xl p-1 flex flex-wrap gap-1 max-w-fit mb-6 relative z-20 no-scrollbar overflow-x-hidden">
+              <div className="bg-slate-900/90 border border-slate-700/60 rounded-2xl p-1.5 flex flex-wrap gap-1.5 max-w-fit mb-6 relative z-20 no-scrollbar overflow-x-hidden shadow-sm backdrop-blur-md">
                 <button
                   onClick={() => setActiveTab('syllabus')}
-                  className={`px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-1.5 sm:gap-2 ${
+                  className={`px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                     activeTab === 'syllabus'
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-                      : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+                      ? 'bg-amber-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <BookOpen className="w-4 h-4" /> Syllabus
                 </button>
                 <button
                   onClick={() => setActiveTab('notes')}
-                  className={`px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-xl transition-all flex items-center gap-1.5 sm:gap-2 ${
+                  className={`px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                     activeTab === 'notes'
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-                      : 'text-slate-600 hover:text-white dark:text-slate-400 dark:hover:text-white'
+                      ? 'bg-amber-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <FileText className="w-4 h-4" /> Structured Notes
@@ -169,17 +169,17 @@ export const Syllabus = () => {
 
               <div className="relative">
                 {isLocked && (
-                  <div className="absolute inset-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-slate-700">
-                    <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-4">
-                      <Lock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+                  <div className="absolute inset-0 z-10 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center rounded-3xl border border-slate-700/80">
+                    <div className="w-16 h-16 bg-amber-500/15 border border-amber-500/30 rounded-2xl flex items-center justify-center mb-4 shadow-sm text-amber-400">
+                      <Lock className="w-8 h-8" />
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Premium Content Locked</h3>
-                    <p className="text-slate-600 dark:text-slate-300 max-w-md mb-6">
+                    <p className="text-slate-300 max-w-md mb-6 text-sm">
                       This content is only available for premium users. Upgrade your account to access syllabus, structured notes, and more.
                     </p>
                     <button 
                       onClick={() => navigate('/get-premium')}
-                      className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors shadow-sm hover-lift"
+                      className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer"
                     >
                       Get Premium Access
                     </button>
@@ -191,9 +191,9 @@ export const Syllabus = () => {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="glass-panel rounded-2xl overflow-hidden"
+                    className="rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl overflow-hidden"
                   >
-                <div className="p-6 border-b border-slate-700/50">
+                <div className="p-6 border-b border-slate-800">
                   <h2 className="text-xl font-bold text-white capitalize">
                     {activeSubject.name} - {activeTab}
                   </h2>
@@ -207,11 +207,11 @@ export const Syllabus = () => {
                 <div className="p-6">
                   {content.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                        {activeTab === 'syllabus' ? <BookOpen className="w-8 h-8 text-slate-400" /> : <FileText className="w-8 h-8 text-slate-400" />}
+                      <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-700 text-slate-400">
+                        {activeTab === 'syllabus' ? <BookOpen className="w-8 h-8" /> : <FileText className="w-8 h-8" />}
                       </div>
-                      <h3 className="text-lg font-medium text-white">No {activeTab} available yet</h3>
-                      <p className="text-slate-400 mt-1 max-w-sm mx-auto">
+                      <h3 className="text-lg font-bold text-white">No {activeTab} available yet</h3>
+                      <p className="text-slate-400 mt-1 max-w-sm mx-auto text-sm">
                         {user?.role === 'admin' ? `No ${activeTab} have been added yet.` : 'We are currently updating the materials for this subject. Check back soon or contribute your own!'}
                       </p>
                     </div>
@@ -222,22 +222,22 @@ export const Syllabus = () => {
                         const isItemLocked = isItemPremiumOnly ? !isPremiumSubscriber : !hasPremiumAccess;
 
                         return (
-                          <div key={item.id} className="p-4 rounded-xl border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group bg-slate-50/50 dark:bg-slate-800/50">
+                          <div key={item.id} className="p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-amber-500/40 transition-all group shadow-sm">
                             <div className="flex items-start sm:items-center gap-4">
-                              <div className="p-3 bg-white dark:bg-slate-700 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-slate-600">
+                              <div className="p-3 bg-amber-500/15 border border-amber-500/30 rounded-xl text-[#F5C21B] shadow-sm shrink-0">
                                 {activeTab === 'syllabus' ? <BookOpen className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
                               </div>
                               <div>
-                                <h3 className="font-bold text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-base">
+                                <h3 className="font-bold text-white group-hover:text-[#F5C21B] transition-colors text-base">
                                   {item.description}
                                 </h3>
-                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5">
                                   {isItemPremiumOnly && (
-                                    <span className="text-xs font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <span className="text-xs font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                       <Lock className="w-3 h-3 text-amber-400" /> Premium Only
                                     </span>
                                   )}
-                                  <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                     <CheckCircle2 className="w-3 h-3" /> Verified
                                   </span>
                                   <span className="text-xs text-slate-400">
@@ -275,12 +275,12 @@ export const Syllabus = () => {
           </div>
         </>
       ) : (
-            <div className="glass-panel rounded-2xl p-12 text-center flex flex-col items-center justify-center h-full min-h-[400px]">
-              <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-6">
-                <BookOpen className="w-10 h-10 text-emerald-500" />
+            <div className="rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-xl backdrop-blur-xl p-12 text-center flex flex-col items-center justify-center h-full min-h-[400px]">
+              <div className="w-20 h-20 bg-amber-500/15 border border-amber-500/30 rounded-2xl flex items-center justify-center mb-6 text-[#F5C21B] shadow-sm">
+                <BookOpen className="w-10 h-10" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Select a Subject</h2>
-              <p className="text-slate-400 max-w-md">
+              <p className="text-slate-400 max-w-md text-sm">
                 Choose a subject from the list on the left to view its updated syllabus and structured notes.
               </p>
             </div>

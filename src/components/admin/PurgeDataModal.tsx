@@ -73,8 +73,8 @@ export const PurgeDataModal: React.FC<PurgeDataModalProps> = ({ isOpen, onClose,
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-red-500/30 rounded-2xl shadow-2xl max-w-xl w-full p-6 text-white my-8 relative">
+    <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+      <div className="bg-slate-900/95 border border-red-500/40 rounded-3xl shadow-2xl backdrop-blur-xl max-w-xl w-full p-6 sm:p-8 text-white my-8 relative">
         {/* Close Button */}
         {!isPurging && (
           <button

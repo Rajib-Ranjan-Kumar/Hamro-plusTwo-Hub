@@ -11,13 +11,13 @@ export const NotFound: React.FC = () => {
         description="The page you are looking for does not exist or may have been moved."
       />
       
-      <div className="text-center max-w-lg w-full bg-slate-800/80 backdrop-blur-xl p-8 rounded-3xl border border-slate-700/80 shadow-2xl space-y-6">
-        <div className="w-16 h-16 bg-amber-400/10 border border-amber-400/25 text-[#F5C21B] rounded-2xl flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(245,194,27,0.15)]">
+      <div className="text-center max-w-lg w-full bg-slate-900/90 backdrop-blur-xl p-8 sm:p-10 rounded-3xl border border-slate-700/60 shadow-2xl space-y-6">
+        <div className="w-16 h-16 bg-amber-500/15 border border-amber-500/30 text-[#F5C21B] rounded-2xl flex items-center justify-center mx-auto shadow-sm">
           <Search className="w-8 h-8" />
         </div>
 
         <div className="space-y-2">
-          <span className="inline-block px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-xs font-semibold text-amber-300">
+          <span className="inline-block px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-xs font-semibold text-amber-300">
             Error 404
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -34,21 +34,21 @@ export const NotFound: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link 
             to="/" 
-            className="w-full sm:w-auto px-6 py-3 bg-[#F5C21B] hover:bg-[#e0b018] text-black font-semibold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             <Home className="w-4 h-4" />
             <span>Go to Homepage</span>
           </Link>
           <button 
             onClick={() => window.history.back()}
-            className="w-full sm:w-auto px-6 py-3 bg-slate-700/80 hover:bg-slate-700 text-white font-medium text-sm rounded-xl transition-all border border-slate-600 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-medium text-sm rounded-xl transition-all border border-slate-700 hover:border-slate-600 flex items-center justify-center gap-2 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Go Back</span>
           </button>
         </div>
 
-        <div className="pt-4 border-t border-slate-700/60 text-xs text-slate-400">
+        <div className="pt-4 border-t border-slate-800 text-xs text-slate-400">
           <span>Need help finding notes or syllabus? </span>
           <Link to="/contact" className="text-[#F5C21B] hover:underline font-medium">
             Contact us

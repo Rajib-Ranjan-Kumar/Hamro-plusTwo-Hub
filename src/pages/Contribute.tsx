@@ -204,71 +204,75 @@ export const Contribute = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 max-w-6xl mx-auto"
+      className="space-y-6 max-w-6xl mx-auto pb-12"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-slate-700/60 shadow-xl backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center gap-1.5">
+              <Upload className="w-3.5 h-3.5 text-purple-400" />
+              Contributor Program
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Contribute & Earn
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100 mt-1">Share your study materials and earn real money!</p>
+          <p className="text-xs sm:text-sm text-slate-400">Share your verified study materials, question papers & notes to earn real money directly.</p>
         </div>
-        <div className="bg-slate-800/20 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 flex flex-wrap items-center justify-between sm:justify-start gap-3 sm:gap-6 w-full sm:w-auto">
-          <div>
-            <p className="text-emerald-100 text-xs sm:text-sm font-medium">Available Balance</p>
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-300">NPR {user?.wallet_balance?.toFixed(2) || '0.00'}</p>
+        <div className="relative z-10 shrink-0 flex items-center gap-4 bg-slate-950/70 p-4 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+          <div className="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <DollarSign className="w-6 h-6" />
           </div>
-          {(user?.holding_balance || 0) > 0 && (
-            <div className="border-l border-white/20 pl-3 sm:pl-6">
-              <p className="text-emerald-100 text-xs sm:text-sm font-medium">On Hold</p>
-              <p className="text-lg sm:text-xl font-bold text-amber-300">NPR {user?.holding_balance?.toFixed(2)}</p>
-            </div>
-          )}
+          <div>
+            <p className="text-xs text-slate-400 font-medium">Available Balance</p>
+            <p className="text-xl sm:text-2xl font-bold text-white tracking-tight">NPR {user?.wallet_balance?.toFixed(2) || '0.00'}</p>
+            {(user?.holding_balance || 0) > 0 && (
+              <p className="text-[11px] text-amber-400 font-medium">On Hold: NPR {user?.holding_balance?.toFixed(2)}</p>
+            )}
+          </div>
           <button 
             onClick={() => setActiveTab('withdraw')}
-            className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-slate-900 text-emerald-400 font-bold rounded-lg shadow-sm hover:bg-slate-800 transition-colors hover-lift text-xs sm:text-sm ml-auto sm:ml-2"
+            className="ml-2 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-sm text-xs cursor-pointer transition-all"
           >
             Withdraw
           </button>
         </div>
       </div>
 
-      <div className="glass-panel rounded-2xl overflow-hidden">
-        <div className="border-b border-slate-700">
-          <nav className="flex -mb-px">
-            <button
-              onClick={() => { setActiveTab('submit'); setStatus({ type: null, message: '' }); }}
-              className={`w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm ${
-                activeTab === 'submit'
-                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300'
-              }`}
-            >
-              Submit Material
-            </button>
-            <button
-              onClick={() => { setActiveTab('withdraw'); setStatus({ type: null, message: '' }); }}
-              className={`w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm ${
-                activeTab === 'withdraw'
-                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300'
-              }`}
-            >
-              Withdrawals & History
-            </button>
-          </nav>
+      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/85 border border-slate-700/60 shadow-lg backdrop-blur-md space-y-6">
+        <div className="border-b border-slate-800 flex gap-4">
+          <button
+            onClick={() => { setActiveTab('submit'); setStatus({ type: null, message: '' }); }}
+            className={`pb-3 px-2 font-bold text-sm transition-all border-b-2 cursor-pointer ${
+              activeTab === 'submit'
+                ? 'border-amber-500 text-[#F5C21B]'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            Submit Material
+          </button>
+          <button
+            onClick={() => { setActiveTab('withdraw'); setStatus({ type: null, message: '' }); }}
+            className={`pb-3 px-2 font-bold text-sm transition-all border-b-2 cursor-pointer ${
+              activeTab === 'withdraw'
+                ? 'border-amber-500 text-[#F5C21B]'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            Withdrawals & History
+          </button>
         </div>
 
-        <div className="p-6">
+        <div>
           {status.type && (
-            <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 ${
+            <div className={`mb-6 p-4 rounded-2xl flex items-start gap-3 ${
               status.type === 'success' 
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' 
-                : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
             }`}>
               {status.type === 'success' ? <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" /> : <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />}
-              <p>{status.message}</p>
+              <p className="text-sm font-medium">{status.message}</p>
             </div>
           )}
 
@@ -475,16 +479,16 @@ export const Contribute = () => {
                   <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 disabled:opacity-70 hover-lift cursor-pointer"
+                    className="w-full py-3.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 shadow-sm hover:shadow-md cursor-pointer text-sm"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
                         Uploading {uploadProgress}%...
                       </span>
                     ) : (
                       <>
-                        <Upload className="w-5 h-5" />
+                        <Upload className="w-5 h-5 text-slate-950" />
                         Submit Contribution
                       </>
                     )}
@@ -492,29 +496,29 @@ export const Contribute = () => {
                 </form>
               </div>
 
-              <div className="glass-panel rounded-2xl p-6 h-fit">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <History className="w-5 h-5 text-emerald-500" />
+              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800 h-fit">
+                <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#F5C21B]" />
                   Recent Submissions
                 </h2>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {contributions.length === 0 ? (
-                    <p className="text-sm text-slate-400">No contributions yet. Start uploading to earn!</p>
+                    <p className="text-xs text-slate-400">No contributions yet. Start uploading to earn!</p>
                   ) : (
                     contributions.slice(0, 5).map((c: any) => (
-                      <div key={c.id} className="p-4 rounded-xl bg-slate-800 border border-slate-700 flex flex-col gap-2">
+                      <div key={c.id} className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-colors flex flex-col gap-2">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="font-medium text-white text-sm">{c.subject_name} ({c.type.toUpperCase()})</h3>
-                            <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
+                            <h3 className="font-semibold text-white text-xs">{c.subject_name} ({c.type.toUpperCase()})</h3>
+                            <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">
                               {c.description} {c.exam_year && `(${c.exam_year})`}
                             </p>
                           </div>
-                          <span className={`text-[10px] font-bold px-2 py-1 rounded-full shrink-0 ${
-                            c.status === 'verified' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
-                            c.status === 'rejected' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300' :
-                            'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                            c.status === 'verified' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
+                            c.status === 'rejected' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' :
+                            'bg-amber-500/15 text-amber-400 border border-amber-500/30'
                           }`}>
                             {c.status.toUpperCase()}
                           </span>
@@ -536,30 +540,30 @@ export const Contribute = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-1">
-                <div className="glass-panel rounded-2xl p-6">
-                  <h2 className="text-lg font-bold text-white mb-4">Request Withdrawal</h2>
+                <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+                  <h2 className="text-base font-bold text-white mb-4">Request Withdrawal</h2>
                   
                   <form onSubmit={handleWithdrawalSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">Amount (NPR)</label>
+                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Amount (NPR)</label>
                       <input 
                         type="number"
                         required
                         min="100"
                         max={user?.wallet_balance || 0}
                         placeholder="Min. 100"
-                        className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                        className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all"
                         value={withdrawData.amount}
                         onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
                       />
-                      <p className="text-xs text-slate-500 mt-1">Available: NPR {user?.wallet_balance?.toFixed(2) || '0.00'}</p>
+                      <p className="text-xs text-slate-400 mt-1">Available: NPR {user?.wallet_balance?.toFixed(2) || '0.00'}</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">Payment Method</label>
+                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Payment Method</label>
                       <select 
                         required
-                        className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                        className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all cursor-pointer"
                         value={withdrawData.payment_method}
                         onChange={(e) => setWithdrawData({...withdrawData, payment_method: e.target.value})}
                       >
@@ -570,7 +574,7 @@ export const Contribute = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1">Payment Details</label>
+                      <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Payment Details</label>
                       <textarea 
                         required
                         rows={3}
@@ -579,7 +583,7 @@ export const Contribute = () => {
                             ? "Bank Name, Account Name, Account Number" 
                             : "eSewa/Khalti ID (Mobile Number)"
                         }
-                        className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                        className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-white outline-none text-sm transition-all placeholder-slate-500"
                         value={withdrawData.payment_details}
                         onChange={(e) => setWithdrawData({...withdrawData, payment_details: e.target.value})}
                       />
@@ -588,7 +592,7 @@ export const Contribute = () => {
                     <button 
                       type="submit"
                       disabled={isSubmitting || !user || user.wallet_balance < 100}
-                      className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full transition-colors disabled:opacity-70 disabled:cursor-not-allowed hover-lift"
+                      className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md cursor-pointer text-sm"
                     >
                       {isSubmitting ? 'Processing...' : 'Request Payout'}
                     </button>
@@ -597,23 +601,23 @@ export const Contribute = () => {
               </div>
 
               <div className="lg:col-span-2">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <History className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#F5C21B]" />
                   Withdrawal History
                 </h2>
                 
-                <div className="glass-panel rounded-xl overflow-hidden">
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/60 overflow-hidden shadow-sm">
                   {withdrawals.length === 0 ? (
-                    <div className="p-8 text-center text-slate-400">
+                    <div className="p-8 text-center text-slate-400 text-sm">
                       No withdrawal requests yet.
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
-                        <thead className="bg-emerald-50 dark:bg-emerald-900/20 text-slate-400">
+                        <thead className="bg-slate-900/90 border-b border-slate-800 text-slate-400 text-xs uppercase font-semibold">
                           <tr>
-                            <th className="px-4 py-3 font-medium">Date</th>
-                            <th className="px-4 py-3 font-medium">Amount</th>
+                            <th className="px-4 py-3">Date</th>
+                            <th className="px-4 py-3">Amount</th>
                             <th className="px-4 py-3 font-medium">Method</th>
                             <th className="px-4 py-3 font-medium">Status</th>
                             <th className="px-4 py-3 font-medium">Notes</th>
