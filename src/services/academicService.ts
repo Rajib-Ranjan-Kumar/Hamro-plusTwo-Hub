@@ -27,7 +27,7 @@ import {
 // ============================================================================
 
 export type ItemStatus = 'active' | 'archived';
-export type ResourceStatus = 'published' | 'draft' | 'archived';
+export type ResourceStatus = 'published' | 'premium_only' | 'draft' | 'archived';
 
 export interface College {
   id: string;
@@ -942,6 +942,9 @@ export const uploadEducationalResource = async (
                      (resourceData.resource_type === 'syllabus' ? 'Syllabus' : 'PYQ'));
 
   // 3a. Save to academic_resources (new dynamic hierarchy collection)
+  const isPremiumOnly = resourceData.status === 'premium_only';
+  const computedAccessLevel = isPremiumOnly ? 'premium' : (resourceData.access_level || 'free');
+
   try {
     const docRef = await addDoc(collection(db, 'academic_resources'), {
       title: resourceData.title.trim(),
@@ -968,7 +971,7 @@ export const uploadEducationalResource = async (
       linked_question_paper_id: resourceData.linked_question_paper_id || null,
       linked_question_paper_title: resourceData.linked_question_paper_title || '',
       status: resourceData.status || 'published',
-      access_level: resourceData.access_level || 'free',
+      access_level: computedAccessLevel,
       user_id: currentUid,
       user_name: currentName,
       user_email: currentEmail,
@@ -1007,8 +1010,8 @@ export const uploadEducationalResource = async (
       cloudinary_secure_url: uploadResult.secure_url,
       cloudinary_public_id: uploadResult.public_id,
       solution_url: resourceData.resource_type === 'solution' ? uploadResult.secure_url : null,
-      access_level: resourceData.access_level || 'free',
-      status: 'verified',
+      access_level: computedAccessLevel,
+      status: resourceData.status === 'premium_only' ? 'premium_only' : 'verified',
       solution_status: 'verified',
       upvotes: 0,
       rating: 0,

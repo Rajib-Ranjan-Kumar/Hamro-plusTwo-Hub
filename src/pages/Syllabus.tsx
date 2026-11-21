@@ -6,7 +6,7 @@ import { getSubjects, getContentTypes, getContent, getGlobalSettings } from '../
 import { motion } from 'motion/react';
 
 export const Syllabus = () => {
-  const { user, hasPremiumAccess } = useAuth();
+  const { user, hasPremiumAccess, isPremiumSubscriber } = useAuth();
   const navigate = useNavigate();
 
   const [year, setYear] = useState(user?.year || 'Class 11');
@@ -217,36 +217,56 @@ export const Syllabus = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {content.map(item => (
-                        <div key={item.id} className="p-4 rounded-xl border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group bg-slate-50/50 dark:bg-slate-800/50">
-                          <div className="flex items-start sm:items-center gap-4">
-                            <div className="p-3 bg-white dark:bg-slate-700 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-slate-600">
-                              {activeTab === 'syllabus' ? <BookOpen className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-base">
-                                {item.description}
-                              </h3>
-                              <div className="flex items-center gap-3 mt-1">
-                                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                  <CheckCircle2 className="w-3 h-3" /> Verified
-                                </span>
-                                <span className="text-xs text-slate-400">
-                                  Added {item.created_at?.toDate ? item.created_at.toDate().toLocaleDateString() : (item.created_at?.seconds ? new Date(item.created_at.seconds * 1000).toLocaleDateString() : new Date(item.created_at || Date.now()).toLocaleDateString())}
-                                </span>
+                      {content.map(item => {
+                        const isItemPremiumOnly = item.status === 'premium_only' || item.access_level === 'premium';
+                        const isItemLocked = isItemPremiumOnly ? !isPremiumSubscriber : !hasPremiumAccess;
+
+                        return (
+                          <div key={item.id} className="p-4 rounded-xl border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group bg-slate-50/50 dark:bg-slate-800/50">
+                            <div className="flex items-start sm:items-center gap-4">
+                              <div className="p-3 bg-white dark:bg-slate-700 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-slate-600">
+                                {activeTab === 'syllabus' ? <BookOpen className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
+                              </div>
+                              <div>
+                                <h3 className="font-bold text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-base">
+                                  {item.description}
+                                </h3>
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
+                                  {isItemPremiumOnly && (
+                                    <span className="text-xs font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                      <Lock className="w-3 h-3 text-amber-400" /> Premium Only
+                                    </span>
+                                  )}
+                                  <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" /> Verified
+                                  </span>
+                                  <span className="text-xs text-slate-400">
+                                    Added {item.created_at?.toDate ? item.created_at.toDate().toLocaleDateString() : (item.created_at?.seconds ? new Date(item.created_at.seconds * 1000).toLocaleDateString() : new Date(item.created_at || Date.now()).toLocaleDateString())}
+                                  </span>
+                                </div>
                               </div>
                             </div>
+                            
+                            {isItemLocked ? (
+                              <button 
+                                onClick={() => navigate('/get-premium')}
+                                className="w-full sm:w-auto px-5 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+                              >
+                                <Lock className="w-4 h-4 text-amber-400" />
+                                Unlock with Premium
+                              </button>
+                            ) : (
+                              <button 
+                                onClick={() => openViewer(item.file_url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', item.description || item.title, false, item.id)}
+                                className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md cursor-pointer"
+                              >
+                                <FileText className="w-4 h-4" />
+                                View Document (View Only)
+                              </button>
+                            )}
                           </div>
-                          
-                          <button 
-                            onClick={() => openViewer(item.file_url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', item.description || item.title, false, item.id)}
-                            className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md cursor-pointer"
-                          >
-                            <FileText className="w-4 h-4" />
-                            View Document (View Only)
-                          </button>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

@@ -31,6 +31,7 @@ interface AuthContextType {
   isLoading: boolean;
   premiumOnlyMode: boolean;
   hasPremiumAccess: boolean;
+  isPremiumSubscriber: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -222,31 +223,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(newUser);
   };
 
+  // Check if current user is an active paying premium subscriber (or admin)
+  const isPremiumSubscriber = Boolean(
+    user && (
+      user.role === 'admin' ||
+      user.is_premium ||
+      (user.subscription_expiry_date && (() => {
+        try {
+          const expiryDate = new Date(user.subscription_expiry_date);
+          const graceEnd = new Date(expiryDate);
+          graceEnd.setDate(graceEnd.getDate() + 3);
+          return new Date() <= graceEnd;
+        } catch {
+          return false;
+        }
+      })())
+    )
+  );
+
   // Compute hasPremiumAccess dynamically:
-  // When premiumOnlyMode === false, bypass is active for all users.
-  // When premiumOnlyMode === true, strict enforcement applies.
-  const hasPremiumAccess = (() => {
-    if (!premiumOnlyMode) return true; // Global Bypass
-    if (!user) return false;
-    if (user.role === 'admin') return true;
-    if (user.is_premium) return true;
-
-    if (user.subscription_expiry_date) {
-      try {
-        const expiryDate = new Date(user.subscription_expiry_date);
-        const graceEnd = new Date(expiryDate);
-        graceEnd.setDate(graceEnd.getDate() + 3);
-        if (new Date() <= graceEnd) return true;
-      } catch {
-        // Ignore invalid dates
-      }
-    }
-
-    return false;
-  })();
+  // When premiumOnlyMode === false, bypass is active for standard library resources.
+  // When premiumOnlyMode === true, strict premium subscription is required across all folders.
+  const hasPremiumAccess = !premiumOnlyMode || isPremiumSubscriber;
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, fetchUser, isLoading, premiumOnlyMode, hasPremiumAccess }}>
+    <AuthContext.Provider value={{ user, token, login, logout, fetchUser, isLoading, premiumOnlyMode, hasPremiumAccess, isPremiumSubscriber }}>
       {children}
     </AuthContext.Provider>
   );

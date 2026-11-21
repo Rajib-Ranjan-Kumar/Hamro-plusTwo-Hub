@@ -122,6 +122,7 @@ export default async function handler(req: any, res: any) {
     }
 
     let targetPdfUrl = '';
+    let isDocPremiumOnly = false;
 
     // If document ID is provided, securely resolve its storage URL via Firestore REST API
     if (id && typeof id === 'string') {
@@ -151,6 +152,12 @@ export default async function handler(req: any, res: any) {
           fields.file_url?.stringValue ||
           fields.solution_url?.stringValue ||
           '';
+
+        const docStatus = fields.status?.stringValue || '';
+        const docAccess = fields.access_level?.stringValue || '';
+        if (docStatus === 'premium_only' || docAccess === 'premium') {
+          isDocPremiumOnly = true;
+        }
       }
     }
 
@@ -161,6 +168,71 @@ export default async function handler(req: any, res: any) {
 
     if (!targetPdfUrl) {
       return res.status(404).json({ error: 'Requested document not found or lacks a valid PDF file reference.' });
+    }
+
+    // Enforce Premium Access Policy on the Backend
+    if (authCheck.role !== 'admin') {
+      const projectId = process.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId;
+      const firestoreDbId = firebaseConfig.firestoreDatabaseId || '(default)';
+      const token = (authHeader as string).substring(7).trim();
+
+      // Check platform Global Premium mode (settings/global_settings)
+      let isGlobalPremiumOn = true;
+      try {
+        const settingsRes = await fetch(
+          `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${firestoreDbId}/documents/settings/global_settings`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (settingsRes.ok) {
+          const settingsData = await settingsRes.json();
+          if (settingsData.fields?.premium_only_mode?.booleanValue !== undefined) {
+            isGlobalPremiumOn = settingsData.fields.premium_only_mode.booleanValue;
+          }
+        }
+      } catch {
+        // Defaults to true on error
+      }
+
+      // Check if student has active premium status in users/${authCheck.uid}
+      let userHasActivePremium = false;
+      try {
+        const userDocRes = await fetch(
+          `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${firestoreDbId}/documents/users/${authCheck.uid}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (userDocRes.ok) {
+          const userDocData = await userDocRes.json();
+          const uFields = userDocData.fields || {};
+          const isPrem = uFields.is_premium?.booleanValue === true;
+          const subExpiry = uFields.subscription_expiry_date?.stringValue;
+          if (isPrem) {
+            userHasActivePremium = true;
+          } else if (subExpiry) {
+            const exp = new Date(subExpiry).getTime();
+            if (Date.now() <= exp + 3 * 86400000) {
+              userHasActivePremium = true;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Could not check user premium status:", err);
+      }
+
+      // Rule 1: If document is specifically marked 'Visible to Premium Students Only', student MUST have premium
+      if (isDocPremiumOnly && !userHasActivePremium) {
+        return res.status(403).json({
+          error: "Premium Required: This resource is designated for Premium Students Only. Please upgrade your subscription to access."
+        });
+      }
+
+      // Rule 2: When Premium is ON (Global Premium Mode), only premium users can view materials
+      if (isGlobalPremiumOn && !userHasActivePremium) {
+        return res.status(403).json({
+          error: "Premium Required: Premium Mode is active. Upgrade to access full study materials."
+        });
+      }
+
+      // Rule 3: When Premium is OFF (Global Bypass), every registered student can view!
     }
 
     // SSRF Protection: restrict target origin to authorized Cloudinary or Firebase Storage domains

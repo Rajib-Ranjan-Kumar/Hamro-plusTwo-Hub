@@ -8,7 +8,7 @@ import { ThumbsDown } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export const PYQ = () => {
-  const { user, hasPremiumAccess } = useAuth();
+  const { user, hasPremiumAccess, isPremiumSubscriber } = useAuth();
   const navigate = useNavigate();
 
   const [confirmModal, setConfirmModal] = useState<{isOpen: boolean, title: string, message: string, onConfirm: () => void}>({
@@ -368,12 +368,37 @@ export const PYQ = () => {
                       <h4 className="font-semibold text-slate-300 mb-2 flex items-center gap-2">
                         <FileText className="w-4 h-4" /> Question Paper
                       </h4>
-                      <button 
-                        onClick={() => openViewer(selectedPyq.file_url, `${selectedPyq.description} - Question Paper`, false, selectedPyq.id)}
-                        className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
-                      >
-                        <FileText className="w-4 h-4" /> View Question Paper (View Only)
-                      </button>
+                      {(selectedPyq.status === 'premium_only' || selectedPyq.access_level === 'premium') ? (
+                        !isPremiumSubscriber ? (
+                          <button 
+                            onClick={() => navigate('/get-premium')}
+                            className="w-full sm:w-auto px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                          >
+                            <Lock className="w-4 h-4 text-amber-400" /> Unlock with Premium
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => openViewer(selectedPyq.file_url, `${selectedPyq.description} - Question Paper`, false, selectedPyq.id)}
+                            className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                          >
+                            <FileText className="w-4 h-4" /> View Question Paper (View Only)
+                          </button>
+                        )
+                      ) : !hasPremiumAccess ? (
+                        <button 
+                          onClick={() => navigate('/get-premium')}
+                          className="w-full sm:w-auto px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                        >
+                          <Lock className="w-4 h-4 text-amber-400" /> Unlock with Premium
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => openViewer(selectedPyq.file_url, `${selectedPyq.description} - Question Paper`, false, selectedPyq.id)}
+                          className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                        >
+                          <FileText className="w-4 h-4" /> View Question Paper (View Only)
+                        </button>
+                      )}
                     </div>
                     
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-slate-700">
@@ -387,12 +412,37 @@ export const PYQ = () => {
                         )}
                       </h4>
                       {selectedPyq.solution_url ? (
-                        <button 
-                          onClick={() => openViewer(selectedPyq.solution_url, `${selectedPyq.description} - Solution`, false, selectedPyq.id)}
-                          className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
-                        >
-                          <FileText className="w-4 h-4" /> View Solution (View Only)
-                        </button>
+                        (selectedPyq.status === 'premium_only' || selectedPyq.access_level === 'premium') ? (
+                          !isPremiumSubscriber ? (
+                            <button 
+                              onClick={() => navigate('/get-premium')}
+                              className="w-full sm:w-auto px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                            >
+                              <Lock className="w-4 h-4 text-amber-400" /> Unlock Solution with Premium
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => openViewer(selectedPyq.solution_url, `${selectedPyq.description} - Solution`, false, selectedPyq.id)}
+                              className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                            >
+                              <FileText className="w-4 h-4" /> View Solution (View Only)
+                            </button>
+                          )
+                        ) : !hasPremiumAccess ? (
+                          <button 
+                            onClick={() => navigate('/get-premium')}
+                            className="w-full sm:w-auto px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                          >
+                            <Lock className="w-4 h-4 text-amber-400" /> Unlock Solution with Premium
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => openViewer(selectedPyq.solution_url, `${selectedPyq.description} - Solution`, false, selectedPyq.id)}
+                            className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                          >
+                            <FileText className="w-4 h-4" /> View Solution (View Only)
+                          </button>
+                        )
                       ) : (
                         <p className="text-sm text-slate-500">No solution provided yet.</p>
                       )}
@@ -499,6 +549,11 @@ export const PYQ = () => {
                           {item.description}
                         </h3>
                         <div className="flex flex-wrap items-center gap-2 mt-2">
+                          {(item.status === 'premium_only' || item.access_level === 'premium') && (
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center gap-1">
+                              <Lock className="w-3 h-3 text-amber-400" /> Premium Only
+                            </span>
+                          )}
                           {item.term && <span className="text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">{item.term}</span>}
                           {item.exam_year && <span className="text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">{item.exam_year}</span>}
                           {!item.solution_url ? (

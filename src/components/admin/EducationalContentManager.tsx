@@ -542,8 +542,9 @@ export const EducationalContentManager: React.FC = () => {
               className="w-full px-2.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#F4B400]"
             >
               <option value="all">All Statuses</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
+              <option value="published">Published (All Students)</option>
+              <option value="premium_only">Visible to Premium Students Only</option>
+              <option value="draft">Draft (Admin Only)</option>
               <option value="archived">Archived</option>
             </select>
           </div>
@@ -633,15 +634,17 @@ export const EducationalContentManager: React.FC = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${
                             res.status === 'published'
                               ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-800/40'
+                              : res.status === 'premium_only'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                               : res.status === 'archived'
-                              ? 'bg-amber-900/30 text-amber-400 border border-amber-800/40'
+                              ? 'bg-rose-900/30 text-rose-400 border border-rose-800/40'
                               : 'bg-slate-800 text-slate-400 border border-slate-700'
                           }`}
                         >
-                          {res.status}
+                          {res.status === 'premium_only' ? 'Premium Only' : res.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -1026,7 +1029,8 @@ export const EducationalContentManager: React.FC = () => {
                     onChange={e => setWizardStatus(e.target.value as any)}
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#F4B400]/50"
                   >
-                    <option value="published">Published (Visible to students)</option>
+                    <option value="published">Published (Visible to all students)</option>
+                    <option value="premium_only">Visible to Premium Students Only</option>
                     <option value="draft">Draft (Admin only)</option>
                     <option value="archived">Archived</option>
                   </select>
@@ -1125,8 +1129,9 @@ export const EducationalContentManager: React.FC = () => {
                     onChange={e => setEditingItem({ ...editingItem, status: e.target.value as any })}
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#F4B400]/50"
                   >
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
+                    <option value="published">Published (Visible to all students)</option>
+                    <option value="premium_only">Visible to Premium Students Only</option>
+                    <option value="draft">Draft (Admin only)</option>
                     <option value="archived">Archived</option>
                   </select>
                 </div>

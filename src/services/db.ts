@@ -398,7 +398,7 @@ export const getContent = async (type: string, subjectId?: string, year?: string
 
         if (!matchesType) return;
 
-        if (!includePending && data.status && data.status !== 'published' && data.status !== 'verified') {
+        if (!includePending && data.status && data.status !== 'published' && data.status !== 'verified' && data.status !== 'premium_only') {
           return;
         }
 
@@ -430,7 +430,7 @@ export const getContent = async (type: string, subjectId?: string, year?: string
           rating_count: data.rating_count || 0,
           solution_status: data.solution_status || 'verified',
           status: data.status || 'verified',
-          access_level: data.access_level || 'free',
+          access_level: data.status === 'premium_only' ? 'premium' : (data.access_level || 'free'),
           created_at: data.created_at,
           updated_at: data.updated_at
         });
@@ -455,7 +455,7 @@ export const getContent = async (type: string, subjectId?: string, year?: string
 
         if (!matchesType) return;
 
-        if (!includePending && data.status && data.status !== 'verified' && data.status !== 'published') {
+        if (!includePending && data.status && data.status !== 'verified' && data.status !== 'published' && data.status !== 'premium_only') {
           return;
         }
 
@@ -487,7 +487,7 @@ export const getContent = async (type: string, subjectId?: string, year?: string
           rating_count: data.rating_count || 0,
           solution_status: data.solution_status || 'verified',
           status: data.status || 'verified',
-          access_level: data.access_level || 'free',
+          access_level: data.status === 'premium_only' ? 'premium' : (data.access_level || 'free'),
           created_at: data.created_at,
           updated_at: data.updated_at
         });
