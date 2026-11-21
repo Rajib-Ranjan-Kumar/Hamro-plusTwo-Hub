@@ -184,11 +184,12 @@ export const Dashboard = () => {
   }, [user]);
 
   const handleOpenDoc = (item: RecentItem) => {
-    if (item.file_url) {
-      window.open(
-        `/viewer?url=${encodeURIComponent(item.file_url)}&title=${encodeURIComponent(item.title)}&download=true`,
-        '_blank'
-      );
+    if (item.file_url || item.id) {
+      const params = new URLSearchParams();
+      if (item.id) params.set('id', item.id);
+      if (item.file_url) params.set('url', item.file_url);
+      params.set('title', item.title);
+      window.open(`/viewer?${params.toString()}`, '_blank');
     } else {
       navigate('/syllabus');
     }

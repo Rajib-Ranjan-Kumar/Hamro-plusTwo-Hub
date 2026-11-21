@@ -40,8 +40,13 @@ export const Syllabus = () => {
     getContent(activeTab, activeSubject?.id || activeSubject?.name || undefined, year, undefined, undefined, fetchCollegeId).then(data => setContent(data));
   }, [activeSubject, activeTab, user?.college_id, year]);
 
-  const openViewer = (url: string, title: string, allowDownload: boolean = false) => {
-    window.open(`/viewer?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}${allowDownload ? '&download=true' : ''}`, '_blank');
+  const openViewer = (url: string, title: string, allowDownload: boolean = false, id?: string) => {
+    const params = new URLSearchParams();
+    if (id) params.set('id', id);
+    if (url) params.set('url', url);
+    params.set('title', title);
+    if (allowDownload) params.set('download', 'true');
+    window.open(`/viewer?${params.toString()}`, '_blank');
   };
 
   return (
@@ -233,25 +238,13 @@ export const Syllabus = () => {
                             </div>
                           </div>
                           
-                          {item.access_level === 'secure' ? (
-                            <button 
-                              onClick={() => openViewer(item.file_url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', item.description)}
-                              className="w-full sm:w-auto px-5 py-2.5 bg-slate-900 text-white dark:bg-slate-800 dark:text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-100 dark:hover:text-slate-900 transition-all shadow-sm hover:shadow-md"
-                            >
-                              <Lock className="w-4 h-4" />
-                              Secure View
-                            </button>
-                          ) : (
-                            <a 
-                              href={`/viewer?url=${encodeURIComponent(item.file_url)}&title=${encodeURIComponent(item.description)}&download=true`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all shadow-sm hover:shadow-md"
-                            >
-                              <FileText className="w-4 h-4" />
-                              View
-                            </a>
-                          )}
+                          <button 
+                            onClick={() => openViewer(item.file_url || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', item.description || item.title, false, item.id)}
+                            className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md cursor-pointer"
+                          >
+                            <FileText className="w-4 h-4" />
+                            View Document (View Only)
+                          </button>
                         </div>
                       ))}
                     </div>

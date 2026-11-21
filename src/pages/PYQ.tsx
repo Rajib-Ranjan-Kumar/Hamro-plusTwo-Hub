@@ -40,8 +40,13 @@ export const PYQ = () => {
   const [reportReason, setReportReason] = useState('');
   const [reportingId, setReportingId] = useState<string | null>(null);
 
-  const openViewer = (url: string, title: string, allowDownload: boolean = false) => {
-    window.open(`/viewer?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}${allowDownload ? '&download=true' : ''}`, '_blank');
+  const openViewer = (url: string, title: string, allowDownload: boolean = false, id?: string) => {
+    const params = new URLSearchParams();
+    if (id) params.set('id', id);
+    if (url) params.set('url', url);
+    params.set('title', title);
+    if (allowDownload) params.set('download', 'true');
+    window.open(`/viewer?${params.toString()}`, '_blank');
   };
 
   // Fetch colleges list
@@ -363,18 +368,12 @@ export const PYQ = () => {
                       <h4 className="font-semibold text-slate-300 mb-2 flex items-center gap-2">
                         <FileText className="w-4 h-4" /> Question Paper
                       </h4>
-                      {selectedPyq.access_level === 'secure' ? (
-                        <button 
-                          onClick={() => openViewer(selectedPyq.file_url, `${selectedPyq.description} - Question Paper`, false)}
-                          className="text-emerald-600 hover:underline text-sm text-left flex items-center gap-1"
-                        >
-                          <Lock className="w-3 h-3" /> View Secure PDF
-                        </button>
-                      ) : (
-                        <a href={`/viewer?url=${encodeURIComponent(selectedPyq.file_url)}&title=${encodeURIComponent(selectedPyq.description + ' - Question Paper')}&download=true`} target="_blank" rel="noreferrer" className="text-emerald-600 hover:underline text-sm flex items-center gap-1">
-                          <FileText className="w-3 h-3" /> View Question Paper
-                        </a>
-                      )}
+                      <button 
+                        onClick={() => openViewer(selectedPyq.file_url, `${selectedPyq.description} - Question Paper`, false, selectedPyq.id)}
+                        className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                      >
+                        <FileText className="w-4 h-4" /> View Question Paper (View Only)
+                      </button>
                     </div>
                     
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-slate-700">
@@ -388,18 +387,12 @@ export const PYQ = () => {
                         )}
                       </h4>
                       {selectedPyq.solution_url ? (
-                        selectedPyq.access_level === 'secure' ? (
-                          <button 
-                            onClick={() => openViewer(selectedPyq.solution_url, `${selectedPyq.description} - Solution`, false)}
-                            className="text-emerald-600 hover:underline text-sm text-left flex items-center gap-1"
-                          >
-                            <Lock className="w-3 h-3" /> View Secure PDF
-                          </button>
-                        ) : (
-                          <a href={`/viewer?url=${encodeURIComponent(selectedPyq.solution_url)}&title=${encodeURIComponent(selectedPyq.description + ' - Solution')}&download=true`} target="_blank" rel="noreferrer" className="text-emerald-600 hover:underline text-sm flex items-center gap-1">
-                            <FileText className="w-3 h-3" /> View Solution
-                          </a>
-                        )
+                        <button 
+                          onClick={() => openViewer(selectedPyq.solution_url, `${selectedPyq.description} - Solution`, false, selectedPyq.id)}
+                          className="w-full sm:w-auto px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                        >
+                          <FileText className="w-4 h-4" /> View Solution (View Only)
+                        </button>
                       ) : (
                         <p className="text-sm text-slate-500">No solution provided yet.</p>
                       )}
